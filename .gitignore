@@ -1,0 +1,15 @@
+# Folder
+App/bin/
+Core/bin/
+DB/bin/
+Model/bin/
+ViewModel/bin/
+
+App/obj/
+Core/obj/
+DB/obj/
+Model/obj/
+ViewModel/obj/
+
+# dotenv environment variables file
+.env
