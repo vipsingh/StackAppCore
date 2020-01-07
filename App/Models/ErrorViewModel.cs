@@ -1,6 +1,6 @@
 using System;
 
-namespace App.Models
+namespace StackErp.App.Models
 {
     public class ErrorViewModel
     {

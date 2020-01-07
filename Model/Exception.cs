@@ -1,30 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-namespace Model
+namespace StackErp.Model
 {
-    public class EntityException: Exception 
-    {
-        public EntityException(): base() {
-
-        }
-
-        public EntityException(string message): base(message) {
-
-        }
-    }
-
-    public class AuthException: Exception 
-    {
-        public AuthException(): base() {
-
-        }
-
-        public AuthException(string message): base(message) {
-            
-        }
-    }
-
     public class AppException: Exception 
     {
         public AppException(): base() {
@@ -35,5 +13,27 @@ namespace Model
             
         }
     }
+    public class EntityException: AppException 
+    {
+        public EntityException(): base() {
+
+        }
+
+        public EntityException(string message): base(message) {
+
+        }
+    }
+
+    public class AuthException: AppException 
+    {
+        public AuthException(): base() {
+
+        }
+
+        public AuthException(string message): base(message) {
+            
+        }
+    }
+
 }
    

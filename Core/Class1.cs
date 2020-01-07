@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core
+namespace StackErp.Core
 {
     public class Class1
     {

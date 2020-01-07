@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ViewModel
+namespace StackErp.ViewModel
 {
     public class Class1
     {

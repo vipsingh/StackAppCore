@@ -1,3 +1,7 @@
+using System;
+
+namespace StackErp.Model
+{
 public class AnyStatus {
     public string Message {set;get;}
     public int Code {set;get;}
@@ -17,4 +21,5 @@ public class AnyStatus {
     public static AnyStatus PermissionDenied => new AnyStatus(11);
     public static AnyStatus InvalidPostData => new AnyStatus(20);
     public static AnyStatus InvalidUrl => new AnyStatus(30);
+}
 }

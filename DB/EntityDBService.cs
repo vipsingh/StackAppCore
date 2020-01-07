@@ -1,0 +1,40 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using StackErp.Model;
+using StackErp.Model.Entity;
+
+namespace StackErp.DB
+{
+    public static partial class EntityDBService
+    {
+
+        public static List<DynamicObj> GetEntities()
+        {
+            var entities = DBService.Query("select * from entitymaster");
+            return entities.ToList();
+        }
+        public static IEnumerable<DynamicObj> GetEntitySchemas()
+        {
+            var entitiesSchemas = DBService.Query("select * from entityschema");
+            return entitiesSchemas;
+        }
+
+        public static int GetNextEntityDBId(string entityDbName)
+        {
+            var currId = DBService.Single("select max(MaxID) as a from AUTOID where EntityName=@EntityName", new { EntityName = entityDbName });
+            var cid = currId.Get("a", -1);
+            if (cid == -1)
+            {
+                DBService.Execute("INSERT INTO AUTOID VALUES(@Name,@Id)", new { Name = entityDbName, Id = 1 });
+                return 1;
+            }
+            else
+            {
+                DBService.Execute("UPDATE AUTOID SET MaxID=@Id WHERE EntityName=@Name", new { Name = entityDbName, Id = cid + 1 });
+                return cid + 1;
+            }
+        }
+    }
+}

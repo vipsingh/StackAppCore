@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "App", "App\App.csproj", "{3750C2C0-145D-4F69-898F-0131C5EFFC55}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackErp.App", "App\StackErp.App.csproj", "{3750C2C0-145D-4F69-898F-0131C5EFFC55}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{4FF581BA-C799-4BBB-AF3E-85891CC48935}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackErp.Core", "Core\StackErp.Core.csproj", "{4FF581BA-C799-4BBB-AF3E-85891CC48935}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB", "DB\DB.csproj", "{FB08C1A0-E49A-4AD8-B28B-28A9B41CDDB1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackErp.DB", "DB\StackErp.DB.csproj", "{FB08C1A0-E49A-4AD8-B28B-28A9B41CDDB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{ABF2D826-0C6F-4782-B1E6-F20EB2F60123}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackErp.Model", "Model\StackErp.Model.csproj", "{ABF2D826-0C6F-4782-B1E6-F20EB2F60123}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModel", "ViewModel\ViewModel.csproj", "{A854F773-7A22-45C0-9E4C-88D674F526DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StackErp.ViewModel", "ViewModel\StackErp.ViewModel.csproj", "{A854F773-7A22-45C0-9E4C-88D674F526DC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

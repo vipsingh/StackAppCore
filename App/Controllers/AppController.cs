@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace App.Controllers
+namespace StackErp.App.Controllers
 {
     public class AppController : BaseController
     {
+        public AppController(ILogger<AppController> logger): base(logger)
+        {
 
+        }
     }
 }

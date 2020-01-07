@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using App.Models;
+using StackErp.App.Models;
 
-namespace App.Controllers
+namespace StackErp.App.Controllers
 {
     public class HomeController : Controller
     {
@@ -20,7 +20,7 @@ namespace App.Controllers
 
         public IActionResult Index()
         {
-            var d = DB.EntityMetaData.Get("UserMaster").GetSingle(1);
+            var d = StackErp.Core.EntityMetaData.Get("UserMaster").GetSingle(1);
             return View();
         }
 

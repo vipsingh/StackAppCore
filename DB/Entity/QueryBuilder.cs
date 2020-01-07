@@ -1,0 +1,121 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using StackErp.Model;
+using StackErp.Model.DataList;
+using StackErp.Model.Entity;
+
+namespace StackErp.DB
+{
+    public class EntityQueryBuilder
+    {
+        IDBEntity _Entity;
+        public EntityQueryBuilder(IDBEntity entity)
+        {
+            _Entity = entity;
+        }
+
+        public string BuildDetailQry()
+        {
+            string entTable = _Entity.DBName;
+
+            var addedFields = new List<(string, string, string)>();
+            var toJoinTables = new List<(string, string, string)>();
+            addedFields.Add(("ID", entTable + ".id", "id"));
+
+            var fields = _Entity.GetFields();
+            short idx = 0;
+            foreach (var rel in _Entity.Relations)
+            {
+                var idf = "_" + idx;
+                var refEnt = _Entity.GetEntity(rel.ChildName);
+
+                var shouldJoin = false;
+                if (rel.Type == EntityRelationType.LINK)
+                {
+                    addedFields.Add((rel.ParentRefField.Name, $"{idf}.{rel.ChildRefField.DBName}", $"{rel.ParentRefField.Name}__name"));
+                    addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
+                    shouldJoin = true;
+                }
+
+                if (shouldJoin)
+                {
+                    toJoinTables.Add(($"{refEnt.DBName} as {idf}", $"{entTable}.{rel.ParentRefField.DBName}", $"{idf}.id"));
+                }
+                idx++;
+            }
+
+            foreach (var fk in fields.Keys)
+            {
+                var field = fields[fk];
+                if (addedFields.FindAll(x => x.Item1.ToUpper() == field.Name.ToUpper()).Count == 0)
+                    addedFields.Add((field.Name, entTable + "." + field.DBName, field.Name));
+            }
+
+            return PrepareSelectQuery(entTable, addedFields, toJoinTables, $" {entTable}.id = @ItemId");
+        }
+
+        string PrepareSelectQuery(string table, List<(string, string, string)> select, List<(string, string, string)> joinTables, string where)
+        {
+            List<string> selectExp = new List<string>();
+            select.ForEach(x =>
+            {
+                selectExp.Add($"{x.Item2} as {x.Item3}");
+            });
+
+            string qry = String.Format("SELECT {0} FROM {1}", String.Join(",", selectExp), table);
+
+            if (joinTables != null)
+            {
+                joinTables.ForEach(x =>
+                {
+                    qry += $" JOIN {x.Item1} ON {x.Item2} = {x.Item3}";
+                });
+            }
+            qry += " WHERE " + where;
+
+            return qry;
+        }
+
+        internal (string, string) GetSqlOpOp(FilterOperationType filterOp, string value)
+        {
+            var op = "=";
+            var val = value;
+            var likeKW = "ilike"; //for postgre case insenstive search
+            if (filterOp == FilterOperationType.NotEqual)
+                op = "!=";
+            else if (filterOp == FilterOperationType.GreaterThan)
+                op = ">";
+            else if (filterOp == FilterOperationType.GreaterThanEqual)
+                op = ">=";
+            else if (filterOp == FilterOperationType.LessThan)
+                op = "<";
+            else if (filterOp == FilterOperationType.LessThanEqual)
+                op = "<=";
+            else if (filterOp == FilterOperationType.Like)
+                op = likeKW;
+            else if (filterOp == FilterOperationType.Contains)
+            {
+                op = likeKW; val = "%" + value + "%";
+            }
+            else if (filterOp == FilterOperationType.StartWith)
+            {
+                op = likeKW; val = "" + value + "%";
+            }
+            else if (filterOp == FilterOperationType.EndWith)
+            {
+                op = likeKW; val = "%" + value + "";
+            }
+            else if (filterOp == FilterOperationType.In)
+            {
+                op = "IN";
+            }
+            else if (filterOp == FilterOperationType.NotIn)
+            {
+                op = "NOTIN";
+            }
+            //between
+            return (op, val);
+        }
+    }
+}

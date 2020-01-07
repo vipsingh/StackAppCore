@@ -1,8 +1,8 @@
 using System;
 
-namespace Model
+namespace StackErp.Model
 {
-    public class AppContext
+    public class StackAppContext
     {
         public int RoleId {set;get;} 
     public int UserId  {set;get;}
@@ -13,7 +13,7 @@ namespace Model
     public int TimeZoneId  {set;get;}
     public int UnitId  {set;get;}
     public int CompanyId  {set;get;}
-    public int AppType  {set;get;}
+    public ApplicationType AppType  {set;get;}
     public string ShortDateFormat  {set;get;}
     public string LongDateFormat  {set;get;}
     public UserContext UserInfo {set;get;}
