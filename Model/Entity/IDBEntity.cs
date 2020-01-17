@@ -6,6 +6,7 @@ namespace StackErp.Model.Entity
 {
     public interface IDBEntity
     {
+        EntityCode EntityId {get;}
         string Name {get;}
         string DBName {get;}
         Dictionary<string, BaseField> Fields {get;}
@@ -17,23 +18,25 @@ namespace StackErp.Model.Entity
 
         Dictionary<string, BaseField> GetFields();
         BaseField GetFieldSchema(string fieldName);
+        BaseField GetFieldSchemaByViewName(string fieldViewName);
         EntityModelBase GetSingle(int id);
+        EntityModelBase GetDefault();
         EntityModelBase GetAll(FilterExpression filter);
         EntityModelBase GetAll(int[] ids);
-        bool Save(EntityModelBase model);
+        AnyStatus Save(EntityModelBase model);
         bool Write(int id, DynamicObj model);
         DBModelBase Read(int id, List<string> fields);
         List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter);
 
-        IDBEntity GetEntity(string name);
+        IDBEntity GetEntity(EntityCode id);
         
     }
 
     public interface IEntityRelation
     {
         EntityRelationType Type {get;}
-        string ParentName {get;}
-        string ChildName {get;}
+        EntityCode ParentName {get;}
+        EntityCode ChildName {get;}
 
         BaseField ParentRefField {get;}
 

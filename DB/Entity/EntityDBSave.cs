@@ -15,7 +15,7 @@ namespace StackErp.DB
         {
             var eSave = new EntityDBSave(entity);
 
-            var eId = GetNextEntityDBId(entity.Name);
+            var eId = GetNextEntityDBId(entity.EntityId.Code);
             model.SetID(eId);
 
             using (IDbConnection connection = DBService.Connection)
@@ -84,8 +84,11 @@ namespace StackErp.DB
                 var attr = f.Value;
                 var dbName = attr.Field.DBName;
 
-                var param = new DynamicDbParam(f.Key, attr.Value, DBService.GetDbType(attr.Field.BaseType));
-                qryA.Add((dbName, param));
+                if (attr.IsChanged)
+                {
+                    var param = new DynamicDbParam(f.Key, attr.Value, DBService.GetDbType(attr.Field.BaseType));
+                    qryA.Add((dbName, param));
+                }
             }
 
             return qryA;

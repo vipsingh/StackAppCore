@@ -17,7 +17,23 @@ namespace StackErp.Model
     public string ShortDateFormat  {set;get;}
     public string LongDateFormat  {set;get;}
     public UserContext UserInfo {set;get;}
-    public RequestQueryString QS {set;get;}
+    public RequestQueryString RequestQuery {set;get;}
+
+    public void Init()
+    {
+        AppType =  ApplicationType.Web;
+        CompanyId =1;
+        RoleId =1;
+        LanguageId=1;
+        AppRoot ="/";
+        BaseCurrencyCode ="INR";
+        BaseCurrencyId = 1;
+
+        ShortDateFormat = "dd/mmm/yyyy";
+
+        UserInfo = new UserContext();
+
+    }
     }
 
     public class UserContext {

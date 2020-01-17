@@ -6,7 +6,7 @@ namespace StackErp.Model.Entity
 {
     public class EntityQuery
     {
-        public string EntityName {private set;get;}
+        public EntityCode EntityId {private set;get;}
         public QueryType QueryType {private set;get;}
         public EntityQueryFieldCollection Fields {private set;get;}
         public FilterExpression Filters {private set;get;}
@@ -16,8 +16,8 @@ namespace StackErp.Model.Entity
         public string PageSize {private set;get;}
         protected int PageIndex;
 
-        public EntityQuery(string entityName) {
-            EntityName = entityName;
+        public EntityQuery(EntityCode entityId) {
+            EntityId = entityId;
         }
 
         public void WithPage(int pageIndex) 

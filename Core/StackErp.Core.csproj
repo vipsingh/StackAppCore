@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DB\StackErp.DB.csproj" />
     <ProjectReference Include="..\Model\StackErp.Model.csproj" />
+    <ProjectReference Include="..\StackErp.Utils\StackErp.Utils.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

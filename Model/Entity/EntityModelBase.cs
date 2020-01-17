@@ -9,11 +9,11 @@ namespace StackErp.Model
         protected FieldDataCollection _attr;
         public FieldDataCollection Attributes { get => _attr; }
         public Int32 ID { get; protected set; }
-        public string EntityName { get; }
+        public EntityCode EntityId { get; }
 
-        public DBModelBase(string entityName)
+        public DBModelBase(EntityCode entityId)
         {
-            this.EntityName = entityName;
+            this.EntityId = entityId;
             _attr = new FieldDataCollection();
         }
         public virtual object GetValue(string field)
@@ -41,8 +41,12 @@ namespace StackErp.Model
         public bool IsNew { get => !(this.ID > 0); }
 
         public int LayoutId { get; }
+        
+        public bool HasError { private set; get; }
+        public string ErrorMessage { private set; get; }
 
-        public EntityModelBase(IDBEntity entity): base(entity.Name)
+
+        public EntityModelBase(IDBEntity entity): base(entity.EntityId)
         {
             Entity = entity;
         }
@@ -94,6 +98,11 @@ namespace StackErp.Model
         }
 
         public void validate()
+        {
+
+        }
+
+        public void GetSaveErrors()
         {
 
         }

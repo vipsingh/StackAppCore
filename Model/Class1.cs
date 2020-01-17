@@ -5,12 +5,17 @@ using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model
 {
+    [JsonConverter(typeof(StackErp.Model.Utils.DynamicObjJsonConverter))]
     public class DynamicObj
     {
         private Dictionary<string, Object> _d;
 
         public DynamicObj() {
             _d = new Dictionary<string, object>();
+        }
+        private DynamicObj(Dictionary<string, object> d)
+        {
+            _d = d;
         }
         public Dictionary<string, object>.KeyCollection Keys { get => _d.Keys; }
         public void Add(string key, object value, bool isOverride = false) {
@@ -68,6 +73,18 @@ namespace StackErp.Model
             }
 
             return d;
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this._d);
+        }
+
+        public static DynamicObj Parse(string json)
+        {
+            var d = JsonConvert.DeserializeObject<Dictionary<string, Object>>(json);
+            
+            return new DynamicObj(d);
         }
     }
 }

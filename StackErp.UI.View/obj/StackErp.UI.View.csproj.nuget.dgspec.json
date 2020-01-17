@@ -1,0 +1,378 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\My\\x\\stackapp\\StackErp.UI.View\\StackErp.UI.View.csproj": {}
+  },
+  "projects": {
+    "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj",
+        "projectName": "StackErp.Core",
+        "projectPath": "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {
+              "D:\\My\\x\\stackapp\\DB\\StackErp.DB.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\DB\\StackErp.DB.csproj"
+              },
+              "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj"
+              },
+              "D:\\My\\x\\stackapp\\StackErp.Utils\\StackErp.Utils.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\StackErp.Utils\\StackErp.Utils.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\My\\x\\stackapp\\DB\\StackErp.DB.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\DB\\StackErp.DB.csproj",
+        "projectName": "StackErp.DB",
+        "projectPath": "D:\\My\\x\\stackapp\\DB\\StackErp.DB.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\DB\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {
+              "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.0.30, )"
+            },
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "Npgsql": {
+              "target": "Package",
+              "version": "[4.1.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj",
+        "projectName": "StackErp.Model",
+        "projectPath": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\Model\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\My\\x\\stackapp\\StackErp.UI.View\\StackErp.UI.View.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\StackErp.UI.View\\StackErp.UI.View.csproj",
+        "projectName": "StackErp.UI.View",
+        "projectPath": "D:\\My\\x\\stackapp\\StackErp.UI.View\\StackErp.UI.View.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\StackErp.UI.View\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {
+              "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj"
+              },
+              "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj"
+              },
+              "D:\\My\\x\\stackapp\\ViewModel\\StackErp.ViewModel.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\ViewModel\\StackErp.ViewModel.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\My\\x\\stackapp\\StackErp.Utils\\StackErp.Utils.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\StackErp.Utils\\StackErp.Utils.csproj",
+        "projectName": "StackErp.Utils",
+        "projectPath": "D:\\My\\x\\stackapp\\StackErp.Utils\\StackErp.Utils.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\StackErp.Utils\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "Microsoft.CSharp": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[4.5.0, )"
+            },
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\My\\x\\stackapp\\ViewModel\\StackErp.ViewModel.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\My\\x\\stackapp\\ViewModel\\StackErp.ViewModel.csproj",
+        "projectName": "StackErp.ViewModel",
+        "projectPath": "D:\\My\\x\\stackapp\\ViewModel\\StackErp.ViewModel.csproj",
+        "packagesPath": "C:\\Users\\Vipin singh\\.nuget\\packages\\",
+        "outputPath": "D:\\My\\x\\stackapp\\ViewModel\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Vipin singh\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netstandard2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netstandard2.0": {
+            "projectReferences": {
+              "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Core\\StackErp.Core.csproj"
+              },
+              "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj": {
+                "projectPath": "D:\\My\\x\\stackapp\\Model\\StackErp.Model.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netstandard2.0": {
+          "dependencies": {
+            "NETStandard.Library": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.3, )",
+              "autoReferenced": true
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

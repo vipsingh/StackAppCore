@@ -12,7 +12,10 @@ public enum FormControlType {
     Dropdown = 6,
     EntityPicker = 7,
     LongText = 8,
-
+    DateTimePicker = 9,
+    Label = 10,
+    Image = 11,
+    File =12,
     ListView = 100
 }
 
@@ -114,6 +117,14 @@ public enum ActionExecutionType {
     Submit=1,
     Close=2,
     Popup=3,
-    Redirect=4
+    Redirect=4,
+    Client =5,
+    Custom=6
+}
+public enum EvalSourceType {
+    ModelField = 1,
+    Constant = 2,
+    RequestQuery = 3,    
+    RowItem = 4
 }
 }

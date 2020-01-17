@@ -1,0 +1,6 @@
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\StackErp.UI.View.csprojAssemblyReference.cache
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\staticwebassets\StackErp.UI.View.StaticWebAssets.Manifest.cache
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\staticwebassets\StackErp.UI.View.StaticWebAssets.xml
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\StackErp.UI.View.MvcApplicationPartsAssemblyInfo.cache
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\StackErp.UI.View.AssemblyInfoInputs.cache
+D:\My\x\stackapp\StackErp.UI.View\obj\Debug\netcoreapp3.1\StackErp.UI.View.AssemblyInfo.cs

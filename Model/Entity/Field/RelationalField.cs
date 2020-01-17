@@ -7,11 +7,6 @@ namespace StackErp.Model.Entity
             Type = FieldType.ObjectLink;
             BaseType = BaseTypeCode.Int32;
         }
-
-        public override string ResolveDBName()
-        {            
-            return this.Name + "__id";
-        }
     }
 
     public class SelectField: BaseField {

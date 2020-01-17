@@ -1,15 +1,17 @@
+--User ID=eiklvzyt;Password=tJ_N5qAB8jMMwtPYATj6CBaIPjNEGnkZ;Host=isilo.db.elephantsql.com;Port=5432;Database=eiklvzyt;Pooling=true;
+
 truncate table autoid;
 
 CREATE TABLE autoid
 (
-    entityname character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    entityid integer NOT NULL,
     maxid integer NOT NULL,
-    CONSTRAINT autoid_pkey PRIMARY KEY (entityname)
+    CONSTRAINT autoid_pkey PRIMARY KEY (entityid)
 )
 
 CREATE TABLE entitymaster
 (
-	id integer GENERATED ALWAYS AS IDENTITY,
+	id integer,
 	name character varying(100)  NOT NULL,
 	text character varying(200) ,
 	tablename character varying(60) ,
@@ -21,7 +23,7 @@ CREATE TABLE entitymaster
 
 CREATE TABLE entityschema
 (
-	id integer GENERATED ALWAYS AS IDENTITY,
+	id integer,
 	entityid integer NOT NULL,
 	fieldname character varying(100)  NOT NULL,
 	label character varying(100)  NOT NULL,
@@ -38,26 +40,26 @@ CREATE TABLE entityschema
 	uisetting character varying(500),
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
-	CONSTRAINT entitymaster_pkey PRIMARY KEY (id)
+	CONSTRAINT entityschema_pkey PRIMARY KEY (id)
 )
 
 CREATE TABLE entity_itemtype
 (
-	id integer GENERATED ALWAYS AS IDENTITY,
+	id integer,
 	entityid integer NOT NULL, 
 	name character varying(100)  NOT NULL,
 	code character varying(5),
 	text character varying(200),
-	createdby__id integer,
+	createdby integer,
 	createdon timestamp without time zone,
-	updatedby__id integer,
+	updatedby integer,
     updatedon timestamp without time zone,
-	CONSTRAINT entity_itemtype_pkey PRIMARY KEY (id),
+	CONSTRAINT entity_itemtype_pkey PRIMARY KEY (id)
 )
 
 CREATE TABLE entity_viewlayout
 (
-	id integer GENERATED ALWAYS AS IDENTITY,
+	id integer,
 	entityid integer NOT NULL,
 	itemtype integer NOT NULL,
 	states character varying(100)  NOT NULL,	
@@ -65,16 +67,16 @@ CREATE TABLE entity_viewlayout
 	layoutxml xml,
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
-	CONSTRAINT entity_viewlayout_pkey PRIMARY KEY (id),
+	CONSTRAINT entity_viewlayout_pkey PRIMARY KEY (id)
 )
 
 CREATE TABLE company_master
 (
-	id integer GENERATED ALWAYS AS IDENTITY,
+	id integer,
 	name character varying(100)  NOT NULL,
 	description character varying(200),	
 
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
-	CONSTRAINT company_master_pkey PRIMARY KEY (id),
+	CONSTRAINT company_master_pkey PRIMARY KEY (id)
 )

@@ -10,17 +10,21 @@ namespace StackErp.ViewModel.ViewContext
     public class FormContext
     {
         public StackAppContext Context { get; }
-        public IDBEntity Entity { get;}
+        public IDBEntity Entity { protected set; get;}
         public EntityLayoutType EntityLayoutType { private set; get;}
         public int ObjectId { private set; get;}
         public RequestQueryString RequestQuery { private set; get;}
         private DynamicObj _parms;
         public DynamicObj Parameters { get => _parms; }
+        private DynamicObj _props;
+        public DynamicObj Properties { get => _props; }
 
-        public EntityModelInfo EntityModelInfo { private set; get;}
+        public EntityModelInfo EntityModelInfo { protected set; get;}
         private Dictionary<string, BaseWidget> _controls;
         public Dictionary<string, BaseWidget> Controls { get => _controls;}
         public bool IsViewMode { private set; get;}
+        public PageActions Actions { get;}
+        public UIFormModel SubmitModel {protected set; get;}
 
         public virtual bool IsNew
         {
@@ -36,33 +40,55 @@ namespace StackErp.ViewModel.ViewContext
     // FieldDependency: Array<{Type: string, Field: string, Parent: string[]}>
     // _ruleIndex: number
 
-        private string _entityName;
-        public FormContext(StackAppContext context, string entity, RequestQueryString requestQuery)
+        protected EntityCode _entity;
+        public FormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery)
         {
             Context = context;
             RequestQuery = requestQuery;
-            _entityName = entity;
+            _entity = entity;
             _controls = new Dictionary<string, BaseWidget>();
             _parms = new DynamicObj();
+            _props = new DynamicObj();
+            Actions = new PageActions();
 
-            ObjectId = RequestQuery.ItemId;
-
-            this.Entity = (IDBEntity)Core.EntityMetaData.Get(_entityName);
+            ObjectId = RequestQuery.ItemId;            
         }
 
-        public virtual void Build()
+        public virtual void Build(UIFormModel model = null)
         {
+            this.SubmitModel = model;
             this.AddEntityContext();
         }
 
         public void AddControl(BaseWidget control) 
         {
-            this.Controls.Add(control.Name, control);
+            this.Controls.Add(control.ControlId.ToUpper(), control);
         }
 
         public virtual void AddEntityContext() {
-            var entityCntxt = new EntityModelInfo(this.ObjectId, this._entityName);         
+            var entityCntxt = new EntityModelInfo(this.ObjectId, this._entity);     
             this.EntityModelInfo = entityCntxt;
+            if (this.SubmitModel != null)
+            {
+                this.EntityModelInfo.Parameters = this.SubmitModel.EntityInfo.Parameters;
+            }
+        }
+
+        public void AddProperty(string key, object value)
+        {
+            this._props.Add(key, value, true);
+        }
+        public T GetProperty<T>(string key, T def)
+        {
+            return this._props.Get(key, def);
+        }
+        public void AddParameter(string key, object value)
+        {
+            this._parms.Add(key, value, true);
+        }
+        public BaseField GetField(string fieldViewName)
+        {
+            return this.Entity.GetFieldSchemaByViewName(fieldViewName);
         }
 
     //     addRules(ruleType: string, criteria: FilterCriteria, fields: string[]): number {

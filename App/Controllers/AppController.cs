@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace StackErp.App.Controllers
 {
-    public class AppController : BaseController
+    public class AppController : StackErp.UI.Controllers.BaseController
     {
         public AppController(ILogger<AppController> logger): base(logger)
         {
-
+            
         }
     }
 }

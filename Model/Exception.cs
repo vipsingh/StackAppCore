@@ -13,12 +13,14 @@ namespace StackErp.Model
             
         }
     }
-    public class EntityException: AppException 
+    public class DBException: AppException 
     {
-        public EntityException(): base() {
+        public DBException(string message): base(message) {
 
         }
-
+    }
+    public class EntityException: AppException 
+    {
         public EntityException(string message): base(message) {
 
         }
@@ -26,11 +28,14 @@ namespace StackErp.Model
 
     public class AuthException: AppException 
     {
-        public AuthException(): base() {
-
-        }
-
         public AuthException(string message): base(message) {
+            
+        }
+    }
+
+    public class UserException: AppException 
+    {
+        public UserException(string message): base(message) {
             
         }
     }

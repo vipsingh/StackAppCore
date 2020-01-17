@@ -6,24 +6,46 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StackErp.Model;
+using StackErp.UI.View.PageAction;
+using StackErp.UI.View.PageBuilder;
+using StackErp.ViewModel.Model;
+using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
-    public class EntityController : BaseController
+    public class EntityController : StackErp.UI.Controllers.BaseController
     {
         public EntityController(ILogger<EntityController> logger): base(logger)
         {
 
         }
-        public IActionResult Save()
+
+        public IActionResult New()
+        {            
+
+            var context = new EditFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            context.Build();
+
+            var builder = new EntityPageBuilder();
+            var page = builder.CreateNewPage(context);
+
+            return CreateResult(page);
+        }
+
+        [HttpPost]
+        public IActionResult Save([FromBody] UIFormModel model)
         {
-            var ent = Core.EntityMetaData.Get("UserRole");
-            var m = ent.GetDefault();
+            var s = ModelState;
+            var pageAction = new EntityPageAction(this.StackAppContext);
+            var actionRes = pageAction.GetSaveAction(this.RequestQuery, model);
+
+            // var ent = Core.EntityMetaData.Get(EntityCode.UserRole);
+            // var m = ent.GetDefault();
             
-            m.SetValue("Name", "Role XX");
-            ent.Save(m);
+            // m.SetValue("Name", "Role XX");
+            // ent.Save(m);
             
-            return Json(new {r = true});
+            return CreateResult(actionRes);
         }
     }
 }

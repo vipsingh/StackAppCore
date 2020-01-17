@@ -21,12 +21,14 @@ namespace StackErp.Model.Entity
         public object Computed { set; get; }
         public bool IsDbStore { set; get; }
         public bool Copy { set; get; }
-        public string RefObject { set; get; }
+        public EntityCode RefObject { set; get; }
         public string Domain { set; get; }
         public DynamicObj Properties { set; get; }
         public string TableName { set; get; }
+        
         public FormControlType ControlType { set; get; }
-
+        private string _viewName;
+        public string ViewName { set { _viewName = value; } get { return String.IsNullOrEmpty(_viewName)? this.Name: _viewName; } }
         public ControlDefinition ControlInfo { set; get; }
 
         public string LinkFieldName { set; get; }
@@ -36,6 +38,17 @@ namespace StackErp.Model.Entity
         public short DecimalPlace {set;get;}
         public BaseField() {
             Properties = new DynamicObj();
+        }
+        private bool _isInit = false;
+        public void Init()
+        {
+            if(_isInit) return;
+            OnInit();
+            _isInit  = true;
+        }
+        public virtual void OnInit()
+        {
+            
         }
         public virtual string ResolveDBName()
         {            
@@ -54,7 +67,6 @@ namespace StackErp.Model.Entity
             return val;
         }
         
-
     }
     
     public class ControlDefinition 
@@ -62,7 +74,7 @@ namespace StackErp.Model.Entity
         public object Visibility {set;get;}
         public object DataLinking {set;get;}
         public DataMap DataMapping {set;get;}
-        public object DataSource {set;get;}
+        public object DataSource {set;get;}        
 
     }
 

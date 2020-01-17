@@ -2,24 +2,48 @@ using System;
 
 namespace StackErp.Model
 {
-public class AnyStatus {
-    public string Message {set;get;}
-    public int Code {set;get;}
+public struct AnyStatus {
+    public string Message;
+    public int Code;
+        public static implicit operator int(AnyStatus other)
+        {
+            return other.Code;
+        }
 
-    public AnyStatus(int code, string message = null) {
-        this.Code = code;
-        this.Message = message;
-    }
+        public static implicit operator AnyStatus(int other)
+        {
+            AnyStatus error;
 
-    public static AnyStatus Success => new AnyStatus(0);
-    public static AnyStatus NotInitialized => new AnyStatus(1);
-    public static AnyStatus SaveFailure => new AnyStatus(2);
-    public static AnyStatus SelectFailure => new AnyStatus(3);
-    public static AnyStatus UpdateFailure => new AnyStatus(4);
-    public static AnyStatus InvalidData => new AnyStatus(9);
-    public static AnyStatus InSuficientData => new AnyStatus(10);
-    public static AnyStatus PermissionDenied => new AnyStatus(11);
-    public static AnyStatus InvalidPostData => new AnyStatus(20);
-    public static AnyStatus InvalidUrl => new AnyStatus(30);
+            error.Code = other;
+            error.Message = null;
+
+            return error;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return (int)obj == Code;
+        }
+
+        public override int GetHashCode()
+        {
+            if (Message == null)
+            {
+                return Code;
+            }
+
+            return Message.GetHashCode() ^ Code;
+        }
+
+    public const int Success = 0;
+    public const int NotInitialized = 1;
+    public const int SaveFailure = 2;
+    public const int SelectFailure = 3;
+    public const int UpdateFailure = 4;
+    public const int InvalidData = 9;
+    public const int InSuficientData = 10;
+    public const int PermissionDenied = 11;
+    public const int InvalidPostData = 20;
+    public const int InvalidUrl = 30;
 }
 }

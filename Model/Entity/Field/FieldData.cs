@@ -15,6 +15,7 @@ namespace StackErp.Model.Entity
         public string Text {set;get;}
         public string Code {set;get;}
         public bool IsValid {private set;get;}
+        public string ErrorMessage {private set;get;}
         public bool IsChanged {set;get;}
 
         public FieldData(BaseField field, object defaultValue = null)

@@ -1,0 +1,8 @@
+d:\My\x\stackapp\StackErp.Utils\obj\Debug\netstandard2.0\StackErp.Utils.csprojAssemblyReference.cache
+d:\My\x\stackapp\StackErp.Utils\obj\Debug\netstandard2.0\StackErp.Utils.AssemblyInfoInputs.cache
+d:\My\x\stackapp\StackErp.Utils\obj\Debug\netstandard2.0\StackErp.Utils.AssemblyInfo.cs
+d:\My\x\stackapp\StackErp.Utils\bin\Debug\netstandard2.0\StackErp.Utils.deps.json
+d:\My\x\stackapp\StackErp.Utils\bin\Debug\netstandard2.0\StackErp.Utils.dll
+d:\My\x\stackapp\StackErp.Utils\bin\Debug\netstandard2.0\StackErp.Utils.pdb
+d:\My\x\stackapp\StackErp.Utils\obj\Debug\netstandard2.0\StackErp.Utils.dll
+d:\My\x\stackapp\StackErp.Utils\obj\Debug\netstandard2.0\StackErp.Utils.pdb

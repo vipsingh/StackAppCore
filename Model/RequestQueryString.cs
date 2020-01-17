@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model
 {
-    public class RequestQueryString : Dictionary<string, string>
+    public class RequestQueryString : Dictionary<string, string>, ICloneable
     {
         private JObject _Data;
         private string _UrlReferer;
@@ -24,10 +24,10 @@ namespace StackErp.Model
             set { this["ViewType"] = value.ToString(); }
         }
 
-        public string EntityName
+        public EntityCode EntityId
         {
-            get { return GetString("EntityName"); }
-            set { this["EntityName"] = value.ToString(); }
+            get { return GetInt("EntityId"); }
+            set { this["EntityId"] = value.Code.ToString(); }
         }
         public int LayoutId
         {
@@ -70,7 +70,7 @@ namespace StackErp.Model
 
         private int GetInt(string param)
         {
-            object val = this[param];
+            string val = GetData(param);
 
             if (val != null)
             {
@@ -84,7 +84,7 @@ namespace StackErp.Model
         }
         private bool GetBool(string param)
         {
-            object val = this[param];
+            string val = GetData(param);
 
             if (val != null)
             {
@@ -98,7 +98,7 @@ namespace StackErp.Model
         }
         private string GetString(string param)
         {
-            object val = this[param];
+            string val = GetData(param);
 
             if (val != null)
             {
@@ -116,9 +116,10 @@ namespace StackErp.Model
         }
         public string GetData(string key)
         {
-            var v = this[key];
+            if(this.ContainsKey(key))
+                return this[key];
 
-            return v;
+            return null;
         }
 
         public void Load(string query)
@@ -133,6 +134,11 @@ namespace StackErp.Model
                     this[k.Key] = k.Value.ToString();
                 }
             }
+        }
+
+        object ICloneable.Clone()
+        {
+            return MemberwiseClone();
         }
 
         public string ToQueryString()

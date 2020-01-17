@@ -36,7 +36,7 @@ namespace StackErp.ViewModel.Model
     {
         public SubmitStatus Status {set;get;}
         public string VerificationToken {set;get;}
-        public EditFormModel Model {set;get;}
+        public UIFormModel Model {set;get;}
         public string RedirectUrl {set;get;}
         public SubmitActionResponse(object data): base(data)
         {

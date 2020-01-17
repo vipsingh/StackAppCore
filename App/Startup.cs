@@ -17,9 +17,7 @@ namespace StackErp.App
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
-
-            DBService.Init(configuration.GetValue<string>("DBInfo:ConnectionString"));
+            Configuration = configuration;            
         }
 
         public IConfiguration Configuration { get; }
@@ -27,7 +25,8 @@ namespace StackErp.App
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,8 +55,11 @@ namespace StackErp.App
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+            
+            //app.InitStackApp(this.Configuration);
+            StackErp.Core.App.ConfigureDB(this.Configuration.GetValue<string>("DBInfo:ConnectionString"));
 
-            EntityMetaData.B();
+            EntityMetaData.Build();
         }
     }
 }

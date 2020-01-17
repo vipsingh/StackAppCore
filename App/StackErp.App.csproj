@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
     <PackageReference Include="Npgsql" Version="4.1.2" />
     <PackageReference Include="Dapper" Version="2.0.30" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -12,5 +13,7 @@
     <ProjectReference Include="..\ViewModel\StackErp.ViewModel.csproj" />
     <ProjectReference Include="..\DB\StackErp.DB.csproj" />
     <ProjectReference Include="..\Core\StackErp.Core.csproj" />
+    <ProjectReference Include="..\StackErp.UI.View\StackErp.UI.View.csproj" />
+    <ProjectReference Include="..\StackErp.Utils\StackErp.Utils.csproj" />
   </ItemGroup>
 </Project>

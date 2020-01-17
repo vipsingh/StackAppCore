@@ -22,7 +22,7 @@ namespace StackErp.Model
                         ret = valueIfNull;
                 }
             }
-            catch (AppException e)
+            catch (Exception e)
             {
                 throw e;
             }

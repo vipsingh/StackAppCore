@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ViewModel\StackErp.ViewModel.csproj" />
+    <ProjectReference Include="..\Model\StackErp.Model.csproj" />
+    <ProjectReference Include="..\Core\StackErp.Core.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+</Project>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using StackErp.App.Models;
+using StackErp.Model;
 
 namespace StackErp.App.Controllers
 {
@@ -20,8 +21,39 @@ namespace StackErp.App.Controllers
 
         public IActionResult Index()
         {
-            var d = StackErp.Core.EntityMetaData.Get("UserMaster").GetSingle(1);
+            //var d = StackErp.Core.EntityMetaData.Get(EntityCode.Get("UserMaster")).GetSingle(1);
             return View();
+        }
+
+        [lizzie.Bind(Name = "write")]
+        object WriteLine(lizzie.Binder<HomeController> binder, lizzie.Arguments arguments)
+        {
+            Console.WriteLine(arguments.Get(0));
+            return null;
+        }
+        [lizzie.Bind(Name = "ev")]
+        object Eval(lizzie.Binder<HomeController> binder, lizzie.Arguments arguments)
+        {
+            var str = arguments.Get(0);
+            return null;
+        }
+
+        public IActionResult lizz()
+        {
+
+            /*
+            should be parse (2 + 3) as +(2,3)
+            */
+            string code = @"
+                var(@foo, 5)
+                ev(foo + 11)
+                
+            ";
+
+            var lambda = lizzie.LambdaCompiler.Compile(new HomeController(null), code);
+            var result = lambda();
+
+            return Json(new { x = result });
         }
 
         public IActionResult Privacy()

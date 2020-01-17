@@ -10,9 +10,9 @@ namespace StackErp.Model.DataList
     public class FilterExpression
     {
         private List<FilterExpField> _data;
-        public string EntityName {get;}
-        public FilterExpression(string entity) {
-            EntityName = entity;
+        public EntityCode EntityId {get;}
+        public FilterExpression(EntityCode entityid) {
+            EntityId = entityid;
             _data = new List<FilterExpField>();
         }
 
@@ -24,7 +24,7 @@ namespace StackErp.Model.DataList
             return this._data.Select(x => x.FieldName).ToList();
         }
 
-        public static FilterExpression BuildFromSimpleJson(string entity, string json) 
+        public static FilterExpression BuildFromSimpleJson(EntityCode entity, string json) 
         {
             //ex1: [["F1", 0, "VV"],[,,]]
             if (String.IsNullOrWhiteSpace(json))
