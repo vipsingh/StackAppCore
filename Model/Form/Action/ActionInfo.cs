@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace StackErp.Model.Form
 {
@@ -7,7 +8,9 @@ namespace StackErp.Model.Form
         public string ActionId { set; get; }
         public string Title { set; get; }
         public string Url { set; get; }
+        [JsonIgnore]
         public string RawUrl { set; get; }
+        [JsonIgnore]
         public RequestQueryString Query { set; get; }
         public ActionType ActionType { set; get; }
         public ActionButtonPosition ActionPosition { set; get; }

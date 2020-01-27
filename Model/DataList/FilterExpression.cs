@@ -20,8 +20,13 @@ namespace StackErp.Model.DataList
             this._data.Add(field);
         }
 
-        public IList<string> GetFields() {
+        public IList<string> GetFieldNames() {
             return this._data.Select(x => x.FieldName).ToList();
+        }
+
+        public List<FilterExpField> GetAll()
+        {
+            return _data;
         }
 
         public static FilterExpression BuildFromSimpleJson(EntityCode entity, string json) 

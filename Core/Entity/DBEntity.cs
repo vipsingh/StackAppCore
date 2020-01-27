@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using StackErp.Core.Form;
 using StackErp.DB;
 using StackErp.Model;
 using StackErp.Model.DataList;
@@ -31,23 +32,21 @@ namespace StackErp.Core
             this.IDField = "ID";
 
             this.Fields = new Dictionary<string, BaseField>();
-            this.Fields.Add("ID", new BaseField()
+            this.Fields.Add("ID", new ObjectKeyField()
             {
                 Type = FieldType.ObjectKey,
-                BaseType = BaseTypeCode.Int32,
                 Name = "ID",
                 DBName = "ID"
             });
-            this.Fields.Add("CREATEDON", new BaseField()
+            this.Fields.Add("CREATEDON", new DateTimeField()
             {
                 Type = FieldType.DateTime,
-                BaseType = BaseTypeCode.DateTime,
                 Name = "CreatedOn",
                 DBName = "CreatedOn",
                 IsReadOnly = true,
                 Copy = false
             });
-            this.Fields.Add("UPDATEDON", new BaseField()
+            this.Fields.Add("UPDATEDON", new DateTimeField()
             {
                 Type = FieldType.DateTime,
                 BaseType = BaseTypeCode.DateTime,
@@ -194,9 +193,16 @@ namespace StackErp.Core
                 }
                 model.SetValue("UPDATEDON", DateTime.Now.ToUniversalTime());
 
-                EntityDBService.SaveEntity(this, model);
+                if (this.Validate(model))
+                {
+                    EntityDBService.SaveEntity(this, model);
 
-                status = AnyStatus.Success;
+                    status = AnyStatus.Success;
+                }
+                else 
+                {
+                    status = AnyStatus.InvalidData;                    
+                }
             }
             catch (AppException ex)
             {
@@ -204,6 +210,30 @@ namespace StackErp.Core
                 status.Message = ex.Message;
             }
             return status;
+        }
+
+        //basic validation => IsRequired
+        private bool Validate(EntityModelBase model)
+        {
+            bool IsValid = true;            
+            var validator = new DataValidator();
+            foreach (var f in model.Attributes)
+            {
+                var field = f.Value;
+                if(model.IsNew || field.IsChanged)
+                {
+                    if(field.Field.IsRequired && !validator.HasValue(field.Field, field.Value))
+                    {
+                        field.ErrorMessage = $"Field {field.Field.Text} is required";
+                        field.IsValid = false;
+                    }
+                }
+
+                if(!field.IsValid)
+                    IsValid = false;
+            }
+
+            return IsValid;
         }
 
         public bool Write(int id, DynamicObj model)

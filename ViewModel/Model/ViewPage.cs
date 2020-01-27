@@ -13,14 +13,14 @@ namespace StackErp.ViewModel.Model
         public Dictionary<string, BaseWidget> Controls {get;set;}        
         public string PostUrl {get;}
         public Dictionary<string, ActionInfo> Actions {get;set;}
-        public EntityModelInfo EntityInfo {set;get;}
+        public ObjectModelInfo EntityInfo {set;get;}
         public string ErrorMessage {set;get;}
 
         public object Layout {set;get;}
         public ViewPage(FormContext formContext)
         {
             this.EntityInfo = formContext.EntityModelInfo;
-            this.Controls = formContext.Controls;            
+            this.Controls = formContext.Widgets; 
             this.Actions = formContext.Actions.ActionButtons;
 
             this.PostUrl = formContext.Context.AppRoot + "entity/save?" + formContext.RequestQuery.ToQueryString();

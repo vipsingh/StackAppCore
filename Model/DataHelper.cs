@@ -96,6 +96,7 @@ namespace StackErp.Model
 
             return GetDataValue(value, Type.GetTypeCode(fieldType));
         }
+        
         public static object GetDataValue(object value, TypeCode typeCode)
         {
             if (value == null)

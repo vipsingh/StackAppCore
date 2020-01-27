@@ -4,12 +4,18 @@ Core/bin/
 DB/bin/
 Model/bin/
 ViewModel/bin/
+StackErp.UI.View/bin/
+StackErp.Utils/bin/
+
 
 App/obj/
 Core/obj/
 DB/obj/
 Model/obj/
 ViewModel/obj/
+ViewModel/obj/
+StackErp.UI.View/obj/
+StackErp.Utils/obj/
 
 # dotenv environment variables file
 .env

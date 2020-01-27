@@ -1,6 +1,7 @@
 using System;
 using StackErp.Core.Layout;
 using StackErp.Model.Entity;
+using StackErp.Model.Layout;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.ViewContext;
 
@@ -16,7 +17,7 @@ namespace StackErp.UI.View.PageGenerator
 
         public virtual void Compile(BaseField field, TField LayoutField)
         {
-            if(!this.FormContext.Controls.ContainsKey(field.ViewName))
+            if(!this.FormContext.Widgets.ContainsKey(field.ViewName))
             {
                 var widget = BuildWidget(field, LayoutField);
                 this.FormContext.AddControl(widget);

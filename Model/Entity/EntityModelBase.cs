@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using StackErp.Model.Entity;
 
 namespace StackErp.Model
@@ -21,10 +22,10 @@ namespace StackErp.Model
             return null;
         }
         
-        public virtual void BuiltWithDB(DynamicObj dbData)
+        public virtual void BuiltWithDB(DbObject dbData)
         {
             //this._attr = dbData;
-            this.ID = dbData.Get("id", 0);
+            this.ID = dbData.Get("id", 0);                       
         }
     }
     
@@ -33,14 +34,14 @@ namespace StackErp.Model
         public IDBEntity Entity {get;}
         public short RecordStatus { get; }
                
-        public DateTime CreatedOn { get; }
-        public DateTime UpdatedOn { get; }
-        public int CreatedBy { get; }
-        public int UpdatedBy { get; }
+        public DateTime CreatedOn {private set; get; }
+        public DateTime UpdatedOn {private set; get; }
+        public int CreatedBy {private set; get; }
+        public int UpdatedBy {private set; get; }
 
         public bool IsNew { get => !(this.ID > 0); }
 
-        public int LayoutId { get; }
+        public int LayoutId {private set; get; }
         
         public bool HasError { private set; get; }
         public string ErrorMessage { private set; get; }
@@ -55,6 +56,21 @@ namespace StackErp.Model
             foreach(var f in Entity.Fields)
             {
                 _attr.Add(f.Key, new FieldData(f.Value, f.Value.DefaultValue));
+            }
+        }
+
+        public override void BuiltWithDB(DbObject dbData)
+        {
+            this.ID = dbData.Get("id", 0);
+            this.CreatedOn = dbData.Get("createdon", DateTime.MinValue);
+            this.UpdatedOn = dbData.Get("updatedon", DateTime.MinValue);
+
+            foreach(var f in Entity.Fields)
+            {
+                var field = f.Value;
+                var val = field.ResolveDbValue(dbData);
+
+                _attr.Add(f.Key, new FieldData(f.Value, val));
             }
         }
 
@@ -97,14 +113,14 @@ namespace StackErp.Model
 
         }
 
-        public void validate()
+        public void Validate()
         {
 
         }
 
-        public void GetSaveErrors()
+        public List<FieldData> GetInvalidFields()
         {
-
+            return this.Attributes.Where(x => !x.Value.IsValid).Select(x => x.Value).ToList();
         }
 
     }

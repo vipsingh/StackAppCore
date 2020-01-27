@@ -24,7 +24,11 @@ namespace StackErp.ViewModel.ViewContext
         }
         public object PostValue {set;get;}
 
-        public WidgetContext(FormContext formContext) 
+        public WidgetContext() 
+        {
+            _parameters = new DynamicObj();            
+        }
+        public WidgetContext(FormContext formContext) : base()
         {
             _parameters = new DynamicObj();
             FormContext = formContext;
@@ -38,6 +42,7 @@ namespace StackErp.ViewModel.ViewContext
             WidgetType = field.ControlType;
             Validation = field.Validations;
             IsRequired = field.IsRequired;
+            ControlDefinition = field.ControlInfo;
         }
     }
 }

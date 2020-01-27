@@ -9,6 +9,15 @@ namespace StackErp.Model.Entity
             Type = FieldType.Text;
             BaseType = BaseTypeCode.String;
         }
+
+        public override object ResolveSetValue(object val, out bool isValid)
+        {
+            isValid = true;
+            if (val is string)
+                return val;
+            else
+                return DataHelper.GetData(val, string.Empty);
+        }
     }
 
     public class LongTextField: StringField
@@ -62,6 +71,22 @@ namespace StackErp.Model.Entity
             Type = FieldType.Integer;
             BaseType = BaseTypeCode.Int32;
         }
+
+        public override object ResolveSetValue(object val, out bool isValid)
+        {
+            isValid = true;
+
+            var d = DataHelper.GetDataValue(val, TypeCode.Int32);
+
+            return d;
+        }
+
+        public override object ResolveDbValue(DbObject db)
+        {
+            var v = db.Get(this.DBName, 0);
+
+            return v;
+        }
     }
 
     public class BigIntField: IntegerField
@@ -77,6 +102,37 @@ namespace StackErp.Model.Entity
         public DecimalField(): base() {
             Type = FieldType.Decimal;
             BaseType = BaseTypeCode.Decimal;
+        }
+
+        public override object ResolveSetValue(object value, out bool isValid)
+        {
+            isValid = true;
+            
+            if (value is decimal)
+                    {
+                        return value;
+                    }
+                    else
+                    {
+                        decimal doubleValue;
+                        if(decimal.TryParse(value.ToString(), out doubleValue))
+                            return doubleValue;
+                        else
+                        {
+                            isValid= false;
+                            return value;
+                        }
+                    }
+        }
+
+        public override object ResolveDbValue(DbObject db)
+        {
+            var v = db.Get<object>(this.DBName, null);
+
+            if(v == null)
+                return null;
+            else
+                return (decimal)v;
         }
     }
 
@@ -94,6 +150,7 @@ namespace StackErp.Model.Entity
     {
         public ObjectKeyField(): base() {
             Type = FieldType.ObjectKey;
+            Copy = false;
         }
     }
     public class BoolField: BaseField
@@ -102,6 +159,24 @@ namespace StackErp.Model.Entity
             Type = FieldType.Bool;
             BaseType = BaseTypeCode.Boolean;
         }
+
+        public override object ResolveSetValue(object val, out bool isValid)
+        {
+            isValid = true;
+            
+            var d = DataHelper.GetDataValue(val, TypeCode.Boolean);
+
+            return d;
+        }
+        public override object ResolveDbValue(DbObject db)
+        {
+            var v = db.Get<object>(this.DBName, null);
+
+            if(v == null)
+                return false;
+            else
+                return DataHelper.GetDataValue(v, TypeCode.Boolean);
+        }
     }
 
     public class DateTimeField: BaseField
@@ -109,6 +184,16 @@ namespace StackErp.Model.Entity
         public DateTimeField(): base() {
             Type = FieldType.DateTime;
             BaseType = BaseTypeCode.DateTime;
+        }
+
+        public override object ResolveDbValue(DbObject db)
+        {
+            var v = db.Get<string>(this.DBName, null);
+
+            if(v == null || v == "")
+                return DateTime.MinValue;
+            else
+                return DateTime.Parse(v);
         }
     }
 

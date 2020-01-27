@@ -18,5 +18,16 @@ namespace StackErp.UI.View.PageBuilder
 
             return renderer.GetViewPage();
         }
+        public ViewPage CreateEditPage(EditFormContext context)
+        {
+            context.CreateDataModel();
+            var lConext = new LayoutContext(context);
+            lConext.Build();
+
+            var renderer = new EditFormRenderer(context);
+            renderer.Generate(lConext);
+
+            return renderer.GetViewPage();
+        }
     }
 }

@@ -39,6 +39,7 @@ namespace StackErp.Model
         }
         public static Dictionary<string, int> AllEntities;
 
+        public const int None = 0;
         public const int User = 1;
         public const int UserRole = 2;
     }

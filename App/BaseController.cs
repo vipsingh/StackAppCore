@@ -37,6 +37,10 @@ namespace StackErp.UI.Controllers
             {
                 q.EntityId = EntityCode.Get(Request.Query["entity"].ToString());
             }
+            if (Request.Query.ContainsKey("itemid"))
+            {
+                q.ItemId = Convert.ToInt32(Request.Query["itemid"]);
+            }
 
             if (Request.Query.ContainsKey("q"))
             {

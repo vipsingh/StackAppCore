@@ -1,5 +1,6 @@
 using System;
 using StackErp.Core.Layout;
+using StackErp.Model.Layout;
 
 namespace StackErp.ViewModel.ViewContext
 {

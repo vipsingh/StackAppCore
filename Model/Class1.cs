@@ -19,26 +19,26 @@ namespace StackErp.Model
         }
         public Dictionary<string, object>.KeyCollection Keys { get => _d.Keys; }
         public void Add(string key, object value, bool isOverride = false) {
-            if(!ContainsKey(key.ToUpper()))
-                _d.Add(key.ToUpper(), value);
+            if(!ContainsKey(key))
+                _d.Add(key, value);
             else if(isOverride) {
                 _d[key] = value;
             }
         }
         public bool ContainsKey(string key) {
-            return _d.ContainsKey(key.ToUpper());
+            return _d.ContainsKey(key);
         }
         public bool Remove(string key) {
-            return _d.Remove(key.ToUpper());
+            return _d.Remove(key);
         }
         public void Clear() {
             _d.Clear();
         }
         public T Get<T>(string attrName, T def)
         {
-            if (_d.ContainsKey(attrName.ToUpper())) 
+            if (_d.ContainsKey(attrName)) 
             {
-                var v = _d[attrName.ToUpper()];
+                var v = _d[attrName];
 
                 return DataHelper.GetData(v, def);
             }
@@ -86,5 +86,31 @@ namespace StackErp.Model
             
             return new DynamicObj(d);
         }
+
+        public static DynamicObj DeserializeJObject(object jObject)
+        {
+            if (jObject == null)
+                return null;
+
+            var row = jObject as Dictionary<string,object>;
+
+            if (row != null)
+                return new DynamicObj(row);
+
+            if (jObject is JObject || jObject is string)
+            {
+                return DynamicObj.Parse(jObject.ToString());
+            }
+
+
+            return null;
+        }
+    }
+
+    public class SelectOption: DynamicObj
+    {
+        public int Value {get => this.Get("Value", 0);}
+        public string Text {get => this.Get("Text", "");}
+        public string Code {get => this.Get("Code", "");}
     }
 }

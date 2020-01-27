@@ -7,7 +7,7 @@ namespace StackErp.ViewModel.Model
     public class UIFormModel
     {
         public DynamicObj Properties {set; get;}
-        public EntityModelInfo EntityInfo {set; get;}
+        public ObjectModelInfo EntityInfo {set; get;}
         public Dictionary<string, UIFormField> Fields {set; get;}
 
         public object GetValue(string controlId) 
@@ -27,16 +27,15 @@ namespace StackErp.ViewModel.Model
         public string ErrorMessage {set; get;}
     }
     
-    public class EntityModelInfo
+    public class ObjectModelInfo: DynamicObj
     {
         public int ObjectId {set; get;}
         public EntityCode EntityId {set; get;}
-        public DynamicObj Parameters {set; get;}
-        public EntityModelInfo()
+        public ObjectModelInfo()
         {
 
         }
-        public EntityModelInfo(int objectId, EntityCode entityId)
+        public ObjectModelInfo(int objectId, EntityCode entityId)
         {
             ObjectId =objectId;
             EntityId=entityId;

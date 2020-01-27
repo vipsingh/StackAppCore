@@ -25,9 +25,9 @@ namespace StackErp.DB
             }
         }
 
-        public static IEnumerable<DynamicObj> Query(string query, object param = null, IDbTransaction trans = null)
+        public static IEnumerable<DbObject> Query(string query, object param = null, IDbTransaction trans = null)
         {
-            List<DynamicObj> rows = new List<DynamicObj>();
+            List<DbObject> rows = new List<DbObject>();
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
@@ -35,22 +35,22 @@ namespace StackErp.DB
                 foreach (var row in data)
                 {
                     var f = row as IDictionary<string, object>;
-                    rows.Add(DynamicObj.From(f));
+                    rows.Add(DbObject.From(f));
                 }
             }
 
             return rows;
         }
 
-        public static DynamicObj Single(string query, object param = null, IDbTransaction trans = null)
+        public static DbObject Single(string query, object param = null, IDbTransaction trans = null)
         {
-            DynamicObj row = new DynamicObj();
+            DbObject row = new DbObject();
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
                 var data = dbConnection.QuerySingle<dynamic>(query, param, trans);
                 var f = data as IDictionary<string, object>;
-                row = DynamicObj.From(f);
+                row = DbObject.From(f);
             }
 
             return row;

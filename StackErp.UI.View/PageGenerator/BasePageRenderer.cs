@@ -1,5 +1,6 @@
 using System;
 using StackErp.Core.Layout;
+using StackErp.Model.Layout;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -46,7 +47,7 @@ namespace StackErp.UI.View.PageGenerator
         protected virtual void OnRenderComplete()
         {
             this.CompileActions();
-        }
+        }        
 
         public virtual ViewPage GetViewPage()
         {

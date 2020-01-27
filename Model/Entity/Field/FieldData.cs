@@ -14,14 +14,20 @@ namespace StackErp.Model.Entity
         public object Value {set;get;}
         public string Text {set;get;}
         public string Code {set;get;}
-        public bool IsValid {private set;get;}
-        public string ErrorMessage {private set;get;}
+        public bool IsValid {set;get;}
+        public string ErrorMessage {set;get;}
         public bool IsChanged {set;get;}
+        public string ViewName {set;get;}
 
         public FieldData(BaseField field, object defaultValue = null)
         {
             Field = field;
-            Value = defaultValue;
+            IsValid = true;
+            if (defaultValue != null)
+            {
+                Value = defaultValue;
+                IsChanged = true;                
+            }
         }
 
         public void SetValue(object value)
@@ -31,6 +37,8 @@ namespace StackErp.Model.Entity
 
             IsChanged = true;
             IsValid = isValid;
+            if (!isValid)
+                ErrorMessage = $"Invalid field value of {this.Field.Text}";
         }
 
         public override string ToString()

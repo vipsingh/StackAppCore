@@ -19,12 +19,13 @@ namespace StackErp.ViewModel.ViewContext
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
 
-        public EntityModelInfo EntityModelInfo { protected set; get;}
+        public ObjectModelInfo EntityModelInfo { protected set; get;}
         private Dictionary<string, BaseWidget> _controls;
-        public Dictionary<string, BaseWidget> Controls { get => _controls;}
-        public bool IsViewMode { private set; get;}
+        public Dictionary<string, BaseWidget> Widgets { get => _controls;}
+        public bool IsViewMode { protected set; get;}
         public PageActions Actions { get;}
         public UIFormModel SubmitModel {protected set; get;}
+        public EntityModelBase EntityModel {protected set; get;}
 
         public virtual bool IsNew
         {
@@ -62,16 +63,16 @@ namespace StackErp.ViewModel.ViewContext
 
         public void AddControl(BaseWidget control) 
         {
-            this.Controls.Add(control.ControlId.ToUpper(), control);
+            this.Widgets.Add(control.ControlId.ToUpper(), control);
         }
 
         public virtual void AddEntityContext() {
-            var entityCntxt = new EntityModelInfo(this.ObjectId, this._entity);     
+            var entityCntxt = new ObjectModelInfo(this.ObjectId, this._entity);     
             this.EntityModelInfo = entityCntxt;
-            if (this.SubmitModel != null)
-            {
-                this.EntityModelInfo.Parameters = this.SubmitModel.EntityInfo.Parameters;
-            }
+            // if (this.SubmitModel != null)
+            // {
+            //     this.EntityModelInfo.Parameters = this.SubmitModel.EntityInfo.Parameters;
+            // }
         }
 
         public void AddProperty(string key, object value)

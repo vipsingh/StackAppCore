@@ -6,8 +6,7 @@ using StackErp.ViewModel.Model;
 namespace StackErp.ViewModel.ViewContext
 {
     public class EditFormContext: FormContext
-    {
-        public EntityModelBase EntityModel {private set; get;}
+    {        
         public EditFormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery): base(context, entity, requestQuery)
         {
             this.Entity = (IDBEntity)Core.EntityMetaData.Get(entity);

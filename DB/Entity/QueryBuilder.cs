@@ -69,53 +69,13 @@ namespace StackErp.DB
             {
                 joinTables.ForEach(x =>
                 {
-                    qry += $" JOIN {x.Item1} ON {x.Item2} = {x.Item3}";
+                    qry += $" LEFT JOIN {x.Item1} ON {x.Item2} = {x.Item3}";
                 });
             }
             qry += " WHERE " + where;
 
             return qry;
         }
-
-        internal (string, string) GetSqlOpOp(FilterOperationType filterOp, string value)
-        {
-            var op = "=";
-            var val = value;
-            var likeKW = "ilike"; //for postgre case insenstive search
-            if (filterOp == FilterOperationType.NotEqual)
-                op = "!=";
-            else if (filterOp == FilterOperationType.GreaterThan)
-                op = ">";
-            else if (filterOp == FilterOperationType.GreaterThanEqual)
-                op = ">=";
-            else if (filterOp == FilterOperationType.LessThan)
-                op = "<";
-            else if (filterOp == FilterOperationType.LessThanEqual)
-                op = "<=";
-            else if (filterOp == FilterOperationType.Like)
-                op = likeKW;
-            else if (filterOp == FilterOperationType.Contains)
-            {
-                op = likeKW; val = "%" + value + "%";
-            }
-            else if (filterOp == FilterOperationType.StartWith)
-            {
-                op = likeKW; val = "" + value + "%";
-            }
-            else if (filterOp == FilterOperationType.EndWith)
-            {
-                op = likeKW; val = "%" + value + "";
-            }
-            else if (filterOp == FilterOperationType.In)
-            {
-                op = "IN";
-            }
-            else if (filterOp == FilterOperationType.NotIn)
-            {
-                op = "NOTIN";
-            }
-            //between
-            return (op, val);
-        }
+        
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using StackErp.Model;
 using StackErp.ViewModel;
 using StackErp.ViewModel.Model;
@@ -32,7 +33,12 @@ namespace StackErp.UI.View.PageAction
                 if (saveStatus == AnyStatus.Success)
                 {
                     response.Status = SubmitStatus.Success;
-
+                    return response;
+                }
+                else if(saveStatus == AnyStatus.InvalidData)
+                {
+                    PrepareErrorModel(recordModel, ref model);
+                    response.Model = model;                    
                     return response;
                 }
                 response.Message = saveStatus.Message;
@@ -41,6 +47,17 @@ namespace StackErp.UI.View.PageAction
             response.Message = generator.Status.Message;
 
             return response;
+        }
+
+        private void PrepareErrorModel(EntityModelBase recordModel, ref UIFormModel model)
+        {
+            var fields = new Dictionary<string, UIFormField>();
+            foreach(var fData in recordModel.GetInvalidFields())
+            {
+                fields.Add(fData.Field.ViewName.ToUpper(), new UIFormField(){ ControlId = fData.Field.ViewName, ErrorMessage = fData.ErrorMessage });
+            }
+
+            model.Fields = fields;
         }
     }
 }

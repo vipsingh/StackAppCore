@@ -16,7 +16,7 @@ public enum FormControlType {
     Label = 10,
     Image = 11,
     File =12,
-    ListView = 100
+    EntityListView = 100
 }
 
 public enum EntityLayoutType {

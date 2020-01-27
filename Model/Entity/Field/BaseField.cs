@@ -2,7 +2,7 @@ using System;
 
 namespace StackErp.Model.Entity
 {
-    public class BaseField
+    public abstract class BaseField
     {
         public IDBEntity Entity  { set; get; }
         public FieldType Type { set; get; }
@@ -36,19 +36,23 @@ namespace StackErp.Model.Entity
         //OnChangeInfo: { DependUpon: string[] }
 
         public short DecimalPlace {set;get;}
+        public bool AllowZero { get; set; }
+
         public BaseField() {
             Properties = new DynamicObj();
+            ControlInfo = new ControlDefinition();
         }
         private bool _isInit = false;
         public void Init()
         {
             if(_isInit) return;
+            this.Text = String.IsNullOrEmpty(this.Text)? this.Name: this.Text;
             OnInit();
             _isInit  = true;
         }
         public virtual void OnInit()
         {
-            
+            ControlInfo.FieldAttribute = new FieldAttribute(){ValueField = this.Name};
         }
         public virtual string ResolveDBName()
         {            
@@ -66,6 +70,13 @@ namespace StackErp.Model.Entity
 
             return val;
         }
+
+        public virtual object ResolveDbValue(DbObject db)
+        {
+            var v = db.Get(this.DBName, String.Empty);
+
+            return v;
+        }
         
     }
     
@@ -76,11 +87,21 @@ namespace StackErp.Model.Entity
         public DataMap DataMapping {set;get;}
         public object DataSource {set;get;}        
 
+        public FieldAttribute FieldAttribute {set;get;}
+
     }
 
     public class DataMap {
         public object Text {set;get;}
         public object Value {set;get;}
         public object Code {set;get;}
+    }
+
+    public class FieldAttribute
+    {
+        public string ValueField {set;get;}
+        public string TextField {set;get;}
+        public string CodeField {set;get;}
+        public object DefaultValue {set;get;}
     }
 }

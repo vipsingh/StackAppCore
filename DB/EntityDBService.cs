@@ -10,12 +10,12 @@ namespace StackErp.DB
     public static partial class EntityDBService
     {
 
-        public static List<DynamicObj> GetEntities()
+        public static List<DbObject> GetEntities()
         {
             var entities = DBService.Query("select * from entitymaster");
             return entities.ToList();
         }
-        public static IEnumerable<DynamicObj> GetEntitySchemas()
+        public static IEnumerable<DbObject> GetEntitySchemas()
         {
             var entitiesSchemas = DBService.Query("select * from entityschema");
             return entitiesSchemas;

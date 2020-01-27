@@ -70,11 +70,6 @@ public enum BaseTypeCode {
         OneToOne = 3,
         ManyToMany=4
     }
-public enum ListingType {
-    EntityList = 1,
-    RelatedEntityList = 2
-}
-
 public enum EntityModelHooksType {
     AfterModelPrepareToSave,
     BeforeValidate,

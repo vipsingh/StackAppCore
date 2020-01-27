@@ -16,7 +16,7 @@ namespace StackErp.ViewModel.FormWidget
         public virtual FormControlType WidgetType { get => FormControlType.None; }
         public string ControlId { private set; get; }
         public bool IsHidden { private set; get; }
-        public object Value { private set; get; }
+        public object Value { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
@@ -24,11 +24,11 @@ namespace StackErp.ViewModel.FormWidget
         public Dictionary<string, IValidation> Validation { get => _validations; }
         public bool IsReadOnly { private set; get; }
         public bool IsRequired { private set; get; }
-        public string DataUrl { private set; get; }
+        public string DataUrl { protected set; get; }
         //      RuleToFire: Array<{Index: number}>
         // Dependency: { Parents: Array<{Id: string}>, Children: Array<{Id: string}> }
         // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }
-        public bool IsEditable { private set; get; }
+        public bool IsEditable { protected set; get; }
         protected object PostValue { private set; get; }
 
         public BaseWidget(WidgetContext context)

@@ -36,7 +36,15 @@ namespace StackErp.UI.View.PageGenerator
         }
         public void FillWidgetsData()
         {
+            var recordModel = this.FormContext.EntityModel;
+            foreach(var widgetKey in this.FormContext.Widgets)
+            {
+                var widget = widgetKey.Value;
+                var fieldAttr = widget.Context.ControlDefinition.FieldAttribute;
 
+                var value = recordModel.GetValue(fieldAttr.ValueField);
+                widget.SetValue(value);
+            }
         }
 
         public override ViewPage GetViewPage()

@@ -64,7 +64,7 @@ namespace StackErp.Core
             return entities;
         }
 
-        private static BaseField BuildField(string entName, string table, DynamicObj sch, List<DynamicObj> dbentities)
+        private static BaseField BuildField(string entName, string table, DbObject sch, List<DbObject> dbentities)
         {            
             var typ = sch.Get("fieldtype", 0);
             var fname = sch.Get("FIELDNAME", "");
@@ -88,6 +88,8 @@ namespace StackErp.Core
 
                 //field.DBName = fname + "__id";
             }
+            field.IsRequired = sch.Get("isrequired", false);
+
             field.ControlType = GetDefaultControl(field.Type);
 
             return field;
@@ -95,7 +97,7 @@ namespace StackErp.Core
 
         private static BaseField CreateField(FieldType type)
         {
-            var field = new BaseField();
+            BaseField field = null;
             switch(type)
             {
                 case FieldType.BigInt:

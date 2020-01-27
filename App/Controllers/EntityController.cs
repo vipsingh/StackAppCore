@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using StackErp.Model;
 using StackErp.UI.View.PageAction;
 using StackErp.UI.View.PageBuilder;
+using StackErp.ViewModel.DataList;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -32,6 +33,17 @@ namespace StackErp.App.Controllers
             return CreateResult(page);
         }
 
+        public IActionResult Edit()
+        {
+            var context = new EditFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            context.Build();
+
+            var builder = new EntityPageBuilder();
+            var page = builder.CreateEditPage(context);
+
+            return CreateResult(page);
+        }
+
         [HttpPost]
         public IActionResult Save([FromBody] UIFormModel model)
         {
@@ -46,6 +58,17 @@ namespace StackErp.App.Controllers
             // ent.Save(m);
             
             return CreateResult(actionRes);
+        }
+
+        [HttpPost]
+        public IActionResult List([FromBody] ListRequestinfo request)
+        {
+            var context = new DataListContext(this.StackAppContext, request);
+            var builder = new EntityListBuilder();
+            builder.Build(context);
+            var res = builder.GetResponse(context);
+            
+            return CreateResult(res);
         }
     }
 }
