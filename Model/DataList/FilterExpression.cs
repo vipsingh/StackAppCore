@@ -80,7 +80,9 @@ namespace StackErp.Model.DataList
     NotLike= 13,
     IsSpecified = 14,
     NotSpecified = 15,
-    Between = 16
+    Between = 16,
+    FixedExpression = 17, //expression is given like xy < 45
+    Expression = 18
     }
 }
 

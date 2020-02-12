@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using StackErp.Model;
+using StackErp.Model.Form;
 using StackErp.ViewModel;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
@@ -51,7 +52,7 @@ namespace StackErp.UI.View.PageAction
 
         private void PrepareErrorModel(EntityModelBase recordModel, ref UIFormModel model)
         {
-            var fields = new Dictionary<string, UIFormField>();
+            var fields = new InvariantDictionary<UIFormField>();
             foreach(var fData in recordModel.GetInvalidFields())
             {
                 fields.Add(fData.Field.ViewName.ToUpper(), new UIFormField(){ ControlId = fData.Field.ViewName, ErrorMessage = fData.ErrorMessage });

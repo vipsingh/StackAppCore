@@ -1,6 +1,7 @@
 using System;
 using StackErp.Model;
 using StackErp.Model.Entity;
+using StackErp.Model.Form;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
@@ -51,7 +52,7 @@ namespace StackErp.ViewModel
         public BaseWidget BuildWidget(BaseField field, UIFormField fieldValue)
         {   
             var widgetContext = new WidgetContext(this._formContext);
-            widgetContext.Build(field);
+            widgetContext.Build(field, null);
             widgetContext.WidgetType = (FormControlType)fieldValue.WidgetType;
             widgetContext.PostValue = fieldValue.Value;
 

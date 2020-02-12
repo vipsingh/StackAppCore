@@ -2,6 +2,17 @@ using System;
 
 namespace StackErp.Model
 {
+
+public enum AppPageType
+{
+    None = 0,
+    Edit = 1,
+    Detail = 2,
+    Desk = 3,
+    Report = 4,
+    Dashboard = 5,
+    Error = 6
+}
 public enum FormControlType {
     None = 0,
     TextBox = 1,
@@ -16,6 +27,7 @@ public enum FormControlType {
     Label = 10,
     Image = 11,
     File =12,
+    Entity = 99,
     EntityListView = 100
 }
 

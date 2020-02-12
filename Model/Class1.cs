@@ -8,10 +8,10 @@ namespace StackErp.Model
     [JsonConverter(typeof(StackErp.Model.Utils.DynamicObjJsonConverter))]
     public class DynamicObj
     {
-        private Dictionary<string, Object> _d;
+        public Dictionary<string, Object> _d;
 
         public DynamicObj() {
-            _d = new Dictionary<string, object>();
+            _d = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         }
         private DynamicObj(Dictionary<string, object> d)
         {
@@ -79,6 +79,10 @@ namespace StackErp.Model
         {
             return JsonConvert.SerializeObject(this._d);
         }
+        public void Serialize(JsonSerializer serializer, JsonWriter writer)
+        {
+            serializer.Serialize(writer, this._d);
+        }
 
         public static DynamicObj Parse(string json)
         {
@@ -112,5 +116,15 @@ namespace StackErp.Model
         public int Value {get => this.Get("Value", 0);}
         public string Text {get => this.Get("Text", "");}
         public string Code {get => this.Get("Code", "");}
+    }
+
+    public class InvariantDictionary<TValue> : Dictionary<string, TValue>
+    {
+        protected Dictionary<string, TValue> collections;
+        public InvariantDictionary()
+            : base()
+        {
+            collections = new Dictionary<string, TValue>(StringComparer.InvariantCultureIgnoreCase);
+        }
     }
 }

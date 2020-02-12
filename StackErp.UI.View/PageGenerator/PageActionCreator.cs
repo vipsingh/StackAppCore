@@ -41,8 +41,7 @@ namespace StackErp.UI.View.PageGenerator
         }
         private static ActionInfo New(ActionContext cntxt)
         {
-            string url = "entity/new";
-            var info = CreateDefault(url, cntxt);
+            var info = CreateDefault(AppLinkProvider.NEW_ENTITY_URL, cntxt);
             info.ExecutionType = ActionExecutionType.Redirect;
             
             return info;

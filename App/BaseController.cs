@@ -33,18 +33,21 @@ namespace StackErp.UI.Controllers
         protected RequestQueryString GetQuery()
         {
             var q = new RequestQueryString();
-            if (Request.Query.ContainsKey("entity"))
-            {
-                q.EntityId = EntityCode.Get(Request.Query["entity"].ToString());
-            }
-            if (Request.Query.ContainsKey("itemid"))
-            {
-                q.ItemId = Convert.ToInt32(Request.Query["itemid"]);
-            }
+            // if (Request.Query.ContainsKey("entity"))
+            // {
+            //     q.EntityId = EntityCode.Get(Request.Query["entity"].ToString());
+            // }
+            // if (Request.Query.ContainsKey("itemid"))
+            // {
+            //     q.ItemId = Convert.ToInt32(Request.Query["itemid"]);
+            // }
 
             if (Request.Query.ContainsKey("q"))
             {
                 q.Load(Request.Query["q"].ToString());
+            } else if (Request.Query.ContainsKey("qx"))
+            {
+                q.LoadNonEncrypt(Request.Query["qx"].ToString());
             }
 
             return q;
@@ -52,20 +55,15 @@ namespace StackErp.UI.Controllers
 
         protected IActionResult CreateResult(object page)
         {
-            var result = new PageResponse(page);
+            var result = new ActionResponse(page);
 
             return Json(result);
         }
-
-        static System.Text.Json.JsonSerializerOptions GetJsonOption()
+        protected IActionResult CreatePageResult(object page)
         {
-            var serializeOptions = new System.Text.Json.JsonSerializerOptions(){
-                IgnoreNullValues = true,
-                PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
-            };
-            serializeOptions.Converters.Add(new App.Helpers.DynamicObjJsonConverter());
+            var result = new PageResponse(page);
 
-            return serializeOptions;
+            return Json(result);
         }
     }
 }

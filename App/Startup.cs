@@ -26,7 +26,14 @@ namespace StackErp.App
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews()
-                .AddNewtonsoftJson();
+                .AddNewtonsoftJson(options =>
+                    {
+                        // Use the default property (Pascal) casing
+                        options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+
+                        // Configure a custom converter
+                        //options.SerializerSettings.Converters.Add(new App.Helpers.DynamicObjJsonConverter());
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,7 +57,12 @@ namespace StackErp.App
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {
+            {                
+                endpoints.MapControllerRoute(
+                    name: "web",
+                    pattern: "web/{c?}/{a?}",
+                    defaults: new { controller = "App", action = "Index" });
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

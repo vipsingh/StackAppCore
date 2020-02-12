@@ -8,6 +8,12 @@ namespace StackErp.Model.Entity
             Type = FieldType.ObjectLink;
             BaseType = BaseTypeCode.Int32;
         }
+        public override void OnInit()
+        {
+            base.OnInit();
+            ControlInfo.FieldAttribute.RefEntity = this.RefObject;
+            BuildPickerDataSource();
+        }
 
         public override object ResolveSetValue(object value, out bool isValid)
         {
@@ -45,6 +51,18 @@ namespace StackErp.Model.Entity
 
                 return option;
             }
+        }
+
+        private void BuildPickerDataSource()
+        {
+            this.ControlInfo.DataSource = new PickerDataSource {
+                Type = "ENTITY",
+                Entity = this.RefObject,
+                Fields = new List<string>(){this.Entity.TextField},
+                IdField = this.Entity.IDField,
+                SortOnField = "",
+                Domain = this.Domain
+            };
         }
     }
 

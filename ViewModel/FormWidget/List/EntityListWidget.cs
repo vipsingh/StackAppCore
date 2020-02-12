@@ -1,5 +1,6 @@
 using System;
 using StackErp.Model;
+using StackErp.Model.Form;
 using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel.FormWidget
@@ -15,7 +16,7 @@ namespace StackErp.ViewModel.FormWidget
         public override void OnCompile()
         {
             base.OnCompile();
-            DataUrl = "/Entity/List?entity=UserMaster";
+            DataActionLink = new ActionInfo("/Entity/List", this.Context.FormContext.RequestQuery, "DETAIL");
         }
 
 

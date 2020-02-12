@@ -8,6 +8,7 @@ namespace StackErp.UI.View.PageGenerator
 {    
     public class BasePageRenderer
     {
+        protected LayoutContext LayoutContext {private set; get;}
         protected FormContext FormContext {private set; get;}
         protected LayoutFieldCompiler FieldCompiler {set; get;}
         public BasePageRenderer(FormContext cntxt)
@@ -17,6 +18,7 @@ namespace StackErp.UI.View.PageGenerator
 
         public void Generate(LayoutContext layoutContext)
         {
+            this.LayoutContext = layoutContext;
             this.Compile(layoutContext);
 
             this.OnRenderComplete();
@@ -51,7 +53,8 @@ namespace StackErp.UI.View.PageGenerator
 
         public virtual ViewPage GetViewPage()
         {
-            return null;
+            var page = new ViewPage(this.FormContext);
+            return page;
         }
     }
 }

@@ -10,10 +10,12 @@ namespace StackErp.ViewModel.Model
     {
         public Dictionary<string, BaseWidget> Fields  {set; get;} 
         public DynamicObj Properties { get; }
-        public object Data {set; get;} 
+        public List<DynamicObj> Data {set; get;} 
         public string RenderMode{set;get;}
         public string IdColumn {set;get;}
         public object Layout{set;get;}
         public Dictionary<string, ActionInfo> ActionButtons {get;}
+        public int PageSize {set;get;}
+        public int PageIndex {set;get;}
     }
 }

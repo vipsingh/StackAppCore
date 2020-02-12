@@ -15,7 +15,7 @@ namespace StackErp.Model.Entity
 
         public List<(string, string)> OrderBy {private set;get;}
         public string ItemIdField {private set;get;}
-        public string PageSize {private set;get;}
+        public int PageSize {private set;get;}
         protected int PageIndex;
         public bool IsFixedQuery {private set;get;}
         public string QrySql {private set;get;}
@@ -34,7 +34,11 @@ namespace StackErp.Model.Entity
         {
             foreach(var f in view.Fields)
             {
-                AddField(f.FieldId, true);
+                if (String.IsNullOrEmpty(f.FieldName)) {
+                    f.FieldName = Entity.GetFieldSchemaByViewName(f.FieldId).Name;
+                } 
+                
+                AddField(f.FieldName, true);
             }
         }
 
@@ -74,9 +78,10 @@ namespace StackErp.Model.Entity
 
         }
 
-        public void WithPage(int pageIndex) 
+        public void WithPage(int pageIndex, int pageSize)
         {
             PageIndex= pageIndex;
+            PageSize = pageSize;
         }
     }
 

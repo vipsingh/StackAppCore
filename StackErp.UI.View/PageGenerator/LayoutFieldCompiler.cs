@@ -17,7 +17,7 @@ namespace StackErp.UI.View.PageGenerator
 
         public virtual void Compile(BaseField field, TField LayoutField)
         {
-            if(!this.FormContext.Widgets.ContainsKey(field.ViewName))
+            if(!this.FormContext.Widgets.ContainsKey(LayoutField.FieldId))
             {
                 var widget = BuildWidget(field, LayoutField);
                 this.FormContext.AddControl(widget);
@@ -26,8 +26,8 @@ namespace StackErp.UI.View.PageGenerator
 
         public BaseWidget BuildWidget(BaseField field, TField LayoutField)
         {   
-            var widgetContext = new WidgetContext(this.FormContext);
-            widgetContext.Build(field);
+            var widgetContext = new WidgetContext(this.FormContext);            
+            widgetContext.Build(field, LayoutField);
 
             var widget = WidgetFactory.Create(widgetContext);
             widget.OnCompile();

@@ -15,6 +15,7 @@ namespace StackErp.Core
         public EntityCode EntityId { get; }
         public string Name { get; }
         public string DBName { private set; get; }
+        public string Text { private set; get; }
         public Dictionary<string, BaseField> Fields { get; private set; }
 
         private string _fieldText;
@@ -30,15 +31,18 @@ namespace StackErp.Core
             this.Name = name;
             this.DBName = name.ToLower();
             this.IDField = "ID";
+            this.Text = name;
 
             this.Fields = new Dictionary<string, BaseField>();
             this.Fields.Add("ID", new ObjectKeyField()
             {
                 Type = FieldType.ObjectKey,
                 Name = "ID",
-                DBName = "ID"
+                DBName = "ID",
+                Entity = this
             });
-            this.Fields.Add("CREATEDON", new DateTimeField()
+
+            fields.Add("CREATEDON", new DateTimeField()
             {
                 Type = FieldType.DateTime,
                 Name = "CreatedOn",
@@ -46,7 +50,7 @@ namespace StackErp.Core
                 IsReadOnly = true,
                 Copy = false
             });
-            this.Fields.Add("UPDATEDON", new DateTimeField()
+            fields.Add("UPDATEDON", new DateTimeField()
             {
                 Type = FieldType.DateTime,
                 BaseType = BaseTypeCode.DateTime,
@@ -60,6 +64,7 @@ namespace StackErp.Core
             {
                 if (!this.Fields.Keys.Contains(f.Key))
                 {
+                    f.Value.Entity = this;
                     this.Fields.Add(f.Key, f.Value);
                 }
             }

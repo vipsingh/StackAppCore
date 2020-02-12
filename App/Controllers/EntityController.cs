@@ -30,7 +30,7 @@ namespace StackErp.App.Controllers
             var builder = new EntityPageBuilder();
             var page = builder.CreateNewPage(context);
 
-            return CreateResult(page);
+            return CreatePageResult(page);
         }
 
         public IActionResult Edit()
@@ -41,7 +41,18 @@ namespace StackErp.App.Controllers
             var builder = new EntityPageBuilder();
             var page = builder.CreateEditPage(context);
 
-            return CreateResult(page);
+            return CreatePageResult(page);
+        }
+
+        public IActionResult Detail()
+        {
+            var context = new DetailFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            context.Build();
+
+            var builder = new EntityPageBuilder();
+            var page = builder.CreateDetailPage(context);
+
+            return CreatePageResult(page);
         }
 
         [HttpPost]
@@ -69,6 +80,17 @@ namespace StackErp.App.Controllers
             var res = builder.GetResponse(context);
             
             return CreateResult(res);
+        }
+
+        public IActionResult Desk()
+        {
+            var context = new DeskPageContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            context.Build();
+
+            var builder = new EntityPageBuilder();
+            var page = builder.CreateDeskPage(context);
+
+            return CreatePageResult(page);
         }
     }
 }

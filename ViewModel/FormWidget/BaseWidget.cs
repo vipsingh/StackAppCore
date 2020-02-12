@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using StackErp.Model;
+using StackErp.Model.Form;
+using StackErp.ViewModel.Helper;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -14,9 +16,11 @@ namespace StackErp.ViewModel.FormWidget
         public WidgetContext Context { get; }
         public string Caption { private set; get; }
         public virtual FormControlType WidgetType { get => FormControlType.None; }
-        public string ControlId { private set; get; }
+        public string WidgetId { private set; get; }
         public bool IsHidden { private set; get; }
         public object Value { protected set; get; }
+        public string FormatedValue { protected set; get; }
+        public string FormatInfo { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
@@ -24,7 +28,8 @@ namespace StackErp.ViewModel.FormWidget
         public Dictionary<string, IValidation> Validation { get => _validations; }
         public bool IsReadOnly { private set; get; }
         public bool IsRequired { private set; get; }
-        public string DataUrl { protected set; get; }
+        public ActionInfo DataActionLink { protected set; get; }
+        public ActionInfo ActionLink { protected set; get; }
         //      RuleToFire: Array<{Index: number}>
         // Dependency: { Parents: Array<{Id: string}>, Children: Array<{Id: string}> }
         // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }
@@ -34,33 +39,57 @@ namespace StackErp.ViewModel.FormWidget
         public BaseWidget(WidgetContext context)
         {
             Context = context;
-            _props = new DynamicObj();
-            _validations = new Dictionary<string, IValidation>();
+            _props = new DynamicObj();            
             this.Init(context);
         }
 
         public void Init(WidgetContext context) {
             this.Caption = context.Caption;
-            this.ControlId = context.ControlId;
+            this.WidgetId = context.ControlId;
             
             //this.IsHidden = context.UIParams ? !!controlContext.UIParams.IsHidden : false;
             this.IsViewMode = context.FormContext.IsViewMode;
             this.PostValue = context.PostValue;
         }
+        private bool _isCompiled = false;
         public virtual void OnCompile()
         {
-            this.buildValidation();
+            if (_isCompiled) return;
+            this.BuildValidation();
+            _isCompiled = true;
         }
-        public virtual bool OnSetData(object value)
+        protected virtual bool OnSetData(object value)
         {
+            this.Value = value;
+            return true;
+        }
+        protected virtual bool OnFormatSetData(object value)
+        {
+            if (value == null)
+            {
+                FormatedValue = this.Context.AppContext.AppInfo.NotSpecifiedText;
+                return false;
+            }
+
+            if (value is SelectOption)
+            {
+                FormatedValue = ((SelectOption)value).Text;
+            }
+            else
+                FormatedValue = value.ToString();
+
+            Value = value;
+
             return true;
         }
 
-        public virtual void SetValue(object value)
+        public virtual bool SetValue(object value)
         {
-            if (this.OnSetData(value))
+            if (this.Context.IsViewMode) {
+                return this.OnFormatSetData(value);
+            } else
             {
-                this.Value = value;
+                return this.OnSetData(value);
             }
         }
 
@@ -71,8 +100,17 @@ namespace StackErp.ViewModel.FormWidget
             return this.Value;
         }
 
-        public virtual void buildValidation()
+        public virtual void BuildValidation()
         {
+            var fieldValidation = this.Context.Validation;
+            _validations = new Dictionary<string, IValidation>();
+            if(fieldValidation != null)
+            {
+                if(fieldValidation.IsMendatory)
+                {
+                    AddValidation("REQUIRED", ValidationHelper.GetRequiredValidation(Caption));
+                }
+            }
             
         }
 

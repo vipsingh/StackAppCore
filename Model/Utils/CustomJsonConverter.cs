@@ -7,7 +7,7 @@ namespace StackErp.Model.Utils
 {
     public override void WriteJson(JsonWriter writer, DynamicObj value, JsonSerializer serializer)
     {
-        writer.WriteValue(value.ToJson());
+        value.Serialize(serializer, writer);
     }
 
     public override DynamicObj ReadJson(JsonReader reader, Type objectType, DynamicObj existingValue, bool hasExistingValue, JsonSerializer serializer)

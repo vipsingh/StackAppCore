@@ -7,7 +7,7 @@ namespace StackErp.Model.Form
     {
         public string ActionId { set; get; }
         public string Title { set; get; }
-        public string Url { set; get; }
+        public string Url { get => this.ToURL(); }
         [JsonIgnore]
         public string RawUrl { set; get; }
         [JsonIgnore]
@@ -20,17 +20,22 @@ namespace StackErp.Model.Form
         private DynamicObj _attr;
         public DynamicObj Attributes { get => _attr; }
 
-        public ActionInfo(string rawUrl, RequestQueryString qs, string id)
+        public ActionInfo(string rawUrl, RequestQueryString qs, string id): this(rawUrl, qs)
+        {
+            this.ActionId = id;
+            this.Title = id;
+        }
+        public ActionInfo(string rawUrl, RequestQueryString qs)
         {
             _attr = new DynamicObj();
             this.RawUrl = rawUrl;
-            this.Query = qs;
-            this.ActionId = id;
-            this.Title = id;
-
-            this.Url = this.ToURL();
+            this.Query = (qs == null) ? null : qs.Clone();
         }
 
+        public void AddAttribute(string key, object value)
+        {
+            this._attr.Add(key, value);
+        }
         public string ToURL()
         {
             var str = this.RawUrl;

@@ -18,6 +18,7 @@ namespace StackErp.ViewModel.Model
     public class PageResponse: ActionResponse
     {
         public bool IsPage{get;}
+        //public AppPageType PageType {get;}
         public PageResponse(object data): base(data)
         {
             this.IsPage = true;

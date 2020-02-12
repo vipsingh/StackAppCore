@@ -8,9 +8,8 @@ using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model
 {
-    public class RequestQueryString : Dictionary<string, string>, ICloneable
+    public class RequestQueryString : Dictionary<string, string>
     {
-        private JObject _Data;
         private string _UrlReferer;
 
         public int ItemId
@@ -28,6 +27,11 @@ namespace StackErp.Model
         {
             get { return GetInt("EntityId"); }
             set { this["EntityId"] = value.Code.ToString(); }
+        }
+        public EntityCode RelatedEntityId
+        {
+            get { return GetInt("RelatedEntityId"); }
+            set { this["RelatedEntityId"] = value.Code.ToString(); }
         }
         public int LayoutId
         {
@@ -66,6 +70,17 @@ namespace StackErp.Model
         {
             get { return GetBool("IsAjax"); }
             set { this["IsAjax"] = value.ToString(); }
+        }
+
+        public int FieldId
+        {
+            get { return GetInt("FieldId"); }
+            set { this["FieldId"] = value.ToString(); }
+        }
+        public string WidgetId
+        {
+            get { return GetString("WidgetId"); }
+            set { this["WidgetId"] = value.ToString(); }
         }
 
         private int GetInt(string param)
@@ -112,7 +127,7 @@ namespace StackErp.Model
         }
         public RequestQueryString()
         {
-            _Data = new JObject();
+            
         }
         public string GetData(string key)
         {
@@ -127,18 +142,30 @@ namespace StackErp.Model
             var s = Decrypt(query);
             var d = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(s);
 
-            foreach (var k in this._Data)
+            foreach (var k in d)
             {
-                if (d[k] != null)
+                if (k.Value != null)
+                {
+                    this[k.Key] = k.Value.ToString();
+                }
+            }
+        }
+        public void LoadNonEncrypt(string query)
+        {            
+            var d = (JObject)Newtonsoft.Json.JsonConvert.DeserializeObject(query);
+
+            foreach (var k in d)
+            {
+                if (k.Value != null)
                 {
                     this[k.Key] = k.Value.ToString();
                 }
             }
         }
 
-        object ICloneable.Clone()
+        public RequestQueryString Clone()
         {
-            return MemberwiseClone();
+            return (RequestQueryString)MemberwiseClone();
         }
 
         public string ToQueryString()

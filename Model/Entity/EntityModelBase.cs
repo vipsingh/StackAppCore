@@ -45,6 +45,7 @@ namespace StackErp.Model
         
         public bool HasError { private set; get; }
         public string ErrorMessage { private set; get; }
+        public bool IsChangeTrackOff { private set; get; }
 
 
         public EntityModelBase(IDBEntity entity): base(entity.EntityId)
@@ -64,14 +65,16 @@ namespace StackErp.Model
             this.ID = dbData.Get("id", 0);
             this.CreatedOn = dbData.Get("createdon", DateTime.MinValue);
             this.UpdatedOn = dbData.Get("updatedon", DateTime.MinValue);
-
+            
+            this.SetChangeTrack(true);
             foreach(var f in Entity.Fields)
             {
                 var field = f.Value;
                 var val = field.ResolveDbValue(dbData);
 
-                _attr.Add(f.Key, new FieldData(f.Value, val));
+                _attr.Add(f.Key, new FieldData(f.Value, val){ IsChanged = false });
             }
+            this.SetChangeTrack(false);
         }
 
         public void SetID(int id)
@@ -121,6 +124,10 @@ namespace StackErp.Model
         public List<FieldData> GetInvalidFields()
         {
             return this.Attributes.Where(x => !x.Value.IsValid).Select(x => x.Value).ToList();
+        }
+        public void SetChangeTrack(bool isOff)
+        {
+            this.IsChangeTrackOff = isOff;
         }
 
     }

@@ -5,9 +5,9 @@ using StackErp.ViewModel.Model;
 
 namespace StackErp.ViewModel.ViewContext
 {
-    public class ViewFormContext: FormContext
+    public class DetailFormContext: FormContext
     {        
-        public ViewFormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery): base(context, entity, requestQuery)
+        public DetailFormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery): base(context, entity, requestQuery)
         {
             this.Entity = (IDBEntity)Core.EntityMetaData.Get(entity);
             IsViewMode = true;

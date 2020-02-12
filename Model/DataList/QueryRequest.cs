@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using StackErp.Model.Form;
 
 namespace StackErp.Model.DataList
 {    
@@ -11,7 +12,7 @@ namespace StackErp.Model.DataList
 
         public List<string> OrderBy {set;get;}
         public string Search  {set;get;}
-        public object DataFilter {set;get;}
+        public Dictionary<string, UIFormField> DataFilter {set;get;}
     }
 
     public class DataListOutput

@@ -14,5 +14,17 @@ namespace StackErp.App.Controllers
         {
             
         }
+
+        public IActionResult Index(string c, string  a)
+        {  
+            var page = new PageLayout(this.StackAppContext);
+            var m = page.Build();
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(m);
+
+            ViewBag.OrignalUrl = $"{c}/{a}" + (this.Request.QueryString != null ? this.Request.QueryString.ToString(): "");
+            ViewBag.PageData = json;
+            ViewBag.Host = Request.Scheme + "://" + Request.Host.ToUriComponent();
+            return View(m);
+        }
     }
 }

@@ -13,7 +13,6 @@ namespace StackErp.Core.Layout
 {
     public class EntityLayoutService
     {
-        private IDBEntity _Entity;
         private EntityCode _EntityId;
         public EntityLayoutService(StackAppContext appContext, EntityCode entityId)
         {
@@ -114,6 +113,7 @@ namespace StackErp.Core.Layout
             {
                 var field = new TField();
                 field.FieldId = f.ViewName;
+                field.FieldName = f.Name;
 
                 if (col_r.Count == 1)
                     start_new_r = true;
@@ -142,20 +142,15 @@ namespace StackErp.Core.Layout
 
         public TList PrepareListLayout(int listId)
         {
-            //  var layout = LayoutDbService.GetItemType(_EntityId.Code, layoutId);
+            // var layout = LayoutDbService.GetItemType(_EntityId.Code, layoutId);
             // if (layout == null)
             //     throw new EntityException("Layout is not defined.");
 
-            // var layoutXml = layout.Get("layoutxml", string.Empty);
-            // if (string.IsNullOrWhiteSpace(layoutXml))
-            //     return CreateDefault();
-
-            var layoutXml = @"<tlist>
-                <field text=""Name"" id=""Name"" />                
-                <field id=""SubmitAmount"" />
-						<field id=""Role"" />
-            </tlist>";
-             XmlDocument document = new XmlDocument();
+            var layoutXml = String.Empty; //layout.Get("layoutxml", string.Empty);
+            if (string.IsNullOrWhiteSpace(layoutXml))
+                return CreateDefaultList();
+           
+            XmlDocument document = new XmlDocument();
             document.LoadXml(layoutXml);
 
             var view = new TList();
@@ -169,6 +164,24 @@ namespace StackErp.Core.Layout
                 view.Fields.Add(TField.FromXmlNode(page));
             }
 
+            return view;
+        }
+
+        public TList CreateDefaultList() {
+            var _Entity = Core.EntityMetaData.Get(_EntityId);
+            var layoutF = _Entity.GetLayoutFields(EntityLayoutType.View);
+
+            var view = new TList();
+            view.Text = _Entity.Text;
+
+            foreach (var f in layoutF)
+            {
+                var field = new TField();
+                field.FieldId = f.ViewName;
+                field.FieldName = f.Name;
+                view.Fields.Add(field);
+            }
+            
             return view;
         }
     }

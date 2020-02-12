@@ -1,5 +1,6 @@
 using System;
 using StackErp.Model;
+using StackErp.Model.Form;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 

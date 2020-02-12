@@ -4,6 +4,7 @@ using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.FormWidget;
+using StackErp.Model.Layout;
 
 namespace StackErp.ViewModel.ViewContext
 {
@@ -14,14 +15,15 @@ namespace StackErp.ViewModel.ViewContext
         public EntityLayoutType EntityLayoutType { private set; get;}
         public int ObjectId { private set; get;}
         public RequestQueryString RequestQuery { private set; get;}
+        public LayoutContext LayoutContext { set; get;}
         private DynamicObj _parms;
         public DynamicObj Parameters { get => _parms; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
 
         public ObjectModelInfo EntityModelInfo { protected set; get;}
-        private Dictionary<string, BaseWidget> _controls;
-        public Dictionary<string, BaseWidget> Widgets { get => _controls;}
+        private InvariantDictionary<BaseWidget> _controls;
+        public InvariantDictionary<BaseWidget> Widgets { get => _controls;}
         public bool IsViewMode { protected set; get;}
         public PageActions Actions { get;}
         public UIFormModel SubmitModel {protected set; get;}
@@ -47,7 +49,7 @@ namespace StackErp.ViewModel.ViewContext
             Context = context;
             RequestQuery = requestQuery;
             _entity = entity;
-            _controls = new Dictionary<string, BaseWidget>();
+            _controls = new InvariantDictionary<BaseWidget>();
             _parms = new DynamicObj();
             _props = new DynamicObj();
             Actions = new PageActions();
@@ -63,7 +65,7 @@ namespace StackErp.ViewModel.ViewContext
 
         public void AddControl(BaseWidget control) 
         {
-            this.Widgets.Add(control.ControlId.ToUpper(), control);
+            this.Widgets.Add(control.WidgetId, control);
         }
 
         public virtual void AddEntityContext() {
@@ -90,6 +92,11 @@ namespace StackErp.ViewModel.ViewContext
         public BaseField GetField(string fieldViewName)
         {
             return this.Entity.GetFieldSchemaByViewName(fieldViewName);
+        }
+
+        public TView GetLayoutView()
+        {
+            return this.LayoutContext.View;
         }
 
     //     addRules(ruleType: string, criteria: FilterCriteria, fields: string[]): number {

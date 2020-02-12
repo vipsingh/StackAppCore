@@ -19,8 +19,9 @@ namespace StackErp.ViewModel.FormWidget
             Add(FormControlType.EntityPicker, GetObjectPicker);
             Add(FormControlType.NumberBox, GetNumber);
             Add(FormControlType.CheckBox, GetCheckBox);
+            Add(FormControlType.LongText, GetText);        
 
-            Add(FormControlType.LongText, GetText);            
+            Add(FormControlType.EntityListView, GetEntityList);
         }
 
         public static BaseWidget Create(WidgetContext cntxt)
@@ -73,6 +74,12 @@ namespace StackErp.ViewModel.FormWidget
         private static BaseWidget GetCheckBox(WidgetContext cntxt)
         {
             return new CheckBoxWidget(cntxt);
+        }
+
+        //**********************
+        private static BaseWidget GetEntityList(WidgetContext cntxt)
+        {
+            return new EntityListWidget(cntxt);
         }
     }
 }

@@ -49,7 +49,8 @@ namespace StackErp.UI.View.PageGenerator
 
         public override ViewPage GetViewPage()
         {
-            var page = new ViewPage(this.FormContext);
+            var page = base.GetViewPage();
+            page.PageType = AppPageType.Edit;
             return page;
         }
     }

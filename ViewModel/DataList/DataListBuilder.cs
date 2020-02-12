@@ -18,9 +18,15 @@ namespace StackErp.ViewModel.DataList
         public virtual DataListResponse GetResponse(DataListContext context)
         {
             var resp = new DataListResponse()
-            {
-                Fields = context.Fields
+            {                
+                Data = context.Data,
+
             };
+            if (context.ListRequest.RequestType == DataListRequestType.SchemaWithData)
+            {
+                resp.Fields = context.Fields;
+                resp.IdColumn = context.IdColumn;
+            }
             return resp;
         }
 

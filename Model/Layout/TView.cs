@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using Newtonsoft.Json;
 using StackErp.Model.Entity;
 using StackErp.Model.Utils;
 
@@ -30,6 +31,8 @@ namespace StackErp.Model.Layout
         }
         private void ExtractPageFields(TPage p, ref List<TField> fields)
         {
+            if (p == null) return;
+            
             foreach (var g in p.Groups)
                 {
                     foreach (var r in g.Rows)
@@ -49,11 +52,16 @@ namespace StackErp.Model.Layout
     }
     public class TField
     {
+        [JsonIgnore]
+        public string FieldName { set; get; }
         public string FieldId { set; get; }
         public string Text { set; get; }
         public bool FullRow { set; get; }
         public string InVisible { set; get; }
+        [JsonIgnore]
         public string Domain { set; get; }
+        [JsonIgnore]
+        public FormControlType Widget { set; get; }
         public static TField FromXmlNode(XmlNode node)
         {
             var f = new TField();
@@ -90,6 +98,7 @@ namespace StackErp.Model.Layout
     public class TList
     {
         public string Id  { set; get; }
+        public string Text  { set; get; }
         public List<TField> Fields { set; get; }
         public TList()
         {

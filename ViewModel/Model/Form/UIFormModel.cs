@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using StackErp.Model;
+using StackErp.Model.Form;
 
 namespace StackErp.ViewModel.Model
 {
@@ -8,29 +9,20 @@ namespace StackErp.ViewModel.Model
     {
         public DynamicObj Properties {set; get;}
         public ObjectModelInfo EntityInfo {set; get;}
-        public Dictionary<string, UIFormField> Fields {set; get;}
+        public InvariantDictionary<UIFormField> Fields {set; get;}
 
         public object GetValue(string controlId) 
         {
-            var val = this.Fields[controlId];            
+            var val = this.Fields[controlId];
 
             return val.Value;
         }
     }
-
-    public class UIFormField
-    {
-        public string ControlId {set; get;}
-        public FormControlType WidgetType {set; get;}
-        public DynamicObj Properties {set; get;}
-        public object Value {set; get;}
-        public string ErrorMessage {set; get;}
-    }
     
     public class ObjectModelInfo: DynamicObj
     {
-        public int ObjectId {set; get;}
-        public EntityCode EntityId {set; get;}
+        public int ObjectId {set { this.Add("ObjectId", value, true); } get => this.Get("ObjectId", -1);}
+        public EntityCode EntityId {set { this.Add("EntityId", value.Code, true); } get => this.Get("EntityId", 0);}
         public ObjectModelInfo()
         {
 

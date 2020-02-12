@@ -9,9 +9,9 @@ namespace StackErp.Core
 {
     public class EntityMetaData
     {
-        private static IDictionary<int, DBEntity> entities;
+        public static IDictionary<int, DBEntity> entities;
 
-        public static IDictionary<int, DBEntity> Build()
+        public static void Build()
         {
             entities = new Dictionary<int, DBEntity>();
             EntityCode.AllEntities = new Dictionary<string, int>();
@@ -42,8 +42,7 @@ namespace StackErp.Core
                     if (fields.Keys.Contains(fname.ToUpper()))
                         throw new AppException($"Field with same name <{fname}> in entity <{name}> found in system.");
 
-                        var field = BuildField(name, table, sch, dbentities);
-                        field.Init();
+                        var field = BuildField(name, table, sch, dbentities);                        
                         fields.Add(fname.ToUpper(), field);
                     }
 
@@ -51,17 +50,21 @@ namespace StackErp.Core
                     entities.Add(entid, e);
                 }
 
-                foreach (var ent in entities)
+                foreach (var entK in entities)
                 {
-                    ent.Value.Init();
+                    var ent = entK.Value;
+                    ent.Init();
+                    foreach(var fieldK in ent.Fields)
+                    {
+                        fieldK.Value.Init();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw new EntityException("Error in building entities. " + ex.Message);
             }
-
-            return entities;
+            
         }
 
         private static BaseField BuildField(string entName, string table, DbObject sch, List<DbObject> dbentities)
@@ -138,14 +141,7 @@ namespace StackErp.Core
                     break;
             }
             return field;
-        }
-        // public static DBEntity Get(string name)
-        // {
-        //     if (entities.Keys.Contains(name.ToUpper()))
-        //         return entities[name.ToUpper()];
-
-        //     throw new EntityException($"Requested Entity {name} not found.");
-        // }
+        }        
 
         public static DBEntity Get(EntityCode id)
         {
@@ -197,6 +193,6 @@ namespace StackErp.Core
             }
 
             return t;
-        }
+        }        
     }
 }

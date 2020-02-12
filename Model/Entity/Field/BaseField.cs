@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace StackErp.Model.Entity
 {
@@ -84,17 +85,23 @@ namespace StackErp.Model.Entity
     {
         public object Visibility {set;get;}
         public object DataLinking {set;get;}
-        public DataMap DataMapping {set;get;}
-        public object DataSource {set;get;}        
+        public SourceDataMap DataMapping {set;get;}
+        public PickerDataSource DataSource {set;get;}        
 
         public FieldAttribute FieldAttribute {set;get;}
 
     }
 
-    public class DataMap {
-        public object Text {set;get;}
-        public object Value {set;get;}
-        public object Code {set;get;}
+    public class SourceDataMap {
+        public SourceFieldMap Text {set;get;}
+        public SourceFieldMap Value {set;get;}
+        public SourceFieldMap Code {set;get;}
+        public List<SourceFieldMap> Others {set;get;}
+    }
+    public class SourceFieldMap
+    {
+        public string Source {set;get;}
+        public string Field {set;get;}
     }
 
     public class FieldAttribute
@@ -103,5 +110,17 @@ namespace StackErp.Model.Entity
         public string TextField {set;get;}
         public string CodeField {set;get;}
         public object DefaultValue {set;get;}
+        public EntityCode RefEntity {set;get;}
+    }
+
+    public class PickerDataSource
+    {
+        public string Type {set;get;} //ENTITY,SERVICE,FUNCTION
+        public EntityCode Entity {set;get;}
+        public List<string> Fields {set;get;}
+        public string IdField {set;get;}
+        public string SortOnField {set;get;}
+        public string FunctionName {set;get;}
+        public string Domain {set;get;}
     }
 }

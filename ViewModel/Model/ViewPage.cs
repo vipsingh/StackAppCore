@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using StackErp.Model;
 using StackErp.Model.Form;
+using StackErp.Model.Layout;
 using StackErp.Model.Utils;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.ViewContext;
@@ -10,18 +11,22 @@ namespace StackErp.ViewModel.Model
 {
     public class ViewPage
     {
-        public Dictionary<string, BaseWidget> Controls {get;set;}        
+        public AppPageType PageType {set;get;}
+        public Dictionary<string, BaseWidget> Widgets {get;set;}        
         public string PostUrl {get;}
-        public Dictionary<string, ActionInfo> Actions {get;set;}
+        public InvariantDictionary<ActionInfo> Actions {get;set;}
         public ObjectModelInfo EntityInfo {set;get;}
         public string ErrorMessage {set;get;}
 
-        public object Layout {set;get;}
+        public TView Layout {set;get;}
         public ViewPage(FormContext formContext)
         {
+            PageType = AppPageType.Detail;
+            
             this.EntityInfo = formContext.EntityModelInfo;
-            this.Controls = formContext.Widgets; 
+            this.Widgets = formContext.Widgets; 
             this.Actions = formContext.Actions.ActionButtons;
+            this.Layout = formContext.GetLayoutView();
 
             this.PostUrl = formContext.Context.AppRoot + "entity/save?" + formContext.RequestQuery.ToQueryString();
         }

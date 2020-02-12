@@ -26,11 +26,18 @@ namespace StackErp.ViewModel.DataList
 
         protected void PrepareFields(DataListContext context, DataListDefinition defn)
         {
-            var formContext = new ViewContext.ViewFormContext(context.Context, context.SourceEntityId, context.Context.RequestQuery);
+            var formContext = new ViewContext.DetailFormContext(context.Context, context.SourceEntityId, context.Context.RequestQuery);
 
             foreach(var tField in defn.Layout.Fields)
             {
-                var field = context.SourceEntity.GetFieldSchemaByViewName(tField.FieldId);
+                BaseField field = null;
+                if (!String.IsNullOrEmpty(tField.FieldName))
+                {
+                    field = context.SourceEntity.GetFieldSchema(tField.FieldName);
+                } else {
+                    field = context.SourceEntity.GetFieldSchemaByViewName(tField.FieldId);
+                }
+
                 if (field != null)
                 {
                     var w = BuildWidget(formContext, field);
@@ -42,7 +49,7 @@ namespace StackErp.ViewModel.DataList
         public BaseWidget BuildWidget(ViewContext.FormContext formContext, BaseField field)
         {   
             var widgetContext = new WidgetContext(formContext);
-            widgetContext.Build(field);
+            widgetContext.Build(field, null);
 
             var widget = WidgetFactory.Create(widgetContext);
             widget.OnCompile();
@@ -54,10 +61,11 @@ namespace StackErp.ViewModel.DataList
         {
             EntityListService service = new EntityListService();
             var data = service.ExecuteData(context.DbQuery);
-
+            context.Data = data;
         }
         protected void PrepareRow(DbObject dbRow)
         {
+
         }
     }
 }

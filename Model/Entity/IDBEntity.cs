@@ -9,6 +9,7 @@ namespace StackErp.Model.Entity
         EntityCode EntityId {get;}
         string Name {get;}
         string DBName {get;}
+        string Text { get; }
         Dictionary<string, BaseField> Fields {get;}
         
         string TextField {get; set;}

@@ -53,7 +53,7 @@ namespace StackErp.DB
         private string BuildQuery()
         {
             string qry = "";
-            var fls = BuildInsertFields();
+            var fls = BuildInsertFields(_model.IsNew);
             List<string> toInsert = new List<string>();
             List<string> toInsertP = new List<string>();
             toInsert.Add("ID");
@@ -76,7 +76,7 @@ namespace StackErp.DB
             return qry;
         }
 
-        private List<(string, DynamicDbParam)> BuildInsertFields()
+        private List<(string, DynamicDbParam)> BuildInsertFields(bool isNew)
         {
             List<(string, DynamicDbParam)> qryA = new List<(string, DynamicDbParam)>();
             foreach (var f in _model.Attributes)
