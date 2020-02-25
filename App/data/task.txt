@@ -1,13 +1,25 @@
 Native Validation               18/Jan
 Display save error on field     18/Jan
 Detail Object                   20/Jan  #set formatted value
+PickerList                      05/Feb
+Layout Validation
+Custom Actions
+Layout Rules
 
 ## Client Side ##
 Basic Form Edit                 18/Jan
 FormBuilder                     20/Jan - 26/Jan
 ListView
 
-PickerList                      05/Feb
-Layout Validation
-Layout Rules
-Custom Actions
+
+------------------------------------------------------------------------------------------------
+Form Rules -> 
+
+UIField.GetVisibility()
+IFormRuleInfo {
+	Type: Mandatory, ReadOnly, Visibility
+	Criteria: FilterExpression
+	Fields: []
+}
+
+create FormFilterExpression from FilterExpression

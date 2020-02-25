@@ -121,7 +121,7 @@ public enum ActionButtonPosition {
 public enum ActionDisplayType {
     None=0,
     Label=1,
-    Button=2    
+    Button=2
 }
 
 public enum ActionExecutionType {

@@ -39,7 +39,7 @@ namespace StackErp.ViewModel.ViewContext
     //  JSIncludes: Array<string>
     // CSSIncludes: Array<string>
 
-    // FormRules: Array<{Type: string, Index: number, Criteria: FilterCriteria, Fields: string[]}>
+       public List<FormRule> FormRules {set;get;}
     // FieldDependency: Array<{Type: string, Field: string, Parent: string[]}>
     // _ruleIndex: number
 
