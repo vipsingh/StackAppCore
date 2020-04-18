@@ -1,19 +1,22 @@
 import React from "react";
-import PropTypes from "prop-types";
-import Form from "../../../Component/Form/Form";
 import PageView from "../../../Component/Form/PageView";
+import EntityForm from "../../../Component/Form/EntityForm";
 
-class Desk extends React.Component {
-  static propTypes = {
-    data: PropTypes.object
-  };
-  constructor(props) {
+class Desk extends React.Component<{
+  data: any
+}, {
+  IsLoading: boolean,
+  Schema: any,
+  FormData: any
+}> {
+
+  constructor(props: any) {
     super(props);
 
     this.state = {
       IsLoading: false,
       Schema: props.data,
-      Formdata: null
+      FormData: null
     };
   }
 
@@ -21,18 +24,18 @@ class Desk extends React.Component {
     return true;
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: any) {
     this.setState({ Schema: nextProps.data });
   }
 
   render() {
     
     return (
-        <Form
+        <EntityForm
                 Schema={this.state.Schema}
-                Formdata={this.state.Formdata}
+                FormData={this.state.FormData}
                 render={
-                    (prop) => {
+                    (prop: any) => {
                         return (
                            <PageView 
                                {...prop}

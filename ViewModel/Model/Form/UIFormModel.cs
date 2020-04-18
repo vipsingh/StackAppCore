@@ -1,19 +1,25 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using StackErp.Model;
 using StackErp.Model.Form;
 
 namespace StackErp.ViewModel.Model
 {
+    public class XForm {
+        public string XYZ  {set; get;}
+        public ObjectModelInfo EntityInfo {set; get;}
+        //public InvariantDictionary<UIFormField> Widgets {set; get;}
+    }
     public class UIFormModel
     {
         public DynamicObj Properties {set; get;}
         public ObjectModelInfo EntityInfo {set; get;}
-        public InvariantDictionary<UIFormField> Fields {set; get;}
+        public InvariantDictionary<UIFormField> Widgets {set; get;}
 
         public object GetValue(string controlId) 
         {
-            var val = this.Fields[controlId];
+            var val = this.Widgets[controlId];
 
             return val.Value;
         }
@@ -33,4 +39,5 @@ namespace StackErp.ViewModel.Model
             EntityId=entityId;
         }
     }
+
 }

@@ -12,7 +12,7 @@ namespace StackErp.ViewModel.ViewContext
     {
         public StackAppContext Context { get; }
         public IDBEntity Entity { protected set; get;}
-        public EntityLayoutType EntityLayoutType { private set; get;}
+        public EntityLayoutType EntityLayoutType { protected set; get;}
         public int ObjectId { private set; get;}
         public RequestQueryString RequestQuery { private set; get;}
         public LayoutContext LayoutContext { set; get;}
@@ -40,6 +40,7 @@ namespace StackErp.ViewModel.ViewContext
     // CSSIncludes: Array<string>
 
        public List<FormRule> FormRules {set;get;}
+       public List<string> MissingFields {set;get;}
     // FieldDependency: Array<{Type: string, Field: string, Parent: string[]}>
     // _ruleIndex: number
 
@@ -53,6 +54,7 @@ namespace StackErp.ViewModel.ViewContext
             _parms = new DynamicObj();
             _props = new DynamicObj();
             Actions = new PageActions();
+            MissingFields = new List<string>();
 
             ObjectId = RequestQuery.ItemId;            
         }
@@ -66,6 +68,14 @@ namespace StackErp.ViewModel.ViewContext
         public void AddControl(BaseWidget control) 
         {
             this.Widgets.Add(control.WidgetId, control);
+        }
+
+        public BaseWidget GetWidget(string widgetId) 
+        {
+            if (this.Widgets.ContainsKey(widgetId))
+                return this.Widgets[widgetId];
+            
+            return null;
         }
 
         public virtual void AddEntityContext() {

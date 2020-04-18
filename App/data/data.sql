@@ -1,19 +1,28 @@
 insert into entitymaster(name,text,tablename,primaryfield,namefield)
 values('UserRole','UserRole','UserRole','id','name');
 
-insert into entityschema(entityid,fieldname,label,fieldtype,length,isrequired
+insert into entityschema(id, entityid,fieldname,label,fieldtype,length,isrequired
 ,dbname,tablename,viewtype,defaultvalue
 ,linkentity,linkentity_domain,createdon,updatedon)
-values(2,'id','id',25,0,false
+values(12,2,'id','id',25,0,false
 ,'id','UserRole',0,null
 ,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
 
-insert into entityschema(entityid,fieldname,label,fieldtype,length,isrequired
+insert into entityschema(id,entityid,fieldname,label,fieldtype,length,isrequired
 ,dbname,tablename,viewtype,defaultvalue
 ,linkentity,linkentity_domain,createdon,updatedon)
-values(1,'AssignDate','AssignDate',5,100,false
+values(11,1,'AssignDate','AssignDate',5,100,false
 ,'AssignDate','UserMaster',0,null
 ,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+--select field
+insert into entityschema(id,entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue,LookupId
+,linkentity,linkentity_domain,createdon,updatedon)
+values(14,1,'Type','Type',9,100,false
+,'Type','UserMaster',0,null,1
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
 
 --link field
 insert into entityschema(entityid,fieldname,label,fieldtype,length,isrequired

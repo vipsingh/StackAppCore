@@ -32,6 +32,7 @@ CREATE TABLE entityschema
 	viewtype integer default(0),
 	linkentity integer,
 	linkentity_domain character varying(500),	
+	lookupid int,
 	isrequired boolean,
 	isreadonly boolean,
 	defaultvalue character varying(200),
@@ -79,4 +80,13 @@ CREATE TABLE company_master
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
 	CONSTRAINT company_master_pkey PRIMARY KEY (id)
+)
+
+create table lookup_master(
+	id integer not null,
+	dataid integer not null,
+	datatext character varying(100) ,
+	datainfo character varying(500) ,
+	datacode character varying(60) ,
+	primary key(id,dataid)
 )

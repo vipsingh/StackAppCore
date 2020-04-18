@@ -21,10 +21,11 @@ namespace StackErp.ViewModel.ViewContext
         public EntityCode SourceEntityId {protected set; get;}
         public IDBEntity SourceEntity {protected set; get;}
         public DbQuery DbQuery {protected set; get;}
-        public Dictionary<string, BaseWidget> Fields  {set; get;} 
+        public InvariantDictionary<BaseWidget> Fields  {set; get;} 
         protected int _DefaultPageSize;
         public List<DynamicObj> Data {set; get;} 
         public  string IdColumn {set; get;} 
+        public string ItemViewField {set; get;} 
 
         public DataListContext(StackAppContext context, ListRequestinfo requestInfo)
         {
@@ -32,7 +33,7 @@ namespace StackErp.ViewModel.ViewContext
             ListRequest = requestInfo;
             _parms = new DynamicObj();
             _props = new DynamicObj();
-            Fields = new Dictionary<string, BaseWidget>();
+            Fields = new InvariantDictionary<BaseWidget>();
              _RequestMode = ListRequest.RequestType;
             Init();
         }
@@ -56,12 +57,15 @@ namespace StackErp.ViewModel.ViewContext
         {
             var entity = Core.EntityMetaData.Get(defn.EntityId);
             this.DbQuery = new DbQuery(entity);
+            this.DbQuery.ItemIdField = defn.ItemIdField;
+            
             if (defn.Layout != null)
             {
                 this.DbQuery.BuildWithLayout(defn.Layout);
             }
             this.DbQuery.ResolveFields();
             this.IdColumn = defn.ItemIdField;
+            this.ItemViewField = defn.ItemViewField;
 
             var gridReq = ListRequest.GridRequest;
             if (gridReq != null)

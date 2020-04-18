@@ -10,6 +10,7 @@ namespace StackErp.ViewModel.ViewContext
         public EditFormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery): base(context, entity, requestQuery)
         {
             this.Entity = (IDBEntity)Core.EntityMetaData.Get(entity);
+            this.EntityLayoutType = EntityLayoutType.Edit;
         }
 
         public override bool IsNew

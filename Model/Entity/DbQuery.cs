@@ -14,7 +14,7 @@ namespace StackErp.Model.Entity
         public FilterExpression Filters {private set;get;}
 
         public List<(string, string)> OrderBy {private set;get;}
-        public string ItemIdField {private set;get;}
+        public string ItemIdField {set;get;}
         public int PageSize {private set;get;}
         protected int PageIndex;
         public bool IsFixedQuery {private set;get;}

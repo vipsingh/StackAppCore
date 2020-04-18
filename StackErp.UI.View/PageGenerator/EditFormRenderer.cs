@@ -16,6 +16,7 @@ namespace StackErp.UI.View.PageGenerator
         {
             base.Compile(layoutContext);
             this.BuildDependencies();
+            BuildActions();
         }
         protected void BuildDependencies()
         {
@@ -23,15 +24,14 @@ namespace StackErp.UI.View.PageGenerator
         }
         protected override void OnRenderComplete()
         {
-            this.FillWidgetsData();
-            BuildActions();
+            this.FillWidgetsData();            
             
             base.OnRenderComplete();
         }
         private void BuildActions()
         {
             var actionContext = new ActionContext(FormContext, ActionType.Save, "BTN_SAVE");
-            actionContext.Query = FormContext.RequestQuery;//.clone();
+            actionContext.Query = FormContext.RequestQuery.Clone();
             FormContext.Actions.Add(PageActionCreator.Create(actionContext));
         }
         public void FillWidgetsData()

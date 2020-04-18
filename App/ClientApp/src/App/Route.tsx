@@ -1,11 +1,10 @@
-
 import React from "react";
-import { Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import PageFactory from "./Page/Factory";
 import Studio from "./Page/Studio";
+import PageContext, { createPageContext } from "../Core/PageContext";
 
 function AppRoutes() {
-  
   return (
     <Switch>
       <Route exact path="/" component={NotFound} />
@@ -31,22 +30,30 @@ class NotFound extends React.Component {
   }
 }
 
-class RouteComponent extends React.Component<{
-  match: any,
-  location: any
-}, {
-  loaded: boolean,
-  pageType: string,
-  data: any
-}> {
+class RouteComponent extends React.Component<
+  {
+    match: any;
+    location: any;
+    history: any
+  },
+  {
+    loaded: boolean;
+    pageType: string;
+    data: any;
+  }
+  > 
+{
+  pageContext: any  
   
   constructor(props: any) {
     super(props);
     this.state = {
       loaded: false,
       pageType: "",
-      data: null
+      data: null,
     };
+
+    this.pageContext = createPageContext(0, this.props.history);
   }
 
   componentDidMount() {
@@ -65,9 +72,9 @@ class RouteComponent extends React.Component<{
 
     window._App.Request.getData({
       url: url,
-      type: "GET"
+      type: "GET",
     })
-      .then((data: any) => {        
+      .then((data: any) => {
         const schema = data;
         const pageType = schema.PageType;
         this.setState({ pageType, data: data, loaded: true });
@@ -97,7 +104,7 @@ class RouteComponent extends React.Component<{
 
     if (this.state.loaded && data) {
       const Component: any = PageFactory.getPage(pageType);
-      return <Component data={data} />;
+      return <PageContext.Provider value={this.pageContext}><Component data={data} /></PageContext.Provider>;
     } else {
       return <label>routing</label>;
     }

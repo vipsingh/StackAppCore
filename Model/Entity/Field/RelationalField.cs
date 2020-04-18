@@ -67,12 +67,18 @@ namespace StackErp.Model.Entity
     }
 
     public class SelectField: BaseField {
-        public int CollectionId {set;get;}
+        public int LookupId {set;get;}
         public bool IsPickList {set;get;}
         public List<SelectOption> PickList {set;get;}
         public SelectField(): base() {
             Type = FieldType.Select;
             BaseType = BaseTypeCode.Int32;
+        }
+
+        public override void OnInit()
+        {
+            base.OnInit();
+            ControlInfo.LookupId = this.LookupId;
         }
 
         public override object ResolveSetValue(object value, out bool isValid)

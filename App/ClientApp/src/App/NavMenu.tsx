@@ -1,6 +1,7 @@
 import React from "react";
 import _ from "lodash";
-import { Menu, Icon } from "antd";
+import { Menu } from "antd";
+import { HomeOutlined } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import ActionButton from "../Component/ActionLink";
 
@@ -31,7 +32,7 @@ export default class NavMenu extends React.PureComponent {
     return (
       <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
         <Menu.Item key="1">
-          <Icon type="home" />
+          <HomeOutlined />
           <span>Home</span>
         </Menu.Item>
 

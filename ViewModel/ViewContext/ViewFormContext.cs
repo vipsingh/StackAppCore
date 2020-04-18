@@ -11,6 +11,7 @@ namespace StackErp.ViewModel.ViewContext
         {
             this.Entity = (IDBEntity)Core.EntityMetaData.Get(entity);
             IsViewMode = true;
+            this.EntityLayoutType = EntityLayoutType.View;
         }
 
         public override void Build(UIFormModel model = null)

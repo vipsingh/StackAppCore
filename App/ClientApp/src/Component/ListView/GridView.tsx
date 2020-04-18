@@ -2,6 +2,7 @@ import React from "react";
 import { Table } from 'antd';
 import _, { Dictionary } from "lodash";
 import ListingWrapper from "./ListingWrapper";
+import ActionLink from "../ActionLink";
 
 class GridView extends React.Component<{
     listData: any, 
@@ -19,17 +20,19 @@ class GridView extends React.Component<{
         };
     }
 
-    formatCell(val: any, row: any) {
-        // if (this.Format && this.Format.URL) {
-        //     let u = this.Format.URL;
-        //     u = u.replace("$$ObjectId$$", row.RowId);
-        //     return (<a href={u}>{val}</a>);
-        // }
-        if (typeof val === "object" && val.Text){
-            val = val.Text;
+    formatCell(val: any, row: any) {        
+        const { AdditionalValue, FormatedValue } = val;
+        let d = FormatedValue;
+        if (typeof FormatedValue === "object"){
+            d = FormatedValue.Text;
+        } 
+
+        if (AdditionalValue && AdditionalValue.ViewLink) {
+            const { ViewLink } = AdditionalValue;
+            return (<ActionLink ActionId={"VIEW"} {...ViewLink} Title={d} />);
         }
 
-        return val;
+        return d;
     }
 
     prepareAntTableSchema(columns: Dictionary<any>) {
@@ -54,6 +57,8 @@ class GridView extends React.Component<{
                 columns={columns}
                 dataSource={Data}
                 rowKey={IdColumn}
+                bordered
+                size="small"
             />
         );
     }

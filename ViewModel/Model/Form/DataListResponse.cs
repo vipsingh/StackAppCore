@@ -13,6 +13,7 @@ namespace StackErp.ViewModel.Model
         public List<DynamicObj> Data {set; get;} 
         public string RenderMode{set;get;}
         public string IdColumn {set;get;}
+        public string ItemViewField {set;get;}
         public object Layout{set;get;}
         public Dictionary<string, ActionInfo> ActionButtons {get;}
         public int PageSize {set;get;}

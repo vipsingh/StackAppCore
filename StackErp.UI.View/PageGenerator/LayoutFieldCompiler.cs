@@ -17,6 +17,9 @@ namespace StackErp.UI.View.PageGenerator
 
         public virtual void Compile(BaseField field, TField LayoutField)
         {
+            if (LayoutField.FieldId == null && field != null) {
+                LayoutField.FieldId = field.ViewName;
+            }
             if(!this.FormContext.Widgets.ContainsKey(LayoutField.FieldId))
             {
                 var widget = BuildWidget(field, LayoutField);

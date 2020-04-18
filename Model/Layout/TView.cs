@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 using StackErp.Model.Entity;
 using StackErp.Model.Utils;
@@ -13,6 +14,10 @@ namespace StackErp.Model.Layout
         public TPage Header { set; get; }
         public int RenderingStyle { set; get; }
         public List<TPage> Pages { set; get; }
+        
+        [JsonIgnore]
+        public List<TFormRule> FormRules { set; get; }
+        public List<TCommand> Commands { set; get; }
         public TView()
         {
             Pages = new List<TPage>();
@@ -95,6 +100,22 @@ namespace StackErp.Model.Layout
         }
     }
 
+    public class TFormRule
+    {
+        public string Type {set;get;}
+        public string Criteria {set;get;}
+        public List<string> Fields {set;get;}
+    }
+    
+    public class TCommand
+    {
+        [XmlAttribute]
+         public string Id {set;get;}
+         [XmlAttribute]
+        public string Text {set;get;}
+        [XmlAttribute]
+        public string Position {set;get;}
+    }
     public class TList
     {
         public string Id  { set; get; }

@@ -39,10 +39,10 @@ namespace StackErp.Core
                     {
                         var fname = sch.Get("FIELDNAME", "");
 
-                    if (fields.Keys.Contains(fname.ToUpper()))
-                        throw new AppException($"Field with same name <{fname}> in entity <{name}> found in system.");
+                        if (fields.Keys.Contains(fname.ToUpper()))
+                            throw new AppException($"Field with same name <{fname}> in entity <{name}> found in system.");
 
-                        var field = BuildField(name, table, sch, dbentities);                        
+                        var field = BuildField(name, table, sch, dbentities);
                         fields.Add(fname.ToUpper(), field);
                     }
 
@@ -50,11 +50,13 @@ namespace StackErp.Core
                     entities.Add(entid, e);
                 }
 
+                StackErp.Core.Studio.StudioService.BuildSchema(ref entities);
+
                 foreach (var entK in entities)
                 {
                     var ent = entK.Value;
                     ent.Init();
-                    foreach(var fieldK in ent.Fields)
+                    foreach (var fieldK in ent.Fields)
                     {
                         fieldK.Value.Init();
                     }
@@ -64,18 +66,18 @@ namespace StackErp.Core
             {
                 throw new EntityException("Error in building entities. " + ex.Message);
             }
-            
+
         }
 
-        private static BaseField BuildField(string entName, string table, DbObject sch, List<DbObject> dbentities)
-        {            
+        internal static BaseField BuildField(string entName, string table, DbObject sch, List<DbObject> dbentities)
+        {
             var typ = sch.Get("fieldtype", 0);
             var fname = sch.Get("FIELDNAME", "");
 
             var field = CreateField((FieldType)typ);
 
             field.Name = fname;
-            field.Type = (FieldType)typ;            
+            field.Type = (FieldType)typ;
             field.DBName = fname;
             field.IsDbStore = true;
             field.TableName = table;
@@ -93,55 +95,64 @@ namespace StackErp.Core
             }
             field.IsRequired = sch.Get("isrequired", false);
 
+            if (field is SelectField)
+            {
+                var lookupid = sch.Get("lookupid", 0);
+                ((SelectField)field).LookupId = lookupid;
+            }                
+
             field.ControlType = GetDefaultControl(field.Type);
 
             return field;
         }
 
-        private static BaseField CreateField(FieldType type)
+        internal static BaseField CreateField(FieldType type)
         {
             BaseField field = null;
-            switch(type)
+            switch (type)
             {
+                case FieldType.ObjectKey:
+                    field = new ObjectKeyField();
+                    break;
                 case FieldType.BigInt:
                     field = new BigIntField();
                     break;
                 case FieldType.Bool:
                     field = new BoolField();
                     break;
-                                    case FieldType.Date:
+                case FieldType.Date:
                     field = new DateField();
                     break;
-                                    case FieldType.DateTime:
+                case FieldType.DateTime:
                     field = new DateTimeField();
                     break;
-                                    case FieldType.Decimal:
+                case FieldType.Decimal:
                     field = new DecimalField();
                     break;
-                                    case FieldType.Image:
+                case FieldType.Image:
                     field = new ImageField();
                     break;
-                                    case FieldType.Integer:
+                case FieldType.Integer:
                     field = new IntegerField();
                     break;
-                                                        case FieldType.LongText:
+                case FieldType.LongText:
                     field = new LongTextField();
                     break;
-                                                        case FieldType.MonataryAmount:
+                case FieldType.MonataryAmount:
                     field = new DecimalField();
                     break;
-                                                        case FieldType.ObjectLink:
+                case FieldType.ObjectLink:
                     field = new LinkField();
                     break;
-                    case FieldType.Select:
+                case FieldType.Select:
                     field = new SelectField();
                     break;
-                    default:
+                default:
                     field = new StringField();
                     break;
             }
             return field;
-        }        
+        }
 
         public static DBEntity Get(EntityCode id)
         {
@@ -182,7 +193,7 @@ namespace StackErp.Core
                     break;
                 case FieldType.MonataryAmount:
                     t = FormControlType.DecimalBox;
-                    break;                    
+                    break;
                 case FieldType.Select:
                     t = FormControlType.Dropdown;
                     break;
@@ -193,6 +204,6 @@ namespace StackErp.Core
             }
 
             return t;
-        }        
+        }
     }
 }

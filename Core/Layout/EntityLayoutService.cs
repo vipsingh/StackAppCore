@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using StackErp.DB.Layout;
@@ -8,6 +9,7 @@ using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.Model.Utils;
 using StackErp.Model.Layout;
+using System.Xml.Serialization;
 
 namespace StackErp.Core.Layout
 {
@@ -71,10 +73,47 @@ namespace StackErp.Core.Layout
                 view.Pages.Add(p);
             }
 
+            view.FormRules = new List<TFormRule>();
 
+            var rules = root.SelectSingleNode("/view/rules");
+            if (rules != null) 
+            {
+                foreach (XmlNode r in rules.SelectNodes("./rule"))
+                {
+                    var fr = new TFormRule();
+                    fr.Criteria = r.Attributes["criteria"].Value;
+                    fr.Type = r.Attributes["type"].Value;
+                    var rFields = r.Attributes["fields"].Value;
+                    if (!String.IsNullOrEmpty(rFields))
+                    {
+                        fr.Fields = rFields.Split(',').ToList();
+                    }
+                    view.FormRules.Add(fr);
+                }
+            }
 
+            var commands = root.SelectSingleNode("/view/commands");
+            if (commands != null) 
+            {       
+                view.Commands = new List<TCommand>();         
+                foreach (XmlNode r in commands.SelectNodes("./command"))
+                {
+                    var fr = new TCommand();
+                    fr.Id = ReadAttribute(r, "id");
+                    fr.Text = ReadAttribute(r, "text");
+                    fr.Position = ReadAttribute(r, "position");                    
+                    view.Commands.Add(fr);
+                }
+            }
 
             return view;
+        }
+
+        private static string ReadAttribute(XmlNode node, string attr)
+        {
+            var n = node.Attributes[attr];
+
+            return n== null ? null: n.Value;
         }
 
         private TGroup CreateGroup(XmlNode group)

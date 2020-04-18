@@ -7,10 +7,13 @@ namespace StackErp.Model
 {
     public class DBModelBase
     {
+        public string DbTableName {protected set; get;}
         protected FieldDataCollection _attr;
         public FieldDataCollection Attributes { get => _attr; }
         public Int32 ID { get; protected set; }
         public EntityCode EntityId { get; }
+        public int _id { private set; get; }
+        public bool IsNew { get => !(this._id > 0); }
 
         public DBModelBase(EntityCode entityId)
         {
@@ -25,21 +28,19 @@ namespace StackErp.Model
         public virtual void BuiltWithDB(DbObject dbData)
         {
             //this._attr = dbData;
-            this.ID = dbData.Get("id", 0);                       
+            this.ID = _id = dbData.Get("id", 0);                       
         }
     }
     
     public class EntityModelBase: DBModelBase
     {
         public IDBEntity Entity {get;}
-        public short RecordStatus { get; }
+        public short RecordStatus { get; }        
                
         public DateTime CreatedOn {private set; get; }
         public DateTime UpdatedOn {private set; get; }
         public int CreatedBy {private set; get; }
-        public int UpdatedBy {private set; get; }
-
-        public bool IsNew { get => !(this.ID > 0); }
+        public int UpdatedBy {private set; get; }        
 
         public int LayoutId {private set; get; }
         
@@ -51,6 +52,7 @@ namespace StackErp.Model
         public EntityModelBase(IDBEntity entity): base(entity.EntityId)
         {
             Entity = entity;
+            DbTableName = entity.DBName;
         }
 
         public void CreateDefault() {
@@ -62,7 +64,8 @@ namespace StackErp.Model
 
         public override void BuiltWithDB(DbObject dbData)
         {
-            this.ID = dbData.Get("id", 0);
+            base.BuiltWithDB(dbData);
+                        
             this.CreatedOn = dbData.Get("createdon", DateTime.MinValue);
             this.UpdatedOn = dbData.Get("updatedon", DateTime.MinValue);
             

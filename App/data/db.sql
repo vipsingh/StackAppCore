@@ -25,6 +25,7 @@ CREATE TABLE userrole
     name character varying(100) COLLATE pg_catalog."default" NOT NULL,    
     info character varying(100),
     category integer,
+    isadmin BOOLEAN,
     createdon timestamp without time zone,
     updatedon timestamp without time zone,
     CONSTRAINT userrole_pkey PRIMARY KEY (id)

@@ -7,10 +7,11 @@ function processRequest(resolve: Function, reject: Function, params: RequestPara
     const requestType = (typeof params.type === "string") ? params.type.toUpperCase() : "POST";
     let contentType = params.contentType ? params.contentType : null;
     let url = params.url;
-    const _w: any = window;
-    url = `${_w._AppSetting.ApiUrl}${url}&_x=${new Date().getTime()}`;
+    //const _w: any = window;
+    url = "/" + url;
+    url = `${url.replace("//","/")}&_x=${new Date().getTime()}`;
     
-    console.log(url);
+    //console.log(url);
 
     contentType = "application/json";
     if (contentType) {
@@ -19,7 +20,11 @@ function processRequest(resolve: Function, reject: Function, params: RequestPara
 
     let f = null;
     if (requestType === "POST") {
-        f = axios({
+        const instance = axios.create({
+            headers: myHeaders
+          });
+
+        f = instance({
             method: 'post',
             url: url,
             data: requestBody

@@ -15,10 +15,6 @@ export default class ActionLink extends React.Component<ActionInfo> {
 
             return;
         }
-
-        if (prop.Url) {
-            this.context.router.history.push(prop.Url);
-        }
     }
 
     render() {
@@ -29,7 +25,7 @@ export default class ActionLink extends React.Component<ActionInfo> {
                 <Button 
                     key={prop.ActionId}
                     style={{ margin: "1px 10px" }}
-                    onClick={prop.Url ? undefined : this.onCommandClick}
+                    onClick={prop.ExecutionType === 4 ? undefined : this.onCommandClick}
                     type="primary">
                         {
                             this.renderLink()
@@ -45,8 +41,11 @@ export default class ActionLink extends React.Component<ActionInfo> {
         const prop = this.props;
         const title = prop.Title || prop.ActionId;
 
-        if (this.props.Url) {
-            return <Link to={`/web/${prop.Url}`}>{title}</Link>;
+        if (prop.ExecutionType === 4 && this.props.Url) {
+            let u = `/web/${prop.Url}`;
+            u = u.replace("//", "/");
+
+            return <Link to={u}>{title}</Link>;
         }
 
         return title;

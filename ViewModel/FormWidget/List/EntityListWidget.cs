@@ -11,7 +11,7 @@ namespace StackErp.ViewModel.FormWidget
 
         public EntityListWidget(WidgetContext cntxt): base(cntxt)
         {
-            
+
         }
         public override void OnCompile()
         {

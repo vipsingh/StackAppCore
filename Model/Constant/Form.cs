@@ -41,10 +41,10 @@ public enum EntityLayoutType {
     Kanban =6
 }
 
-public enum LayoutViewType {
-    None = 0,
-    Simple = 1
-}
+// public enum LayoutViewType {
+//     None = 0,
+//     Simple = 1
+// }
 
 public enum LayoutRenderMode {
     None = 0,
@@ -101,9 +101,9 @@ public enum ActionType {
     Export= 15,
     Update = 16,
 
-
-    WebUrl = 21,
+    Url = 21,
     Client = 22,
+    Function = 23,
 
     Custom = 50
 }
@@ -136,7 +136,8 @@ public enum ActionExecutionType {
 public enum EvalSourceType {
     ModelField = 1,
     Constant = 2,
-    RequestQuery = 3,    
-    RowItem = 4
+    RequestQuery = 3,
+    User = 4,
+    Env = 5
 }
 }

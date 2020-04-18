@@ -34,7 +34,7 @@ export default class EntityPage extends React.Component<any, any> {
         return(
             <Form
                 entityModel={this.state.entityModel}
-                onChange={this.onModelChange}
+                onFormUpdate={this.onModelChange}
                 onSubmit={this.handleSubmit}
                 render={
                     (prop: any) => {

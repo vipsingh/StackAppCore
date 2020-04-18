@@ -10,9 +10,9 @@ interface WidgetInfo {
     WidgetType: number,
     Value: any,
     Caption: string,
-    IsRequired: bool,
-    Disabled: boolean,
-    ListValues: Array<any>,
+    IsRequired: boolean,
+    IsReadOnly: boolean,
+    Options: Array<any>,
     IsViewMode: boolean,
     DataActionLink: any,
     IsHidden: boolean,
@@ -24,10 +24,19 @@ interface WidgetInfo {
 
 interface WidgetInfoProps extends WidgetInfo{
     IsDirty: boolean
-    api: any,
+    api: FormApi,
     onChange: Function,
     ValidationResult: any,
-    children: any
+    children: any,
+    HasError: boolean
+}
+
+interface FormApi {
+    setValue: Function,
+    updateField: Function,
+    getErrorResult: Function,
+    validateField: Function,
+    prepareFieldRequest: Function
 }
 
 interface ObjectModelInfo extends Dictionary {
@@ -43,9 +52,15 @@ interface ActionInfo {
     ActionId: string,
     Title: string,
     Url?: string,
-    ActionType: number,
+    ActionType?: number,
     DisplayType?: number,
     Icon?: string,
     ExecutionType?: number,
     onClick?: Function
+}
+
+interface RequestResultInfo {
+    Status: number,
+    Message: string,
+    RedirectUrl: string
 }

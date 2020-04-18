@@ -12,7 +12,8 @@ namespace StackErp.ViewModel.Model
     public class ViewPage
     {
         public AppPageType PageType {set;get;}
-        public Dictionary<string, BaseWidget> Widgets {get;set;}        
+        public Dictionary<string, BaseWidget> Widgets {get;set;}   
+        public List<FormRule> FormRules {get;set;}   
         public string PostUrl {get;}
         public InvariantDictionary<ActionInfo> Actions {get;set;}
         public ObjectModelInfo EntityInfo {set;get;}
@@ -22,11 +23,8 @@ namespace StackErp.ViewModel.Model
         public ViewPage(FormContext formContext)
         {
             PageType = AppPageType.Detail;
-            
-            this.EntityInfo = formContext.EntityModelInfo;
+                        
             this.Widgets = formContext.Widgets; 
-            this.Actions = formContext.Actions.ActionButtons;
-            this.Layout = formContext.GetLayoutView();
 
             this.PostUrl = formContext.Context.AppRoot + "entity/save?" + formContext.RequestQuery.ToQueryString();
         }

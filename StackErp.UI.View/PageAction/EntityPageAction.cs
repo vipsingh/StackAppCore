@@ -34,6 +34,7 @@ namespace StackErp.UI.View.PageAction
                 if (saveStatus == AnyStatus.Success)
                 {
                     response.Status = SubmitStatus.Success;
+                    response.RedirectUrl = AppLinkProvider.GetDetailPageLink(recordModel.EntityId, recordModel.ID).Url;
                     return response;
                 }
                 else if(saveStatus == AnyStatus.InvalidData)
@@ -55,10 +56,10 @@ namespace StackErp.UI.View.PageAction
             var fields = new InvariantDictionary<UIFormField>();
             foreach(var fData in recordModel.GetInvalidFields())
             {
-                fields.Add(fData.Field.ViewName.ToUpper(), new UIFormField(){ ControlId = fData.Field.ViewName, ErrorMessage = fData.ErrorMessage });
+                fields.Add(fData.Field.ViewName.ToUpper(), new UIFormField(){ WidgetId = fData.Field.ViewName, ErrorMessage = fData.ErrorMessage });
             }
 
-            model.Fields = fields;
+            model.Widgets = fields;
         }
     }
 }

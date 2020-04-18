@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 
 namespace StackErp.Model
 {
-    [JsonConverter(typeof(Utils.EntityCodeJsonConverter))]
     public struct EntityCode 
     {
         public int Code;

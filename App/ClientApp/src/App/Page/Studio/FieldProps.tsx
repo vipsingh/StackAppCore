@@ -45,7 +45,7 @@ export default class FieldProps extends Component<{
         return(
             <Form
                 entityModel={this.state.entityModel}
-                onChange={this.onModelChange}
+                onFormUpdate={this.onModelChange}
                 onSubmit={this.handleSubmit}
                 render={
                     (prop: any) => {

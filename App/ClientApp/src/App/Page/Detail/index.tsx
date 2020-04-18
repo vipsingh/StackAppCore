@@ -1,28 +1,32 @@
 import React from "react";
-import PropTypes from "prop-types";
 import EntityForm from "../../../Component/Form/EntityForm";
 import PageView from "../../../Component/Form/PageView";
 
 
-export default class NewEdit extends React.Component {
-    static propTypes = {
-        data: PropTypes.object
-    }
-    constructor(props) {
-        super(props);
+export default class Detail extends React.Component <{
+    data: any
+    }, {
+        IsLoading: boolean,
+        Schema: any,
+        FormData: any
+    }> 
+{
 
+    constructor(props: any) {
+        super(props);
+    
         this.state = {
-            IsLoading: false,
-            Schema: props.data,
-            Formdata: null
+          IsLoading: false,
+          Schema: props.data,
+          FormData: null
         };
-    }
+      }
 
     shouldComponentUpdate() {
         return true;
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentWillReceiveProps(nextProps: any) {
         this.setState({Schema: nextProps.data});
     }
 
@@ -36,9 +40,9 @@ export default class NewEdit extends React.Component {
         return (
             <EntityForm
                 Schema={this.state.Schema}
-                Formdata={this.state.Formdata}
+                FormData={this.state.FormData}
                 render={
-                    (prop) => {
+                    (prop: any) => {
                         return (
                            <PageView
                                {...prop}

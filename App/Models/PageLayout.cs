@@ -29,7 +29,7 @@ namespace StackErp.App
 
             foreach(var e in enyts)
             {
-                menues.Add(new ActionInfo("/entity/desk", new RequestQueryString(){ EntityId = e.Get("ID", 0) }, e.Get("ID", "")){ Title = e.Get("Name", "") });
+                menues.Add(new ActionInfo("/entity/desk", new RequestQueryString(){ EntityId = e.Get("ID", 0) }, e.Get("ID", "")){ Title = e.Get("Name", ""), ExecutionType = ActionExecutionType.Redirect });
             }
             page.SideMenues = menues;
         }

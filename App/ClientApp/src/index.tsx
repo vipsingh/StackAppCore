@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 //import App from './App';
 import MyApp from './App/MyApp';
 import Notify from "./Core/Utils/Notify";
 import Request from "./Core/Utils/Request";
 import DebugTrace from "./Core/Utils/DebugTrace";
 import * as serviceWorker from './serviceWorker';
+import './index.css';
 
 window._App = {
     Notify,

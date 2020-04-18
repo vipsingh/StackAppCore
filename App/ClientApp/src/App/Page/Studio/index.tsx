@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import _ from "lodash";
-import { Layout, Menu, Icon, Row, Col, List, Button, Input, Form } from "antd";
+import { Layout, Row, Col, Button, Input, Form, Card } from "antd";
 import FieldProps from "./FieldProps";
 import EntityPage from "./EntityPage";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content } = Layout;
 
 export default class Studio extends Component<any, { form: any, selectedField: number, isEntityView: boolean }> {
   fieldsType: Array<any>
@@ -75,12 +75,10 @@ export default class Studio extends Component<any, { form: any, selectedField: n
 
   renderFieldTypes() {
     return (
-      <List
-        bordered
-        dataSource={fieldTypes}
-        renderItem={item => (
-          <List.Item>
-            <Button
+      <div>
+        {
+          _.map(fieldTypes, (item) => {
+            return (<Button
               type="default"
               icon="list"
               block
@@ -89,11 +87,10 @@ export default class Studio extends Component<any, { form: any, selectedField: n
               }}
             >
               {item.Text}
-            </Button>
-          </List.Item>
-        )}
-      />
-    );
+            </Button>)
+          })
+        }
+      </div>);      
   }
 
   render() {
@@ -119,7 +116,7 @@ export default class Studio extends Component<any, { form: any, selectedField: n
         <Content>
           <Row>
             <Col span={4}>
-              <div style={panelStyle}>{this.renderFieldTypes()}</div>
+              <Card size="small" title={"Fields"} style={panelStyle}>{this.renderFieldTypes()}</Card>
             </Col>
             <Col span={14}>
               <div style={panelStyle}>                
@@ -149,12 +146,12 @@ export default class Studio extends Component<any, { form: any, selectedField: n
               </div>
             </Col>
             <Col span={6}>
-              <div style={panelStyle}>
+              <Card size="small" title={"Field Props"}>
                 <FieldProps
                   selectedField={selectedF}
                   setFieldProp={this.setFieldProp}
                 />
-              </div>
+              </Card>
             </Col>
           </Row>
         </Content>

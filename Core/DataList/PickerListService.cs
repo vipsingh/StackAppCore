@@ -14,13 +14,13 @@ namespace StackErp.Core.DataList
     {
         public DataListDefinition GetListDefn(BaseField field)
         {
-            // var layout = new EntityLayoutService(null, entityId);
-            var defn = new DataListDefinition();
-            // defn.Id = entityId.Code.ToString() + "_" + queryId.ToString();
-            // defn.Layout = layout.PrepareListLayout(queryId);
-            // defn.Query = null;
+            var defn = new DataListDefinition();            
             var ds = field.ControlInfo.DataSource;
             defn.EntityId = ds.Entity;
+            var _Entity = Core.EntityMetaData.Get(ds.Entity);
+            
+            defn.ItemIdField = "Id";
+            defn.ItemViewField = _Entity.GetFieldSchema(_Entity.TextField).ViewName;
             defn.Id = "_" + field.Name;
             defn.Layout = PrepareLayout(ds);
             defn.PageSize = 25;

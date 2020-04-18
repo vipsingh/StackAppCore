@@ -1,5 +1,6 @@
 import React from "react";
 import _ from "lodash";
+import { Space } from "antd";
 import ActionButton from "../ActionLink";
 
 export default class ActionBar extends React.Component<{
@@ -17,14 +18,14 @@ export default class ActionBar extends React.Component<{
         const { commands } = this.props;
 
         return (
-            <div className="object-action-btn react-form-btns">
-                <div className="object-action-inner">
+            <div className="object-action-btn">
+                <Space>
                     {
                         _.map(commands, (c) => {
-                            return (<ActionButton {...c} onClick={this.onCommandClick} />);
+                            return (<ActionButton key={c.ActionId} {...c} DisplayType={2} onClick={this.onCommandClick} />);
                         })
                     }
-                </div>
+                </Space>
             </div>
         );
     }

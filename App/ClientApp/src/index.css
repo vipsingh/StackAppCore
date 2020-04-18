@@ -11,3 +11,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.logo {
+  width: 120px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 10px 18px 10px 0;
+  float: left;
+}
+
+.ant-layout-header {
+  height:50px;
+}
+
+.page-view {
+  background: #fff;
+  border: 1px solid #dedede;
+  padding: 8px;
+}

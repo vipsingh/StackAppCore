@@ -62,7 +62,7 @@ namespace StackErp.Model
                 
             var d = new DbObject();
             foreach(var k in obj) {
-                var v = obj[k];
+                var v = k.Value;
                 if (v is JObject) 
                 {
                     d.Add(k.Key, DbObject.FromJSON(v.ToString()));
@@ -76,9 +76,8 @@ namespace StackErp.Model
         
     }
 
-    public class DbTable
+    public class DbTable: List<DbObject>
     {
-        public List<DbObject> Rows {get;}
         
     }
 }

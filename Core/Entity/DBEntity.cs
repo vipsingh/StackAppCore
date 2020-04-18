@@ -200,9 +200,7 @@ namespace StackErp.Core
 
                 if (this.Validate(model))
                 {
-                    EntityDBService.SaveEntity(this, model);
-
-                    status = AnyStatus.Success;
+                    status = EntityDBService.SaveEntity(this, model);                    
                 }
                 else 
                 {
@@ -216,8 +214,7 @@ namespace StackErp.Core
             }
             return status;
         }
-
-        //basic validation => IsRequired
+        
         private bool Validate(EntityModelBase model)
         {
             bool IsValid = true;            

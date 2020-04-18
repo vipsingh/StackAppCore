@@ -13,13 +13,7 @@ ListView
 
 
 ------------------------------------------------------------------------------------------------
-Form Rules -> 
-
-UIField.GetVisibility()
-IFormRuleInfo {
-	Type: Mandatory, ReadOnly, Visibility
-	Criteria: FilterExpression
-	Fields: []
-}
-
-create FormFilterExpression from FilterExpression
+----Action button on page
+	OnAfterCompile -> AddButtons, AddPageTitle, AddResources
+		AddButtons -> 1. Fetch Layout Buttons, 2.Add fix button on renderer(ex close), fetch link definition (entityid specific and globals, these contains all)
+		

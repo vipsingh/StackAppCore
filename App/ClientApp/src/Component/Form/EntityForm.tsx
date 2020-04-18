@@ -1,38 +1,50 @@
 import React from "react";
-import PropTypes from "prop-types";
 import _ from "lodash";
 import Form, { ViewPageInfo } from "./Form";
+import PageContext from "../../Core/PageContext";
+import StatusCode from "../../Constant/StatusCodes";
 
-export default class EntityForm extends Form {
-    static contextTypes = {
-        router: PropTypes.object
+export interface EntityFormProps {
+    Schema?: any,
+    FormData?: any,
+    render: Function,
+    entityModel?: ViewPageInfo
+}
+
+export default class EntityForm extends React.Component<EntityFormProps, {
+    entityModel: ViewPageInfo
+}> {
+    static contextType = PageContext;
+    //declare context: React.ContextType<typeof PageContext>
+
+    constructor(props: any, cntx: any) {
+        super(props, cntx);
+
+        this.state = {
+            entityModel : this.mergeFields(props)
+        };
     }
 
-    constructor(props: any) {
-        super(props);
-    }
-    
-    executeAction = (command: any) => {
-        const { ExecutionType, Url, ActionType } = command;
-        if (ActionType === 10) { //save
-            this.performSubmit(command);
-        } else {
-            super.executeAction(command);
+    getEntityModel() {
+        if(this.props.entityModel) {
+            return this.props.entityModel;
         }
 
+        return this.state.entityModel;
     }
 
-    performSubmit(linkInfo: any) {
-        debugger;
-        const { EntityInfo } = this.getEntityModel();
-        let onlyChanged = true;
-        if (!EntityInfo.ObjectId || EntityInfo.ObjectId <= 0) {
-            onlyChanged = false;
+    mergeFields(model: ViewPageInfo| null = null) {
+        if (model && model instanceof  ViewPageInfo) {
+            return model;
         }
 
-        const toSaveModel = this.getFormDataToSubmit(onlyChanged);
+        const entityModel: ViewPageInfo = new ViewPageInfo(this.props.Schema);
+        return entityModel;
+    }    
+
+    performSubmit = (linkInfo: any, toSaveModel: any) => {        
         _App.Request.getData({
-            url: linkInfo.URL,
+            url: linkInfo.Url,
             body: toSaveModel
         }).then((result: any) => {
             _Debug.log(result);
@@ -43,61 +55,34 @@ export default class EntityForm extends Form {
         });
     }
 
-    handeleSubmitResponse(result: any) {
-        const { Status, RedirectUrl, Model, Message } = result;
-        if (Status === 0) {
+    handeleSubmitResponse(result: RequestResultInfo) {
+        const { Status, RedirectUrl, Message } = result;
+        if (Status === StatusCode.Success) {
             window._App.Notify.success("Data Saved");
             if (RedirectUrl) {
                 _Debug.log("REDIRECT: " + RedirectUrl);
+                this.context.navigator.navigate(RedirectUrl);
             }
-        } else if(Status === 2) {//FAIL
+        } else if(Status === StatusCode.Fail) {//FAIL
             window._App.Notify.error(Message);
             _Debug.log("FAIL: " + Message);
         }
     }
 
-    prepareFieldRequest = (fieldId: string) => {        
-        const f = this.getEntityModel().Widgets[fieldId];
-        const r: any = {
-            FieldId: fieldId,
-            Properties: f.Properties,
-            EntityInfo: this.getEntityModel().EntityInfo,
-            FieldValue: f.Value
-        };
-
-        if (f.Parents) {
-            r.Model = [];
-            _.each(f.Parents, (p) => {
-                const v = this.getEntityModel().Widgets[p.Id];
-
-                r.Model.push({WidgetId: v.WidgetId, Value: v.Value});
-            });
-        }
-
-        return r;
-    }
-
-    getFormAPI() {
-        return Object.assign(super.getFormAPI(), {
-            setValue: this.setValue,
-            prepareFieldRequest: this.prepareFieldRequest
-        });
+    updateForm = (model: ViewPageInfo) => {
+        this.setState({entityModel: model});
     }
 
     render() {
-        const { render } = this.props;
-        const formProps = {
-            Schema: this.props.Schema,
-            getControl: this.getControl.bind(this),
-            executeAction: this.executeAction
-        };
 
         return (
-            <div>
-                {
-                    render(formProps)
-                }
-            </div>
-        );
+            <Form 
+                {...this.props}
+                entityModel={this.state.entityModel}
+                onSubmit={this.performSubmit}
+                onFormUpdate={this.updateForm}
+            />
+        )
     }
 }
+//onExecuteAction={this.executeAction}

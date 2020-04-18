@@ -35,11 +35,11 @@ namespace StackErp.ViewModel.FormWidget
 
         protected override bool OnFormatSetData(object value)
         {
-            int val = 0;
+            object val = null;
             if (value is SelectOption)
             {
-                val = ((SelectOption)value).Value;
-                ActionLink = StackErp.Model.AppLinkProvider.GetDetailPageLink(this.Context.ControlDefinition.FieldAttribute.RefEntity, val);
+                val = value;
+                this.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(this.Context.ControlDefinition.FieldAttribute.RefEntity, ((SelectOption)val).Value));
             }
             
             return base.OnFormatSetData(val);

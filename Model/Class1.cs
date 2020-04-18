@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model
 {
-    [JsonConverter(typeof(StackErp.Model.Utils.DynamicObjJsonConverter))]
     public class DynamicObj
     {
         public Dictionary<string, Object> _d;
@@ -13,7 +13,7 @@ namespace StackErp.Model
         public DynamicObj() {
             _d = new Dictionary<string, object>(StringComparer.InvariantCultureIgnoreCase);
         }
-        private DynamicObj(Dictionary<string, object> d)
+        public DynamicObj(Dictionary<string, object> d)
         {
             _d = d;
         }
@@ -63,7 +63,7 @@ namespace StackErp.Model
                 
             var d = new DynamicObj();
             foreach(var k in obj) {
-                var v = obj[k];
+                var v = k.Value;
                 if (v is JObject) 
                 {
                     d.Add(k.Key, DynamicObj.FromJSON(v.ToString()));
@@ -86,6 +86,10 @@ namespace StackErp.Model
 
         public static DynamicObj Parse(string json)
         {
+            if (String.IsNullOrEmpty(json)) {
+                return null;
+            }
+            
             var d = JsonConvert.DeserializeObject<Dictionary<string, Object>>(json);
             
             return new DynamicObj(d);
@@ -109,6 +113,17 @@ namespace StackErp.Model
 
             return null;
         }
+
+        public DynamicObj CloneData()
+        {
+            var d = new DynamicObj();
+            foreach(var k in this._d)
+            {
+                d._d.Add(k.Key, k.Value);
+            }
+
+            return d;
+        }
     }
 
     public class SelectOption: DynamicObj
@@ -120,11 +135,30 @@ namespace StackErp.Model
 
     public class InvariantDictionary<TValue> : Dictionary<string, TValue>
     {
-        protected Dictionary<string, TValue> collections;
         public InvariantDictionary()
-            : base()
+            : base(StringComparer.InvariantCultureIgnoreCase)
         {
-            collections = new Dictionary<string, TValue>(StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public virtual void AddItem(string key, TValue value, bool isOverride = false) 
+        {
+            if(!ContainsKey(key))
+                this.Add(key, value);
+            else if(isOverride) {
+                this[key] = value;
+            }
+        }
+
+        public virtual TValue GetItem(string attrName, TValue def)
+        {
+            if (this.ContainsKey(attrName)) 
+            {
+                var v = this[attrName];
+
+                return DataHelper.GetData(v, def);
+            }
+
+            return def;
         }
     }
 }

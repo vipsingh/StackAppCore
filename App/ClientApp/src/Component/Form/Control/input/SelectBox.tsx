@@ -4,20 +4,13 @@ import _ from "lodash";
 
 const Option = Select.Option;
 
-export class SelectBox extends React.Component<{
-    onChange: Function,
-    Value: any,
-    WidgetId: string,
-    Disabled: boolean,
-    ListValues: Array<any>,
-    IsViewMode: boolean
-}> {
+export class SelectBox extends React.Component<WidgetInfoProps> {
  
     handleOnChange = (value: any) => {
-        const { onChange, ListValues } = this.props;        
+        const { onChange, Options } = this.props;        
 
         if (typeof onChange === "function") {            
-            const v = _.find(ListValues, l => { return l.Value.toString() === value.toString(); });
+            const v = _.find(Options, l => { return l.Value.toString() === value.toString(); });
             onChange(v);
         }
     }
@@ -27,16 +20,17 @@ export class SelectBox extends React.Component<{
     }
 
     render() {
-        const {Value, Disabled, ListValues} = this.props;
+        const {Value, IsReadOnly, Options} = this.props;
         
-        const v = typeof Value === "object" ? Value.Value : Value;
+        const v = Value && typeof Value === "object" ? Value.Value : Value;
+        
         return(<Select 
-            value={v}
-            disabled={Disabled}
+            defaultValue={v}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
             style={{ width: "100%" }}
         >
-        {ListValues.map(op => <Option key={op.Value}>{op.Text}</Option>)}
+            {Options.map(op => <Option key={op.Value} value={op.Value}>{op.Text}</Option>)}
         </Select>);
     }
 }

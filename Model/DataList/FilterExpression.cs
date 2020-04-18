@@ -38,7 +38,13 @@ namespace StackErp.Model.DataList
 
             var arr = (JArray)JsonConvert.DeserializeObject(json);
             if (arr != null) {
-                
+                foreach(var jr in arr)
+                {
+                    if (jr is JArray) {
+                        var hr = (JArray)jr;
+                        exp.Add(new FilterExpField(hr.First().ToString(), (FilterOperationType)Convert.ToInt32(hr[1].ToString()), hr[2].ToString()));
+                    }
+                }
             }
 
             return exp;

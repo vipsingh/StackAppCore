@@ -48,9 +48,14 @@ namespace StackErp.DB
             using (IDbConnection dbConnection = Connection)
             {
                 dbConnection.Open();
-                var data = dbConnection.QuerySingle<dynamic>(query, param, trans);
-                var f = data as IDictionary<string, object>;
-                row = DbObject.From(f);
+                var ds = dbConnection.Query<dynamic>(query, param, trans);
+                if (ds.Count() > 0)
+                {
+                    var f = ds.First() as IDictionary<string, object>;
+                    row = DbObject.From(f);
+                } else {
+                    return null;
+                }
             }
 
             return row;

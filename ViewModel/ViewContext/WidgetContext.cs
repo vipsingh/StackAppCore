@@ -19,6 +19,7 @@ namespace StackErp.ViewModel.ViewContext
         public IFieldValidation Validation {private set;get;}
         public bool IsReadOnly { private set; get; }
         public bool IsRequired { private set; get; }
+        public FormatInfo FormatInfo { private set; get; }
         private DynamicObj _parameters;
         public DynamicObj Parameters
         {
@@ -50,12 +51,14 @@ namespace StackErp.ViewModel.ViewContext
             if (field != null) 
             {
                 ControlId = field.ViewName;
-                if (Caption != null)
+                if (Caption == null)
                     Caption = field.Text;
                 WidgetType = field.ControlType;
                 Validation = field.Validations;
                 IsRequired = field.IsRequired;
                 ControlDefinition = field.ControlInfo;
+                FormatInfo = field.FormatInfo;
+                IsReadOnly = field.IsReadOnly;
             }
         }
     }

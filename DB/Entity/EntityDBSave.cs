@@ -11,12 +11,16 @@ namespace StackErp.DB
 {
     public static partial class EntityDBService
     {
-        public static void SaveEntity(IDBEntity entity, EntityModelBase model)
+        public static AnyStatus SaveEntity(IDBEntity entity, EntityModelBase model)
         {
+            var sts = AnyStatus.UpdateFailure;
+
             var eSave = new EntityDBSave(entity);
 
-            var eId = GetNextEntityDBId(entity.EntityId.Code);
-            model.SetID(eId);
+            if(model.IsNew) {
+                var eId = GetNextEntityDBId(entity.EntityId.Code);
+                model.SetID(eId);
+            }
 
             using (IDbConnection connection = DBService.Connection)
             {
@@ -26,16 +30,18 @@ namespace StackErp.DB
                 {
                     eSave.Save(model, connection, transaction);
                     transaction.Commit();
+                    
+                    sts = AnyStatus.Success;                    
                 }
-            }            
+            }
+
+            return sts;         
         }
     }
     public class EntityDBSave
     {
         private IDBEntity _entity;
-        private EntityModelBase _model;
-
-        private DynamicParameters _parameters;
+        private EntityModelBase _model;        
 
         public EntityDBSave(IDBEntity entity)
         {
@@ -44,42 +50,73 @@ namespace StackErp.DB
         public int Save(EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
         {
             _model = model;
-            _parameters = new DynamicParameters();
-            var qry = BuildQuery();
+            var parameters = new DynamicParameters();
+            var toUpdateFields = PrepareInsertUpdateFields(_model);
+            var qry = BuildQuery(model, toUpdateFields, ref parameters);
 
-            return connection.Execute(qry, _parameters, transaction);
+            return connection.Execute(qry, parameters, transaction);
         }
 
-        private string BuildQuery()
+        internal static string BuildQuery(DBModelBase model, List<(string, DynamicDbParam)> fls, ref DynamicParameters parameters)
         {
             string qry = "";
-            var fls = BuildInsertFields(_model.IsNew);
+            
             List<string> toInsert = new List<string>();
             List<string> toInsertP = new List<string>();
-            toInsert.Add("ID");
-            toInsertP.Add("@ID");
-            _parameters.AddParam(new DynamicDbParam("ID", _model.ID, DbType.Int32));
-
 
             foreach (var f in fls)
             {
-                if (!_parameters.ParameterNames.Contains(f.Item2.Name))
-                    _parameters.AddParam(f.Item2);    
-                if(!toInsert.Contains(f.Item1))
+                if (!parameters.ParameterNames.Contains(f.Item2.Name))
+                    parameters.AddParam(f.Item2);
+            }
+
+            toInsert.Add("ID");
+            toInsertP.Add("@ID");
+            parameters.AddParam(new DynamicDbParam("ID", model.ID, DbType.Int32));
+
+            if (!model.IsNew) {
+                return CreateUpdateQuery(model.DbTableName, fls);
+            }
+
+
+            foreach (var f in fls)
+            { 
+                if(!toInsert.Contains(f.Item1, StringComparer.InvariantCultureIgnoreCase))
                 {
                     toInsert.Add(f.Item1);
                     toInsertP.Add("@" + f.Item2.Name);
                 }
             }
 
-            qry = $"INSERT INTO {_entity.DBName}({String.Join(",", toInsert)}) VALUES({String.Join(",", toInsertP)})";
+            qry = $"INSERT INTO {model.DbTableName}({String.Join(",", toInsert)}) VALUES({String.Join(",", toInsertP)})";
             return qry;
         }
 
-        private List<(string, DynamicDbParam)> BuildInsertFields(bool isNew)
+        private static string CreateUpdateQuery(string tableName, List<(string, DynamicDbParam)> fields) 
+        {
+            var q = $"UPDATE {tableName} SET ";
+            List<string> toUpdate = new List<string>();
+            List<string> toUpdate1 = new List<string>();
+            foreach (var f in fields)
+            {
+                 if(!toUpdate1.Contains(f.Item1, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    toUpdate.Add($" {f.Item1} = @{f.Item2.Name} ");
+                    toUpdate1.Add(f.Item1);
+                }
+            }
+
+            q = q + String.Join(",", toUpdate);
+
+            q = q + " WHERE id=@ID;";
+
+            return q;
+        }
+
+        private static List<(string, DynamicDbParam)> PrepareInsertUpdateFields(EntityModelBase model)
         {
             List<(string, DynamicDbParam)> qryA = new List<(string, DynamicDbParam)>();
-            foreach (var f in _model.Attributes)
+            foreach (var f in model.Attributes)
             {
                 var attr = f.Value;
                 var dbName = attr.Field.DBName;

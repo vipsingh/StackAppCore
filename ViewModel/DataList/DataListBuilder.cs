@@ -26,6 +26,7 @@ namespace StackErp.ViewModel.DataList
             {
                 resp.Fields = context.Fields;
                 resp.IdColumn = context.IdColumn;
+                resp.ItemViewField = context.ItemViewField;
             }
             return resp;
         }
@@ -51,6 +52,7 @@ namespace StackErp.ViewModel.DataList
             //build header
 
         }
+        
 
         public virtual void OnBuildInit(DataListContext context, DataListDefinition defn)
         {

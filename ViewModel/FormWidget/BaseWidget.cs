@@ -19,18 +19,19 @@ namespace StackErp.ViewModel.FormWidget
         public string WidgetId { private set; get; }
         public bool IsHidden { private set; get; }
         public object Value { protected set; get; }
+        public DynamicObj AdditionalValue { protected set; get; }
         public string FormatedValue { protected set; get; }
-        public string FormatInfo { protected set; get; }
+        public string WidgetFormatInfo { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
-        private Dictionary<string, IValidation> _validations;
-        public Dictionary<string, IValidation> Validation { get => _validations; }
+        private InvariantDictionary<IValidation> _validations;
+        public InvariantDictionary<IValidation> Validation { get => _validations; }
         public bool IsReadOnly { private set; get; }
         public bool IsRequired { private set; get; }
         public ActionInfo DataActionLink { protected set; get; }
         public ActionInfo ActionLink { protected set; get; }
-        //      RuleToFire: Array<{Index: number}>
+        public List<int> RuleToFire  { protected set; get; }
         // Dependency: { Parents: Array<{Id: string}>, Children: Array<{Id: string}> }
         // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }
         public bool IsEditable { protected set; get; }
@@ -50,6 +51,8 @@ namespace StackErp.ViewModel.FormWidget
             //this.IsHidden = context.UIParams ? !!controlContext.UIParams.IsHidden : false;
             this.IsViewMode = context.FormContext.IsViewMode;
             this.PostValue = context.PostValue;
+            this.IsReadOnly = context.IsReadOnly;
+            this.IsRequired = context.IsRequired;
         }
         private bool _isCompiled = false;
         public virtual void OnCompile()
@@ -67,7 +70,7 @@ namespace StackErp.ViewModel.FormWidget
         {
             if (value == null)
             {
-                FormatedValue = this.Context.AppContext.AppInfo.NotSpecifiedText;
+                FormatedValue = this.Context.AppContext.NotSpecifiedText;
                 return false;
             }
 
@@ -100,15 +103,36 @@ namespace StackErp.ViewModel.FormWidget
             return this.Value;
         }
 
+        public void SetAdditionalValue(string key, object value)
+        {
+            if (this.AdditionalValue == null)
+                this.AdditionalValue = new DynamicObj();
+            
+            this.AdditionalValue.Add(key, value, true);
+        }
+
+        public virtual void ClearValue()
+        {
+            this.Value = null;
+            this.FormatedValue = null;
+            this.AdditionalValue = null;
+        }
+
+        #region Build Validation
+
         public virtual void BuildValidation()
         {
-            var fieldValidation = this.Context.Validation;
-            _validations = new Dictionary<string, IValidation>();
+            if (this.IsRequired) 
+            {
+                AddValidation(ValidationConstant.Required, ValidationHelper.GetRequiredValidation(Caption));
+            }
+
+            var fieldValidation = this.Context.Validation;            
             if(fieldValidation != null)
             {
                 if(fieldValidation.IsMendatory)
                 {
-                    AddValidation("REQUIRED", ValidationHelper.GetRequiredValidation(Caption));
+                    AddValidation(ValidationConstant.Required, ValidationHelper.GetRequiredValidation(Caption));
                 }
             }
             
@@ -116,8 +140,34 @@ namespace StackErp.ViewModel.FormWidget
 
         public void AddValidation(string key, IValidation validation)
         {
+            if (_validations == null)
+                _validations = new InvariantDictionary<IValidation>();
+                
             if (!_validations.Keys.Contains(key))
-                _validations.Add(key, validation);
+                _validations.AddItem(key, validation, true);
         }
+        #endregion
+
+        public void SetRule(int ruleId)
+        {
+            if(this.RuleToFire == null)
+                this.RuleToFire = new List<int>();
+                
+            if(!this.RuleToFire.Contains(ruleId))
+                this.RuleToFire.Add(ruleId);
+        }
+
+        protected virtual void BuildFormatInfo()
+        {
+            //WidgetFormatInfo
+        }
+    }
+
+    public class WidgetFormatInfo
+    {
+        public string FormatString { set; get; }
+        public string ColorCode { set; get; }
+        public string FontSize {set;get;}
+        public string FontWeight {set;get;}
     }
 }

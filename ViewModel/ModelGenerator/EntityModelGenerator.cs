@@ -35,10 +35,10 @@ namespace StackErp.ViewModel
 
         public void SetFieldsModelToRecord(UIFormModel model)
         {
-            foreach(var modelField in model.Fields)
+            foreach(var modelField in model.Widgets)
             {
                 var field = modelField.Value;
-                var fieldSchema = this._formContext.GetField(field.ControlId);
+                var fieldSchema = this._formContext.GetField(field.WidgetId);
                 var widget = BuildWidget(fieldSchema, field);
                 if (widget != null)
                 {

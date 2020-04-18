@@ -151,13 +151,14 @@ namespace StackErp.Model.Entity
         public ObjectKeyField(): base() {
             Type = FieldType.ObjectKey;
             Copy = false;
+            IsReadOnly = true;
         }
     }
     public class BoolField: BaseField
     {
         public BoolField(): base() {
             Type = FieldType.Bool;
-            BaseType = BaseTypeCode.Boolean;
+            BaseType = BaseTypeCode.Boolean;            
         }
 
         public override object ResolveSetValue(object val, out bool isValid)

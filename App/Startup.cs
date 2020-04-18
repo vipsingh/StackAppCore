@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackErp.Model.Utils;
+using StackErp.App.Helpers;
 
 namespace StackErp.App
 {
@@ -32,8 +34,15 @@ namespace StackErp.App
                         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
 
                         // Configure a custom converter
-                        //options.SerializerSettings.Converters.Add(new App.Helpers.DynamicObjJsonConverter());
+                        options.SerializerSettings.Converters.Add(new DynamicObjJsonConverter());
+                        options.SerializerSettings.Converters.Add(new EntityCodeJsonConverter());
+                        
                     });
+
+             services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

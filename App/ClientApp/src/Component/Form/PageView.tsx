@@ -13,7 +13,7 @@ export default class PageView extends React.Component<{
         const {getControl, Schema} = this.props;
         const { Layout } = Schema;
         
-        return (<div>
+        return (<div className="page-view">
             <UIView template={Layout} getControl={getControl} />
             {this.renderActions()}
             </div>

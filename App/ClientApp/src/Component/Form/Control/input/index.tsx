@@ -18,10 +18,10 @@ export class TextBox extends React.Component<WidgetInfoProps> {
     }
 
     render() {
-        const {Value, Disabled} = this.props;
+        const {Value, IsReadOnly} = this.props;
         return(<Input 
             value={Value}
-            disabled={Disabled}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
         />);
     }
@@ -30,10 +30,10 @@ export class TextBox extends React.Component<WidgetInfoProps> {
 export class TextArea extends TextBox {
 
     render() {
-        const {Value, Disabled} = this.props;
+        const {Value, IsReadOnly} = this.props;
         return(<Input.TextArea 
             value={Value}
-            disabled={Disabled}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
         />);
     }
@@ -50,10 +50,10 @@ export class NumberBox extends TextBox {
     }
 
     render() {
-        const {Value, Disabled} = this.props;
+        const {Value, IsReadOnly} = this.props;
         return(<InputNumber  
             value={Value}
-            disabled={Disabled}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
         />);
     }
@@ -70,23 +70,33 @@ export class DecimalBox extends TextBox {
     }
 
     render() {
-        const {Value, Disabled} = this.props;
+        const {Value, IsReadOnly} = this.props;
         return(<InputNumber  
             value={Value}
-            disabled={Disabled}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
             formatter={value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
             parser={value => value ? value.replace(/\$\s?|(,*)/g, ''): ""}
+            style={{ width: "100%" }}
         />);
     }
 }
 
-export class CheckBox extends TextBox {
+export class CheckBox extends React.Component<WidgetInfoProps> {
+
+    handleOnChange = (event: any) => {
+        const v = event.target.checked;
+        const {onChange} = this.props;
+
+        if (typeof onChange === "function") {            
+            onChange(v);
+        }
+    }
 
     render() {
-        const {Value, Disabled, IsViewMode} = this.props;
+        const {Value, IsReadOnly, IsViewMode} = this.props;
 
-        let isDisabled = Disabled;
+        let isDisabled = IsReadOnly;
         if (IsViewMode)
             isDisabled =true;
 
@@ -100,12 +110,6 @@ export class CheckBox extends TextBox {
 }
 
 export class DateBox extends React.Component<WidgetInfoProps> {
-    static propTypes = {
-        onChange: PropTypes.func,
-        Value: PropTypes.any,
-        Disabled: PropTypes.bool        
-    }
-
     handleOnChange = (dateObject: any) => {        
         const {onChange} = this.props;
 
@@ -115,15 +119,15 @@ export class DateBox extends React.Component<WidgetInfoProps> {
     }
 
     render() {
-        const {Value, Disabled} = this.props;
-        let dateVal = moment();
+        const {Value, IsReadOnly} = this.props;
+        let dateVal = undefined;
         if (Value) {
             dateVal = moment(Value);
         }
         
         return(<DatePicker
             value={dateVal}
-            disabled={Disabled}
+            disabled={IsReadOnly}
             onChange={this.handleOnChange}
             allowClear={true}
             format={_AppSetting.DateFormat}

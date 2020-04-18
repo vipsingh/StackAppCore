@@ -30,6 +30,7 @@ namespace StackErp.Model.Form
             _attr = new DynamicObj();
             this.RawUrl = rawUrl;
             this.Query = (qs == null) ? null : qs.Clone();
+            ExecutionType = ActionExecutionType.Redirect;
         }
 
         public void AddAttribute(string key, object value)

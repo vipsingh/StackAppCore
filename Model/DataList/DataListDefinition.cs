@@ -10,7 +10,9 @@ namespace StackErp.Model.DataList
         public EntityCode EntityId {set;get;}
         public string Id {set;get;}
         public string ItemIdField {set;get;}
+        public string ItemTextField {set;get;}
         public TList Layout  {set;get;}
         public int PageSize {set;get;}
+        public string ItemViewField {set;get;}
     }
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using StackErp.Model;
 using StackErp.UI.View.PageAction;
@@ -56,7 +57,7 @@ namespace StackErp.App.Controllers
         }
 
         [HttpPost]
-        public IActionResult Save([FromBody] UIFormModel model)
+        public IActionResult Save([FromBody]UIFormModel model)
         {
             var s = ModelState;
             var pageAction = new EntityPageAction(this.StackAppContext);
@@ -91,6 +92,13 @@ namespace StackErp.App.Controllers
             var page = builder.CreateDeskPage(context);
 
             return CreatePageResult(page);
+        }
+
+        [HttpPost]
+        public IActionResult ExecFunction([FromBody]CustomRequestInfo requestInfo)
+        {
+            
+            return null;
         }
     }
 }

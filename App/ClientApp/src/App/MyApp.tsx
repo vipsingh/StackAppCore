@@ -23,18 +23,19 @@ export default class MyApp extends Component<{}, {collapsed: boolean}> {
     return (
       <Router>
         <Layout style={{ minHeight: "100vh" }}>
+        <Header className="site-layout-background">
+        <div className="logo"></div>
+          </Header>          
+          <Layout className="site-layout">            
           <Sider
             collapsible
             collapsed={this.state.collapsed}
             onCollapse={this.onCollapse}
-          >
-            <div className="logo" />
+          >            
             <NavMenu />            
           </Sider>
-          <Layout>
-            <Header />
             <Content >
-              <div
+              <div className="site-layout-background"
                 style={{
                   padding: 10,
                   minHeight: 360
@@ -42,9 +43,11 @@ export default class MyApp extends Component<{}, {collapsed: boolean}> {
               >
                 <AppRoutes />
               </div>
+              <Footer style={{ textAlign: "center" }}>StackERP ©2018</Footer> 
             </Content>
-            <Footer style={{ textAlign: "center" }}>StackERP ©2018</Footer>
+            
           </Layout>
+          
         </Layout>
       </Router>
     );

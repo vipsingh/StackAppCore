@@ -1,5 +1,6 @@
 import React from "react";
 import { Form } from "antd";
+import cs from "classnames";
 
 const FormItem = Form.Item;
 
@@ -10,11 +11,11 @@ export default class FormField extends React.Component<WidgetInfoProps> {
         return true;
       }
       
-      return nextProps.Value !== this.props.Value || nextProps.ValidationResult !== this.props.ValidationResult;
+      return nextProps.Value !== this.props.Value || nextProps.HasError !== this.props.HasError;
     }
 
     render() {        
-        const label = this.props.Caption;
+        const { WidgetId, Caption, HasError, api } = this.props;
         
         const formItemLayout = {
             labelCol: {
@@ -27,16 +28,24 @@ export default class FormField extends React.Component<WidgetInfoProps> {
             },
           };
 
-        if(!label) {
+        if(!Caption) {
           formItemLayout.wrapperCol.sm.span = 24;
-          }  
+        }
+
+        let validResult: any;
+        if (HasError) {
+          validResult = api.getErrorResult(WidgetId)
+        }
 
         return (
             <FormItem
-            {...formItemLayout}
-            label={label}
+            {...formItemLayout}            
+            label={Caption}        
             >
-            {this.props.children}
+            <div className={cs("form-field-control", {"ant-form-item-has-error": HasError})}>
+              {this.props.children}
+              { !HasError || <div className="ant-form-item-explain"><div>{validResult.Message}</div></div>}
+            </div>
         </FormItem>
         );
     }    

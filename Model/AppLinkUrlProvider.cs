@@ -16,6 +16,6 @@ namespace StackErp.Model
         public const string DETAIL_ENTITY_URL = "/entity/detail";
         public const string NEW_ENTITY_URL = "/entity/new";
         public const string EDIT_ENTITY_URL = "/entity/edit";
-
+        public const string EXEC_FUNC_URL = "/entity/execfunction";
     }
 }

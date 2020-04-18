@@ -39,15 +39,19 @@ namespace StackErp.Model.Entity
         public short DecimalPlace {set;get;}
         public bool AllowZero { get; set; }
 
+        public FormatInfo FormatInfo { get; set; }
+
         public BaseField() {
             Properties = new DynamicObj();
             ControlInfo = new ControlDefinition();
+            FormatInfo = new FormatInfo();
         }
         private bool _isInit = false;
         public void Init()
         {
             if(_isInit) return;
             this.Text = String.IsNullOrEmpty(this.Text)? this.Name: this.Text;
+            FormatInfo.FieldBaseType = this.BaseType;
             OnInit();
             _isInit  = true;
         }
@@ -89,7 +93,7 @@ namespace StackErp.Model.Entity
         public PickerDataSource DataSource {set;get;}        
 
         public FieldAttribute FieldAttribute {set;get;}
-
+        public int LookupId  {set;get;}
     }
 
     public class SourceDataMap {
@@ -123,4 +127,14 @@ namespace StackErp.Model.Entity
         public string FunctionName {set;get;}
         public string Domain {set;get;}
     }
+
+    public class DummyField: BaseField
+    {
+        public DummyField(string name, FieldType type)
+        {
+            this.Name = DBName = name;
+            this.Type = type;
+        }
+    }
+
 }

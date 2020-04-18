@@ -58,4 +58,4 @@ export function registerWidget(type: number, editComponent: any, viewComponent: 
     };
 }
 
-registerWidget(100, ListView);
+registerWidget(100, ListView, ListView);
