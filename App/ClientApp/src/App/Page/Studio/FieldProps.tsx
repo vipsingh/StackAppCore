@@ -1,81 +1,92 @@
-import React, {Component} from 'react';
-import Form, { ViewPageInfo } from '../../../Component/Form/Form';
+import React, { Component } from 'react';
+import Form from '../../../Component/Form/Form';
 import SimpleLayout from '../../../Component/Layout/SimpleLayout';
-import ActionLink from '../../../Component/ActionLink';
+import _ from "lodash";
+import { fieldTypes } from "./helper";
+import ViewPageInfo from '../../../Core/Models/ViewPageInfo';
+import ListForm from '../../../Component/Form/Control/ListForm';
+//import FilterBox from '../../../Component/Form/Control/FilterBox';
 
 export default class FieldProps extends Component<{
     setFieldProp: Function,
     selectedField: any
-  }, any> {
-    
+}, any> {
+
+    schema: any
     constructor(props: any) {
-      super(props);
-      var eModel = new ViewPageInfo({
-        Widgets: {
-            Name: { WidgetId: "Name", WidgetType: 1, Caption: "Name" },
-            Label: { WidgetId: "Label", WidgetType: 1, Caption: "Label" },
-            Type: { WidgetId: "Type", WidgetType: 1, Caption: "Type", IsDisabled: true },
-            IsRequired: { WidgetId: "IsRequired", WidgetType: 4, Caption: "IsRequired" },
-            RefObject: { WidgetId: "RefObject", WidgetType: 1, Caption: "RefObject" }
-        }
-    })
+        super(props);
+        this.schema = {
+            Widgets: {
+                Id: { WidgetId: "Id", WidgetType: 10, Caption: "Id" },
+                FieldName: { WidgetId: "FieldName", WidgetType: 1, Caption: "Name", IsRequired: true },
+                Label: { WidgetId: "Label", WidgetType: 1, Caption: "Label" },
+                FieldType: { WidgetId: "FieldType", WidgetType: 6, Caption: "Type", Options: fieldTypes, RuleToFire: [1] },
+                Length: { WidgetId: "Length", WidgetType: 1, Caption: "Length" },
+                IsRequired: { WidgetId: "IsRequired", WidgetType: 4, Caption: "IsRequired" },
+                LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity" },
+                OtherSetting: { WidgetId: "OtherSetting", WidgetType: 1, Caption: "OtherSetting" }
+            },
+            FormRules: [
+                { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] },                
+            ],
+            Actions: {
+                SAVE: {
+                    ActionId: "SAVE",
+                    DisplayType: 2,
+                    ExecutionType: 1,
+                    Title: "Save"
+                }
+            },
+            EntityInfo: { ObjectId: 0 }
+        };
+        //{ Index: 2, Type: "OPTIONS", Criteria: [{ FieldName: "IsRequired", Op: 0, Value: true }], Field: "FieldType", Options: [3,4,7,8] }
 
-    this.state = {
-        entityModel: eModel
-    };      
+        var eModel = new ViewPageInfo(this.schema);
+
+        const { selectedField } = this.props;
+        const { Widgets } = eModel;            
+        _.forIn(Widgets, (v, k) => {
+            v.Value = selectedField[k];
+        });
+            
+        this.state = {
+            entityModel: eModel,
+            dataModel: eModel.getDataModel()
+        };
     }
-    // /visible: () => this.props.selectedField.Type === 10
 
-    // fChange = (f: any, v: any) => {
-    //     if (f.IsDisabled)
-    //         return;
-    //     this.props.setFieldProp(f.Name, v);
-    // }
-
-    onModelChange = (model: ViewPageInfo) => {
-        this.setState({ entityModel: model });
+    onModelChange = (model: IDictionary<IFieldData>, params: { updateBy: string, param?: string }) => {
+        this.setState({ dataModel: model });
     }
 
-    handleSubmit = (model: any) => {
-        
+    handleSubmit = (toSaveModel: any) => {
+        this.props.setFieldProp(toSaveModel);
     }
 
     render() {
 
-        return(
+        //return (<FilterBox />);
+        //return (<ListForm Schema={this.schema}  />);
+
+        return (
             <Form
                 entityModel={this.state.entityModel}
+                dataModel={this.state.dataModel}
                 onFormUpdate={this.onModelChange}
                 onSubmit={this.handleSubmit}
                 render={
                     (prop: any) => {
                         return (<div>
-                           <SimpleLayout 
-                               Fields={this.state.entityModel.Widgets}
-                               getControl={prop.getControl}
-                           />
-                           <ActionLink ActionId={"BTN_SUBMIT"} DisplayType={2} Title={"Save"} ActionType={1} onClick={this.handleSubmit} />
-                           </div>
+                            <SimpleLayout
+                                Fields={this.state.entityModel.Widgets}
+                                getControl={prop.getControl}
+                            />
+                            {prop.renderActions()}
+                        </div>
                         );
                     }
                 }
-             />
+            />
         )
-    }
-    // getFieldValue(x: string) {
-    //     const form = this.props.selectedField;
-    //     return ( form[x + "__text"]? form[x + "__text"]: form[x] );
-    // }
-
-    // renderF(field: any) {
-    //     const form = this.props.selectedField;
-    //     if (!form)
-    //         return;
-
-    //     if(field.Type === 1){
-    //         return (<Input value={this.getFieldValue(field.Name)} onChange={(e) => { this.fChange(field, e.target.value); }} /> );
-    //     } else if(field.Type === 3){
-    //         return (<Checkbox checked={!!form[field.Name]} onChange={(e) => { this.fChange(field, e.target.checked); }} /> );
-    //     }
-    // }
+    }    
 }

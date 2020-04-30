@@ -11,6 +11,7 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
+    [SPA]
     public class WidgetController : StackErp.UI.Controllers.BaseController
     {
         public WidgetController(ILogger<AppController> logger): base(logger)

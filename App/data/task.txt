@@ -1,19 +1,13 @@
-Native Validation               18/Jan
-Display save error on field     18/Jan
-Detail Object                   20/Jan  #set formatted value
-PickerList                      05/Feb
-Layout Validation
+P1--------------------------------------------
+common formatter of data
 Custom Actions
-Layout Rules
-
-## Client Side ##
-Basic Form Edit                 18/Jan
-FormBuilder                     20/Jan - 26/Jan
-ListView
-
-
-------------------------------------------------------------------------------------------------
+FilterForm
+Layout Rules: invisible
 ----Action button on page
 	OnAfterCompile -> AddButtons, AddPageTitle, AddResources
 		AddButtons -> 1. Fetch Layout Buttons, 2.Add fix button on renderer(ex close), fetch link definition (entityid specific and globals, these contains all)
-		
+
+todo-------------------------------------------
+AddPageTitle
+FilterForm
+custom function invoke, fixed and entity related

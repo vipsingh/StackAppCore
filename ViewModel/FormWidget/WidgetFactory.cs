@@ -12,6 +12,8 @@ namespace StackErp.ViewModel.FormWidget
         static WidgetFactory()
         {
             _widgets = new Dictionary<int, Func<WidgetContext, BaseWidget>>();
+            Add(FormControlType.None, GetLabel);       
+            Add(FormControlType.Label, GetLabel);
             Add(FormControlType.TextBox, GetText);
             Add(FormControlType.DatePicker, GetDatePicker);
             Add(FormControlType.DecimalBox, GetDecimal);
@@ -46,6 +48,11 @@ namespace StackErp.ViewModel.FormWidget
         private static BaseWidget GetText(WidgetContext cntxt)
         {
             return new TextWidget(cntxt);
+        }
+
+        private static BaseWidget GetLabel(WidgetContext cntxt)
+        {
+            return new LabelWidget(cntxt);
         }
 
         private static BaseWidget GetDropdown(WidgetContext cntxt)

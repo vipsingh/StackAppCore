@@ -8,8 +8,10 @@ namespace StackErp.ViewModel.Model
     public class CustomRequestInfo
     {
         public int Mode {set;get;}
-        public string FieldId {set;get;}
-        public UIFormField FieldValue {set;get;}
+        public string WidgetId {set;get;}
+        public UIFormField Value {set;get;}
+        public FormControlType WidgetType {set;get;}
+        public string Caption {set;get;}
         public UIFormModel Model {set;get;}
         public ObjectModelInfo ModelInfo {set;get;}
         public DynamicObj Properties {set;get;}

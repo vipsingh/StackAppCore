@@ -1,36 +1,39 @@
 import React from "react";
-import PropTypes from "prop-types";
-import _, { Dictionary } from "lodash";
+import update from "immutability-helper";
+import _ from "lodash";
+import { notification } from 'antd';
 import { getComponent } from "../WidgetFactory";
 import FormField from "./FormField";
 import HiddenField from "./Control/HiddenField";
 import formFeatures from "../../Core/Form/Features";
 import LinkProcesser from "../../Core/Utils/LinkProcesser";
 import validationUtil from "../../Core/Form/Utils/Validations";
+import ActionBar from "../Layout/ActionBar";
+import ActionLink from "../ActionLink";
+import { prepareFieldRequest, getFormDataToSubmit } from "../../Core/Form/Utils/FormUtils";
 
-export interface FormProps {
-    Schema?: any,
-    FormData?: any,
+export interface FormProps {    
     render: Function,
-    entityModel: ViewPageInfo,
+    entityModel: IPageInfo,
+    dataModel: IDictionary<IFieldData>
     onSubmit: Function,
     onFormUpdate: Function,
     onExecuteAction?: Function
 }
 
-export default class Form extends React.Component<FormProps> 
-{
-    static contextTypes = {
-        router: PropTypes.object
+export default class Form extends React.Component<FormProps, {    
+    errors: IDictionary<{ IsValid: boolean, Message?: string }>
+}> {    
+    WidgetsTempData: any
+    constructor(props: FormProps, ctx: any) {
+        super(props, ctx);        
+
+        this.state = {
+            errors: {}
+        }
+
+        this.WidgetsTempData = {};
     }
-
-    // constructor(props: any) {
-    //     super(props);
-
-    //     this.state = {
-    //         entityModel : this.mergeFields(props)
-    //     };
-    // }
 
     componentWillReceiveProps(nextProps: any) {
         if (nextProps.entityModel) {
@@ -38,17 +41,22 @@ export default class Form extends React.Component<FormProps>
         }
     }
 
-    // mergeFields(model: ViewPageInfo| null = null) {
-    //     if (model && model instanceof  ViewPageInfo) {
-    //         return model;
-    //     }
+    componentDidMount() {
+        let model = this.getDataModel();
+        const keys = Object.keys(model);
+        var ix = 0;
 
-    //     const entityModel: ViewPageInfo = new ViewPageInfo(this.props.Schema);
-    //     return entityModel;
-    // }
+        const next = (m: any) => {
+            if (ix === keys.length) {
+                this.setDataModel(m, { updateBy: "FORM" });
+            } else
+                this.execAllFormFeature(keys[ix++], m, this.getEntitySchema(), [], next); 
+        };
+        next(model);
+    }
 
-    renderField(ControlId: string) {
-        const cinfo = this.getEntityModel().Widgets[ControlId];
+    renderField(ControlId: string, customProps: any) {
+        const cinfo = this.getField(ControlId);
         if (!cinfo) return null;
 
         const {WidgetType, IsViewMode} =  cinfo;    
@@ -62,88 +70,139 @@ export default class Form extends React.Component<FormProps>
             IComponent = HiddenField;
         }
 
+        const dataModel = this.getDataModel();
+        const widgetModel = dataModel[ControlId];
+
+        if (widgetModel.Invisible) {
+            
+            return (<div></div>);
+        }
+
         return (<IComponent 
             {...cinfo}
+            {...customProps}
+            {...widgetModel}
             api={this.getFormAPI()}
             onChange={this.setValue.bind(this, ControlId)}
+            onBlur={this.onBlur.bind(this, ControlId)}
         />);
     }
 
     public getControl(ControlId: string, customProps: any) {
-        const inputFieldComponent = this.renderField(ControlId);
+        const inputFieldComponent = this.renderField(ControlId, customProps);
         if (!inputFieldComponent) return null;
         
-        const cinfo = this.getEntityModel().Widgets[ControlId];
+        const cinfo = this.getField(ControlId);   
+        const dataModel = this.getDataModel(); 
+        const widgetModel = dataModel[ControlId];
 
-        return (<FormField {...cinfo} {...customProps} api={this.getFormAPI()}>
+        return (<FormField {...cinfo} {...customProps} {...widgetModel} api={this.getFormAPI()}>
             {inputFieldComponent}
         </FormField>);
     }
 
-    getEntityModel() {
-        return this.props.entityModel;
-        // if(this.props.entityModel) {
-        //     return this.props.entityModel;
-        // }
-
-        // return this.state.entityModel;
+    getEntitySchema() {
+        return this.props.entityModel;        
     }
 
-    setEntityModel(model: ViewPageInfo) {
+    setDataModel(model: IDictionary<any>, updateBy: { updateBy: string, param?: string }, afterUpdate?: Function) {
         if (this.props.onFormUpdate) {
-            this.props.onFormUpdate(model);
+            this.props.onFormUpdate(model, updateBy, afterUpdate);
+        }
+
+        //this.setState({ dataModel: model });
+    }
+
+    getDataModel() {
+        return this.props.dataModel;
+    }
+
+    setValue = (controlId: string, value: any, afterChange?: Function) => {
+        let dataModel = this.getDataModel();
+        const entitySchema = this.getEntitySchema();
+
+        const fieldInfo = this.getField(controlId);
+        
+        let model = update(dataModel, {[controlId]: { Value: {$set: value}, IsDirty: {$set: true}}});
+        
+        const vRes = validationUtil.validateField({...fieldInfo, ...model[controlId]});        
+        model = update(model, {[controlId]: { HasError: {$set: !vRes.IsValid} }});
+
+        const cErrors = this.setValidationResult(controlId, vRes);
+        this.setState({errors: cErrors});
+
+        this.execAllFormFeature(controlId, model, entitySchema, ["HIDDEN", "OPTIONS"], (m: IDictionary<IFieldData>) => {
+            this.setDataModel(m, { updateBy: "WIDGET", param: controlId }, afterChange);
+        });
+        
+        if (fieldInfo.Dependency) {
+            this.executeDependecy(controlId, model, (m: IDictionary<IFieldData>) => {
+                this.setDataModel(m, { updateBy: "WIDGET", param: controlId });
+            });
         }
     }
 
-    setValue = (controlId: string, value: any) => {
-        const {Widgets} = this.getEntityModel();
-        const field = _.assign({}, Widgets[controlId], {Value: value, IsDirty: true});
+    execAllFormFeature(controlId: string, dataModel: IDictionary<IFieldData>, entitySchema: IPageInfo, onlyFire: Array<string>, cb: Function) {
+        const field = entitySchema.getField(controlId);
         
-        const vRes = validationUtil.validateField(field);
-        field.HasError = !vRes.IsValid;
-        const cErrors = this.setValidationResult(field.WidgetId, vRes);
-
-        const entModel = Object.assign({}, this.getEntityModel(), {Widgets: _.assign({}, Widgets, {[controlId]: field}), Errors: cErrors });
-
-        this.execAllFormFeature(controlId, entModel, (m: ViewPageInfo) => {
-            this.setEntityModel(m);
-        });
-
-        
-    }
-
-    execAllFormFeature(controlId: string, entModel: ViewPageInfo, cb: Function) {
-        const field = entModel.Widgets[controlId];
         if (field.RuleToFire && field.RuleToFire.length > 0) {
-            _.each(field.RuleToFire, (rule) => {
-                const rFire = _.find(entModel.Rules, { Index: rule.Index });
+            _.each(field.RuleToFire, (rule) => {                
+                const rFire = _.find(entitySchema.FormRules, { Index: rule });
                 if (rFire) {
-                    if(rFire.Type === "INVISIBLE") {
-                        entModel = formFeatures.FieldVisibility.execute(rFire, field.WidgetId, entModel);
+                    if (onlyFire.length > 0 && onlyFire.indexOf(rFire.Type.toUpperCase()) >= 0) {
+                        dataModel = this.execFeature(rFire, field, dataModel);
+                    } else if (onlyFire.length === 0) {
+                        dataModel = this.execFeature(rFire, field, dataModel);
                     }
                 }
             });
         }
+        cb(dataModel);
+    }
+
+    execFeature(rFire: any, field: WidgetInfo, dataModel: IDictionary<IFieldData>): IDictionary<IFieldData> {
+        const typ = rFire.Type.toUpperCase();
+        if(typ === "HIDDEN") {
+            dataModel = formFeatures.FieldVisibility.execute(rFire, field.WidgetId, dataModel, this.getFormAPI());
+        } else if(typ === "OPTIONS") {
+            dataModel = formFeatures.OptionsVisibility.execute(rFire, field.WidgetId, dataModel, this.getFormAPI());
+        } else if(typ === "EVAL") {
+            dataModel = formFeatures.ExpressionEval.execute(rFire, dataModel, this.getFormAPI());
+        }
+
+        return dataModel;
+    }
+
+    executeDependecy(controlId: string, entModel: IDictionary<IFieldData>, cb: Function) {
+        entModel = formFeatures.FieldDependency.execute(controlId, entModel, this.getFormAPI());
+
         cb(entModel);
     }
 
-    execFormFeature(controlId: string, featureName: string) {
-
+    onBlur = (widgetId: string) => {
+        const model = this.getDataModel();
+        this.execAllFormFeature(widgetId, model, this.getEntitySchema(), ["EVAL"], (m: IDictionary<IFieldData>) => {
+            this.setDataModel(m, { updateBy: "WIDGET", param: widgetId });
+        });
     }
 
     validate(): PromiseLike<boolean> {
         return new Promise((resolve, reject) => {
-            validationUtil.validateForm(this.getEntityModel()).then(errors => {
-                const { Widgets } = this.getEntityModel();
-                const wgt: Dictionary<WidgetInfoProps> = {};
-                _.forIn(Widgets, (v, k) => {
-                    const field = _.assign({}, v, { HasError: errors[k]? !errors[k].IsValid: false });                    
-                    wgt[k] = field;
-                })
-                const entModel = Object.assign({}, this.getEntityModel(), { Errors: errors, Widgets: Object.assign({}, Widgets, wgt) });
+            validationUtil.validateForm(this.getEntitySchema(), this.getDataModel()).then(errors => {
+                let entitySchema = this.getEntitySchema();
+                const dataModel = this.getDataModel();
                 
-                this.setEntityModel(entModel);
+                let model = dataModel;
+                _.forIn(entitySchema.Widgets, (v, k) => {
+                    model = update(model, {[k]: { HasError: {$set: errors[k]? !errors[k].IsValid: false}}});                    
+                });
+
+                this.setDataModel(model, { updateBy: "VALIDATE" });
+                this.setState({ errors })
                 if (Object.keys(errors).length > 0) {
+                    const msg = _.map(errors, v => (<span>{v.Message}<br/></span>));
+                    notification.error({ message: __L("Error"), description: <div>{msg}</div> });
+
                     resolve(false);
                 } else {
                     resolve(true);
@@ -152,19 +211,21 @@ export default class Form extends React.Component<FormProps>
         });
     }
 
-    validateField(controlInfo: WidgetInfoProps) {
-        const vRes = validationUtil.validateField(controlInfo);                
+    validateField(widgetId: string) {
+        const dataModel = this.getDataModel();
+        let entitySchema = this.getEntitySchema();
+        const fieldInfo = entitySchema.getField(widgetId);
+        const vRes = validationUtil.validateField({...fieldInfo, ...dataModel[widgetId]});                
         
-            this.updateField(controlInfo.WidgetId, { HasError: !vRes.IsValid });
-            const cErrors = this.setValidationResult(controlInfo.WidgetId, vRes);
+        this.updateField(widgetId, { HasError: !vRes.IsValid });
         
-            const entModel = Object.assign({}, this.getEntityModel(), { Errors: cErrors });
-            this.setEntityModel(entModel);
+        const cErrors = this.setValidationResult(widgetId, vRes);
+        this.setState({errors: cErrors});
     }
 
     setValidationResult(WidgetId: string, result: any) {
-        const {Errors} = this.getEntityModel();
-            const cErrors = Object.assign({}, Errors, {});
+        const errors = this.state.errors;
+            const cErrors = Object.assign({}, errors, {});
             if (result.IsValid) {
                 delete cErrors[WidgetId];
             } else {
@@ -173,31 +234,18 @@ export default class Form extends React.Component<FormProps>
         return cErrors;
     }
 
-    setErrorField(controlId: string) {
-
-    }
-
     getErrorResult = (widgetId: string) => {
-        return this.getEntityModel().Errors[widgetId];
+        const errors = this.state.errors;
+        if (errors)
+            return errors[widgetId];
+        else
+            return null;
     }
 
     public executeAction = (action: any) => {
-        const { onSubmit, onExecuteAction } = this.props;
         const { ExecutionType } = action; //ActionType
         if (ExecutionType === 1) { //submit
-            this.validate().then((isValid) => {
-                const { EntityInfo } = this.getEntityModel();
-                let onlyChanged = true;
-                if (!EntityInfo.ObjectId || EntityInfo.ObjectId <= 0) {
-                    onlyChanged = false;
-                }
-        
-                const toSaveModel = this.getFormDataToSubmit(onlyChanged);
-        
-                if (onSubmit) {
-                    onSubmit(action, toSaveModel);
-                }
-            });
+            return this.handleSubmit();
         } else {
             // if (onExecuteAction) {
             //     onExecuteAction(action);
@@ -206,122 +254,99 @@ export default class Form extends React.Component<FormProps>
         }        
     }
 
-    public updateField = (controlId: string, info: any) => {
-        const {Widgets} = this.getEntityModel();
-        const field = _.assign({}, Widgets[controlId], info);
+    public updateField = (controlId: string, info: any, afterUpdate?: Function) => {
+        const dataModel = this.getDataModel();
         
-        const entModel = Object.assign({}, this.getEntityModel(), {Widgets: _.assign({}, Widgets, {[controlId]: field}) });
+        let wd = update(dataModel, {[controlId]: { $merge: info }});
         
-        this.setEntityModel(entModel);
+        return this.setDataModel(wd, { updateBy: "WIDGET", param: controlId }, afterUpdate);
     }
 
     handleSubmit = () => {
+        const dataModel = this.getDataModel();
+        const entitySchema = this.getEntitySchema();
+        const { onSubmit } = this.props;
         this.validate().then((isValid) => {
-            if (isValid) {
-                if (this.props.onSubmit) {
-                    this.props.onSubmit(this.getFormDataToSubmit());
-                }
+            if (!isValid) {                    
+                return;
             }
-        })
-    }
 
-    getFormDataToSubmit(onlyChanged = true) {
-        const { EntityInfo, Widgets } = this.getEntityModel();
-        const model: any = {EntityInfo};
-        const f: any = {};
-        _.forIn(Widgets, (val, key) => {
-            if (!onlyChanged || val.IsDirty) {
-                f[key] = {
-                    Properties: val.Properties,
-                    WidgetId: val.WidgetId,
-                    Value: val.Value,
-                    WidgetType: val.WidgetType
-                };
+            const { EntityInfo } = entitySchema;
+            let onlyChanged = true;
+            if (!EntityInfo.ObjectId || EntityInfo.ObjectId <= 0) {
+                onlyChanged = false;
+            }
+    
+            const toSaveModel = getFormDataToSubmit(entitySchema, dataModel, onlyChanged);
+    
+            if (onSubmit) {
+                onSubmit(toSaveModel);
             }
         });
-
-        model.Widgets = f;
-
-        return model;
-    }
+    }    
 
     prepareFieldRequest = (widgetId: string) => {
-        const f = this.getEntityModel().Widgets[widgetId];
-        const r: any = {
-            FieldId: widgetId,
-            Properties: f.Properties,
-            EntityInfo: this.getEntityModel().EntityInfo,
-            FieldValue: f.Value
-        };
+        return prepareFieldRequest(this.getEntitySchema(), this.getDataModel(), widgetId);
+    }
 
-        if (f.Parents) {
-            r.Model = [];
-            _.each(f.Parents, (p) => {
-                const v = this.getEntityModel().Widgets[p.Id];
+    renderActions = () => {
+        const { Actions } = this.getEntitySchema();
+        
+        return <ActionBar commands={Actions} onCommandClick={this.executeAction} />
+    }
 
-                r.Model.push({WidgetId: v.WidgetId, Value: v.Value});
-            });
-        }
+    getFormActions = () => {
+        const { Actions } = this.getEntitySchema();
 
-        return r;
+        return  _.map(Actions, (c) => {
+                return <ActionLink key={c.ActionId} {...c} DisplayType={2} onClick={this.executeAction} />;
+            });        
+    }
+
+    getField = (widgetId: string): WidgetInfoProps => {
+        return this.getEntitySchema().Widgets[widgetId];
+    }
+
+    setWidgetTempdata = (widgetId: string, data: any) => {
+        this.WidgetsTempData[widgetId] = _.extend(this.WidgetsTempData[widgetId], data);
+    }
+
+    getWidgetTempdata = (widgetId: string) => {
+
+        return this.WidgetsTempData[widgetId] ? this.WidgetsTempData[widgetId]: {};
     }
 
     getFormAPI(): FormApi {
         return {
+            getEntitySchema: () => { return this.getEntitySchema(); },
             setValue: this.setValue,
             updateField: this.updateField,
+            getField: this.getField,
             getErrorResult: this.getErrorResult,
             validateField: this.validateField.bind(this),
-            prepareFieldRequest: this.prepareFieldRequest
+            prepareFieldRequest: this.prepareFieldRequest,
+            setWidgetTempdata: this.setWidgetTempdata,
+            getWidgetTempdata: this.getWidgetTempdata
         };
     }
 
     render() {
         const { render } = this.props;
         const formProps = {
-            Schema: this.props.Schema,
+            entityModel: this.getEntitySchema(),
             getControl: this.getControl.bind(this),
             executeAction: this.executeAction,
-            handleSubmit: this.handleSubmit
+            handleSubmit: this.handleSubmit,
+            renderActions: this.renderActions,
+            getFormActions: this.getFormActions
         };
 
         return (
-            <div>
+            <React.Fragment>
                 {
                     render(formProps)
                 }
-            </div>
+            </React.Fragment>
         );        
     }
-}
-
-export class ViewPageInfo {
-    Widgets!: Dictionary<WidgetInfoProps>
-    Actions!: Dictionary<any>
-    EntityInfo!: ObjectModelInfo
-    ErrorMessage!: string
-    Layout!: any
-    PostUrl!: string|undefined
-    Rules!: any
-    Errors!: Dictionary<{ IsValid: boolean, Message?: string }>
-
-    constructor(schema: any) {
-        this.Widgets = {};
-        this.Errors = {};
-
-        if (schema) {
-            _.extend(this, {...schema});            
-
-            _.each(schema.Widgets, (f) => {
-                this.Widgets[f.WidgetId] = _.assign({}, f);
-            });
-        }
-    }
-    
-    getField(controlId: string) {
-        const f = this.Widgets[controlId];
-
-        return f;
-    }
-
 }

@@ -34,13 +34,16 @@ namespace StackErp.Core
             this.Text = name;
 
             this.Fields = new Dictionary<string, BaseField>();
-            // this.Fields.Add("ID", new ObjectKeyField()
-            // {
-            //     Type = FieldType.ObjectKey,
-            //     Name = "ID",
-            //     DBName = "ID",
-            //     Entity = this
-            // });
+            if (fields.Where(f => f.Key.ToUpper() == "ID").Count() == 0)
+            {
+                this.Fields.Add("ID", new ObjectKeyField()
+                {
+                    Type = FieldType.ObjectKey,
+                    Name = "ID",
+                    DBName = "ID",
+                    Entity = this
+                });
+            }
 
             fields.Add("CREATEDON", new DateTimeField()
             {

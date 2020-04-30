@@ -4,7 +4,7 @@ import { Space } from "antd";
 import ActionButton from "../ActionLink";
 
 export default class ActionBar extends React.Component<{
-    commands: Array<any>,
+    commands?: IDictionary<any>,
     onCommandClick: Function
 }> {
 

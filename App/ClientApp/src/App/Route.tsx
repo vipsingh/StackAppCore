@@ -1,24 +1,19 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import PageFactory from "./Page/Factory";
+import PageFactory from "../Core/PageFactory";
 import Studio from "./Page/Studio";
 import PageContext, { createPageContext } from "../Core/PageContext";
+import { closeAll } from "../Component/UI/Dialog";
 
 function AppRoutes() {
   return (
     <Switch>
-      <Route exact path="/" component={NotFound} />
-      {/* <Route exact path="/builder" component={ObjectBuilder} /> */}
-      <Route path="/web/:controller/:action" component={RouteComponent} />
       <Route exact path="/Studio" component={Studio} />
+      <Route path="/:controller/:action/:param?" component={RouteComponent} />      
       <Route component={NotFound} />
     </Switch>
   );
 }
-
-// function redirectToBase() {
-//   return <Redirect to={window._CURRENT_URL_} />;
-// }
 
 class NotFound extends React.Component {
   render() {
@@ -38,7 +33,7 @@ class RouteComponent extends React.Component<
   },
   {
     loaded: boolean;
-    pageType: string;
+    pageType: number;
     data: any;
   }
   > 
@@ -49,7 +44,7 @@ class RouteComponent extends React.Component<
     super(props);
     this.state = {
       loaded: false,
-      pageType: "",
+      pageType: 10,
       data: null,
     };
 
@@ -57,14 +52,16 @@ class RouteComponent extends React.Component<
   }
 
   componentDidMount() {
-    this.loadPageData(this.props.location);
+    this.loadPageData(this.props.location);    
   }
 
   loadPageData(location: any) {
+    closeAll();
+    
     this.setState({ loaded: false });
 
     let path = location.pathname;
-    path = path.replace("web/", "");
+    //path = path.replace("web/", "");
 
     const q = location.search;
 
@@ -80,14 +77,12 @@ class RouteComponent extends React.Component<
         this.setState({ pageType, data: data, loaded: true });
       })
       .catch((err: any) => {
-        console.error(err);
-        this.setState({ data: null, loaded: true });
+        _Debug.error(`PageLoad: ${err}`);
+        this.setState({ pageType: 10, data: err, loaded: true });
       });
   }
 
   componentWillReceiveProps(nextProps: any) {
-    var that = this;
-
     const type = this.props.location.pathname;
     const q = this.props.location.search;
 

@@ -2,40 +2,46 @@ import * as CTRL from "./Form/Control/input";
 import LabelField from "./Form/Control/LabelField";
 import ListView from "./ListView";
 import { Dictionary } from "lodash";
+import { FormControlType } from "../Constant";
 
 
-export function getComponent(controlType: number, isViewMode: boolean) {
+export function getComponent(controlType: number, isViewMode?: boolean) {
     let editComponent = null;
     let viewComponent: any = LabelField;
     switch(controlType) {
-        case 1:
+        case FormControlType.TextBox:
             editComponent = CTRL.TextBox;
             break;
-        case 2:
+        case FormControlType.DatePicker:
             editComponent = CTRL.DateBox;
             break;
-        case 3:
+        case FormControlType.DecimalBox:
             editComponent = CTRL.DecimalBox;
             break;
-        case 4:
+        case FormControlType.CheckBox:
             editComponent = viewComponent = CTRL.CheckBox;
             break;
-        case 5:
+        case FormControlType.NumberBox:
             editComponent = CTRL.NumberBox;
             break;
-        case 6:
+        case FormControlType.Dropdown:
             editComponent = CTRL.SelectBox;
             break;
-        case 7:
+        case FormControlType.EntityPicker:
             editComponent = CTRL.EntityPicker;
             break;
-        case 8:
+        case FormControlType.LongText:
             editComponent = CTRL.TextArea;
+            break;
+        case FormControlType.Label:
+            editComponent = LabelField;
             break;
         default:
             const w = widgets[controlType];
-            editComponent = w.edit;
-            viewComponent = w.view;
+            if (w) {
+                editComponent = w.edit;
+                viewComponent = w.view;
+            }
             break;
     }
     if(isViewMode) {

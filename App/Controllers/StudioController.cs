@@ -10,6 +10,7 @@ using StackErp.Model;
 
 namespace StackErp.App.Controllers
 {
+    [SPA]
     public class StudioController: Controller
     {
         public StudioController()

@@ -1,18 +1,21 @@
 import React from "react";
-import _ from "lodash";
-import Form, { ViewPageInfo } from "./Form";
+import Form from "./Form";
 import PageContext from "../../Core/PageContext";
-import StatusCode from "../../Constant/StatusCodes";
+//import StatusCode from "../../Constant/StatusCodes";
+import ViewPageInfo from "../../Core/Models/ViewPageInfo";
+import LinkProcesser from "../../Core/Utils/LinkProcesser";
+import _ from "lodash";
 
 export interface EntityFormProps {
-    Schema?: any,
+    Schema: any,
     FormData?: any,
     render: Function,
     entityModel?: ViewPageInfo
 }
 
 export default class EntityForm extends React.Component<EntityFormProps, {
-    entityModel: ViewPageInfo
+    entityModel: ViewPageInfo,
+    dataModel: IDictionary<IFieldData>
 }> {
     static contextType = PageContext;
     //declare context: React.ContextType<typeof PageContext>
@@ -20,9 +23,19 @@ export default class EntityForm extends React.Component<EntityFormProps, {
     constructor(props: any, cntx: any) {
         super(props, cntx);
 
+        const { entityModel, dataModel }: any = this.mergeFields(props);
+
         this.state = {
-            entityModel : this.mergeFields(props)
+            entityModel,
+            dataModel
         };
+    }
+
+    componentWillReceiveProps(nextProps: EntityFormProps) {
+        if (nextProps.FormData !== this.props.FormData) {
+            const { entityModel, dataModel }: any = this.mergeFields(nextProps);
+            this.setState({ entityModel, dataModel })
+        }
     }
 
     getEntityModel() {
@@ -33,18 +46,20 @@ export default class EntityForm extends React.Component<EntityFormProps, {
         return this.state.entityModel;
     }
 
-    mergeFields(model: ViewPageInfo| null = null) {
+    mergeFields(model: ViewPageInfo| EntityFormProps) {
         if (model && model instanceof  ViewPageInfo) {
             return model;
         }
 
         const entityModel: ViewPageInfo = new ViewPageInfo(this.props.Schema);
-        return entityModel;
+        return { entityModel, dataModel: entityModel.getDataModel() };
     }    
 
-    performSubmit = (linkInfo: any, toSaveModel: any) => {        
+    performSubmit = (toSaveModel: any) => {      
+        const { PostUrl } = this.getEntityModel();  
+        
         _App.Request.getData({
-            url: linkInfo.Url,
+            url: PostUrl,
             body: toSaveModel
         }).then((result: any) => {
             _Debug.log(result);
@@ -56,21 +71,11 @@ export default class EntityForm extends React.Component<EntityFormProps, {
     }
 
     handeleSubmitResponse(result: RequestResultInfo) {
-        const { Status, RedirectUrl, Message } = result;
-        if (Status === StatusCode.Success) {
-            window._App.Notify.success("Data Saved");
-            if (RedirectUrl) {
-                _Debug.log("REDIRECT: " + RedirectUrl);
-                this.context.navigator.navigate(RedirectUrl);
-            }
-        } else if(Status === StatusCode.Fail) {//FAIL
-            window._App.Notify.error(Message);
-            _Debug.log("FAIL: " + Message);
-        }
+        LinkProcesser.handeleResponse(result, this.context.navigator);
     }
 
-    updateForm = (model: ViewPageInfo) => {
-        this.setState({entityModel: model});
+    updateForm = (model: IDictionary<IFieldData>) => {
+        this.setState({dataModel: model});
     }
 
     render() {
@@ -79,6 +84,7 @@ export default class EntityForm extends React.Component<EntityFormProps, {
             <Form 
                 {...this.props}
                 entityModel={this.state.entityModel}
+                dataModel={this.state.dataModel}
                 onSubmit={this.performSubmit}
                 onFormUpdate={this.updateForm}
             />

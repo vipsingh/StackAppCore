@@ -1,12 +1,16 @@
 import { notification } from 'antd';
 
+interface NotifyArgs{
+  title: string
+}
+
 const openNotificationWithIcon = (type: string, message: string, op: NotifyArgs = { title: "" }) => {
   const n: any = notification;
     n[type]({
       message: op.title,
       description: message,
     });
-  };
+};
 
 export default {
   success: function(message: string, op: NotifyArgs) {
@@ -25,7 +29,3 @@ export default {
     //Alert.closeAll();
   }
 };
-
-interface NotifyArgs{
-  title: string
-}

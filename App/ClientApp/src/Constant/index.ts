@@ -5,7 +5,7 @@ export const PageType = {
     Desk : 3,
     Report : 4,
     Dashboard : 5,
-    Error : 6
+    Error : 10
 };
 
 export const FormControlType = {

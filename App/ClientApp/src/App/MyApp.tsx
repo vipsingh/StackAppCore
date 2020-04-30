@@ -3,8 +3,9 @@ import { Layout } from "antd";
 import { BrowserRouter as Router } from "react-router-dom";
 import AppRoutes from "./Route";
 import NavMenu from "./NavMenu";
+import Header from "./AppLayout/Header";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Footer, Sider } = Layout;
 
 export default class MyApp extends Component<{}, {collapsed: boolean}> {
   constructor(props: any) {
@@ -23,9 +24,7 @@ export default class MyApp extends Component<{}, {collapsed: boolean}> {
     return (
       <Router>
         <Layout style={{ minHeight: "100vh" }}>
-        <Header className="site-layout-background">
-        <div className="logo"></div>
-          </Header>          
+        <Header />
           <Layout className="site-layout">            
           <Sider
             collapsible
@@ -35,7 +34,7 @@ export default class MyApp extends Component<{}, {collapsed: boolean}> {
             <NavMenu />            
           </Sider>
             <Content >
-              <div className="site-layout-background"
+              <div className="page-content-wrapper"
                 style={{
                   padding: 10,
                   minHeight: 360

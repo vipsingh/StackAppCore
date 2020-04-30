@@ -2,11 +2,12 @@ import React from "react";
 import { Table } from 'antd';
 import _, { Dictionary } from "lodash";
 import ListingWrapper from "./ListingWrapper";
-import ActionLink from "../ActionLink";
+import { cellRenderer } from "./Helper";
 
 class GridView extends React.Component<{
     listData: any, 
-    pager: any
+    pager?: any,
+    rowSelection?: any
 }, {
     columns: Array<any>
 }> {
@@ -16,23 +17,12 @@ class GridView extends React.Component<{
 
         const { Fields } = props.listData;
         this.state = {
-            columns: this.prepareAntTableSchema(Fields)
+            columns: this.prepareAntTableSchema(Fields)            
         };
     }
 
-    formatCell(val: any, row: any) {        
-        const { AdditionalValue, FormatedValue } = val;
-        let d = FormatedValue;
-        if (typeof FormatedValue === "object"){
-            d = FormatedValue.Text;
-        } 
-
-        if (AdditionalValue && AdditionalValue.ViewLink) {
-            const { ViewLink } = AdditionalValue;
-            return (<ActionLink ActionId={"VIEW"} {...ViewLink} Title={d} />);
-        }
-
-        return d;
+    formatCell(col: any, val: any, row: any) {        
+        return cellRenderer(col, val);
     }
 
     prepareAntTableSchema(columns: Dictionary<any>) {
@@ -43,22 +33,23 @@ class GridView extends React.Component<{
                 title: c.WidgetId,
                 dataIndex: c.WidgetId, 
                 key: c.WidgetId,
-                render: this.formatCell.bind(c)
+                render: this.formatCell.bind(this, c)
             };
         });
-    }
+    }    
 
     render() {
         const { columns } = this.state;
-        const { listData: { Data, IdColumn} } = this.props;
+        const { listData: { Data} } = this.props;
  
         return (
             <Table 
                 columns={columns}
                 dataSource={Data}
-                rowKey={IdColumn}
+                rowKey={"RowId"}
                 bordered
                 size="small"
+                rowSelection={this.props.rowSelection}
             />
         );
     }

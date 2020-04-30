@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM, { render } from "react-dom";
 import { Modal, Button } from "antd";
+import _ from "lodash";
 
 function defer() {
   var resolve, reject;
@@ -37,35 +38,42 @@ class DialogBox extends React.Component<{options: any, title: string, children: 
   }
 
   render() {
+    const { options } = this.props;
     let btn_op = {
       confirmLabel: "OK",
       abortLabel: "Cancel"
     };
-    if (this.props.options.buttonType == "YESNO") {
+    if (options.buttonType === "YESNO") {
       btn_op.confirmLabel = "Yes";
       btn_op.abortLabel = "No";
     }
-    let options = Object.assign({}, this.props.options, btn_op);
+    let op = Object.assign({}, options, btn_op);
 
     const action_abort = (
-      <Button type="primary" onClick={this.abort}>
-        {options.abortLabel}
+      <Button key="back" onClick={this.abort}>
+        {op.abortLabel}
       </Button>
     );
 
     const action_confirm = (
-      <Button type="primary" onClick={this.confirm}>
-        {options.confirmLabel}
+      <Button key="submit" type="primary" onClick={this.confirm}>
+        {op.confirmLabel}
       </Button>
     );
 
     const actions = [];
-    if (this.props.options.buttonType == "OK") {
-      actions.push(action_confirm);
-    } else {
-      actions.push(action_abort);
-      actions.push(action_confirm);
+    if (!options.hideCommands) {
+      if (options.buttonType === "OK") {
+        actions.push(action_confirm);
+      } else {
+        actions.push(action_abort);
+        actions.push(action_confirm);
+      }
     }
+
+    let width;
+    if (options.size === "lg")
+      width = "85%";
 
     //actions={actions}
     return (
@@ -73,6 +81,10 @@ class DialogBox extends React.Component<{options: any, title: string, children: 
         title={this.props.title}        
         visible={true}
         onCancel={this.abort}
+        footer={actions}
+        maskClosable={false}
+        width={width}
+        style={{ top: options.size === "lg"? 20: undefined }}
       >
         {this.props.children}
       </Modal>
@@ -80,20 +92,36 @@ class DialogBox extends React.Component<{options: any, title: string, children: 
   }
 }
 
-export const openDialog = function(title: string, children: any, options: any) {
+export const openDialog = function(title: string, children: any, options: any = {}): { promise: Promise<any>, cleanup: Function } {
   var cleanup, component: any, props, wrapper: HTMLDivElement;
-  if (options == null) {
-    options = {};
-  }
+
   title = title || "Message";
   props = { title: title, options: options, children };
   wrapper = document.body.appendChild(document.createElement("div"));
+  wrapper.id = _.uniqueId("dialog");
+  openedDialogs.push(wrapper.id);
   component = render(<DialogBox {...props} />, wrapper);
   cleanup = function() {
     ReactDOM.unmountComponentAtNode(wrapper);
     return setTimeout(function() {
+      openedDialogs = _.remove(openedDialogs, a => a === wrapper.id);
       return wrapper.remove();
     });
   };
-  return component.promise.promise.finally(cleanup);
+  return { promise: component.promise.promise.finally(cleanup), cleanup };
 };
+let openedDialogs: Array<any> = [];
+
+export function closeAll() {
+  _.forEach(openedDialogs, d => {
+      const wrapper = document.getElementById(d);
+      if (wrapper) {
+        ReactDOM.unmountComponentAtNode(wrapper);
+        return setTimeout(function() {
+          return wrapper.remove();
+        });
+      }
+  });
+
+  openedDialogs = [];
+}

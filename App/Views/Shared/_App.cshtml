@@ -1,0 +1,17 @@
+@model AppPageModel;
+@{
+    ViewData["Title"] = "Stack ERP";
+}
+<script>
+    window._CURRENT_URL_ = "@ViewBag.OrignalUrl";
+    window._PAGE_DATA_ = @Html.Raw(ViewBag.PageData);
+    window._AppSetting = {
+      UserId: 1,
+      RoleId: 1,
+      DateFormat: "DD-MM-YYYY",
+      BaseUrl: "/",
+      ApiUrl: "@ViewBag.Host"
+    };
+</script>
+<div id="app">..loading</div>
+

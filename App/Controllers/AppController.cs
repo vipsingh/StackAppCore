@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace StackErp.App.Controllers
 {
@@ -25,6 +26,31 @@ namespace StackErp.App.Controllers
             ViewBag.PageData = json;
             ViewBag.Host = Request.Scheme + "://" + Request.Host.ToUriComponent();
             return View(m);
+        }
+    }
+
+    public class SPAAttribute : ActionFilterAttribute
+    {
+
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            // if (!Settings.CurrentSettings.IsConsoleAppMode)
+            // {
+            //     base.OnActionExecuting(filterContext);
+            //     return;
+            // }
+
+            StackErp.UI.Controllers.BaseController baseController = filterContext.Controller as StackErp.UI.Controllers.BaseController;
+            var eqs = baseController.RequestQuery;
+
+            if (filterContext.HttpContext.Request.Query["_ajax"] == "1")
+            {
+                base.OnActionExecuting(filterContext);
+            }
+            else
+            {
+                filterContext.Result = baseController.SPAApp();
+            }
         }
     }
 }

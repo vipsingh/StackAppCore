@@ -1,7 +1,6 @@
 import React from "react";
 import _ from "lodash";
 import { Row, Col } from "antd";
-// import { Paper } from "~/Core/Ui";
 
 export default class UIView extends React.Component<{
     template: any,
@@ -9,83 +8,22 @@ export default class UIView extends React.Component<{
   }> {
 
   render() {
-    const { template } = this.props;
-    const { Pages, Header } = template;
+    const { template, getControl } = this.props;
+    const { Pages } = template;
     let i = 0;
 
     return (
-        <div className="page-form">
-            {
-                this.renderHeader(Header)
-            }            
-            {
-                _.map(Pages, (s) => {
-                    return this.renderSheet(s, `page_${i++}`);
-                })
-            }
-        </div>
-    );
-  }  
-
-  renderHeader(header: any) {
-    if(!header) return;
-
-    return(
-        <div className={"page-form-header"}>
-            {this.renderSheet(header, `header_0`)}
-        </div>
-    );
-  }
-
-  renderSheet(sheet: any, key: string) {
-    const { Groups } = sheet;
-    let i = 0;
-
-    return (
-        <div className="form-ui-sheet" key={key}>
+        <div className="page-form">            
             <div>
                 {
-                    _.map(Groups, (p) => {
-                        return this.renderGroup(p, `${key}_group_${i++}`);
+                    _.map(Pages, (s) => {
+                        return <div className=" paper"><PageSheet getControl={getControl} sheet={s} key={`page_${i++}`} /></div>;
                     })
                 }
             </div>
         </div>
     );
-  }
-
-  renderGroup(group: any, key: string) {
-    const { Rows } = group;
-    let i = 0;
-
-    return (
-        <div className="form-ui-group">
-        {
-            _.map(Rows, (p) => {
-                return this.renderRow(p, `${key}_row_${i++}`);
-            })
-        }
-        </div>
-    );
-  }
-
-  renderRow(row: any, key: string) {
-    const { getControl } = this.props;
-    const { Fields } = row;
-    let i = 0;
-
-    return (
-        <div className="form-ui-row" >
-            <Row>
-                {
-                    _.map(Fields, (field) => {
-                        return (<UIField key={field.FieldId} {...field} getControl={getControl} />);
-                    })
-                }
-            </Row>
-        </div>
-    );
-  }
+  }    
 }
 
 
@@ -101,4 +39,49 @@ export class UIField extends React.Component<{
     
     return (<Col span={span}>{getControl(FieldId)}</Col>);
   }
+}
+
+export const PageSheet: React.FC<any> = (props) => {
+    const { sheet, key, getControl } =props;
+    const { Groups } = sheet;
+    let i = 0;
+
+    return (
+        <div className="form-ui-sheet">
+                {
+                    _.map(Groups, (p) => {
+                        return <PageGroup getControl={getControl} group={p} key={`${key}_group_${i++}`} /> //this.renderGroup(p, `${key}_group_${i++}`);
+                    })
+                }
+        </div>
+    );
+  }
+
+export const PageGroup: React.FC<any> = (props) => {
+    const { group, getControl } = props;
+    const { Rows, Label } = group;
+    //let i = 0;
+
+    return (
+        <div className="form-ui-group paper-group">
+            {!Label || <h3>{Label}</h3>}
+        {
+            _.map(Rows, (row) => {
+                const { Fields } = row;
+
+                return (
+                    <div className="form-ui-row" >
+                        <Row>
+                            {
+                                _.map(Fields, (field) => {
+                                    return (<UIField key={field.FieldId} {...field} getControl={getControl} />);
+                                })
+                            }
+                        </Row>
+                    </div>
+                );
+            })
+        }
+        </div>
+    );
 }

@@ -1,13 +1,17 @@
 import { criteriaEvaluator } from "../Utils/EvalCriteria";
+import _ from "lodash";
 
-function execute(criteria: Array<any>, model: any) {
+function execute(criteria: Array<any>, model: IDictionary<IFieldData>) {
     if (!criteria) {
         return false;
     }
 
     const result: Array<boolean> = [];
     criteria.forEach(c => {
-        const f = model.getField(c.FieldName);
+        if (_.isArray(c)) {
+            c = { FieldName: c[0], Op: c[1], Value: c.length > 2 ? c[2]: null };
+        }
+        const f = model[c.FieldName];
 
         let r = false;
         if (f) {

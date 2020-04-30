@@ -1,19 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-//import App from './App';
+import registerPages from "./App/Page";
 import MyApp from './App/MyApp';
 import Notify from "./Core/Utils/Notify";
 import Request from "./Core/Utils/Request";
 import DebugTrace from "./Core/Utils/DebugTrace";
+import { getResource } from "./Core/Utils/Localization";
 import * as serviceWorker from './serviceWorker';
 import './index.css';
+import _ from 'lodash';
 
 window._App = {
     Notify,
-    Request  
+    Request,
+    FormatString: (str: string, data: any): string => {
+      var compiled = _.template(str);
+      return compiled(data);
+    }
   };
   
-  window._Debug = DebugTrace;
+window._Debug = DebugTrace;
+window.__L = getResource;
+
+registerPages();
 
 ReactDOM.render(<MyApp />, document.getElementById('app'));
 

@@ -1,25 +1,35 @@
-import _ from "lodash";
+import update from "immutability-helper";
 import FilterCriteria from "./FilterCriteria";
 
-function execute(rule: any, field: string, model: any) {
-    const fieldsToHide = rule.Fields;
+function execute(rule: any, field: string, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {
+  const fieldsToHide = rule.Fields;
 
-    let isCriteriaMetch = true;
-    if (rule.Criteria) {
-        isCriteriaMetch = FilterCriteria.execute(rule.Criteria, model);
+  let isCriteriaMetch = true;
+  if (rule.Criteria) {
+    isCriteriaMetch = FilterCriteria.execute(rule.Criteria, model);
+  }
+
+  let isHidden = false;
+  if (isCriteriaMetch) {
+    isHidden = true;
+  }
+  fieldsToHide.forEach((fId: string) => {    
+    let fHide = formApi.getField(fId);
+    let fTempdata = formApi.getWidgetTempdata(fId);
+    let fdata = model[fId];
+    if (fHide.IsHidden) return;
+
+    if (!isHidden && fdata.Invisible && fTempdata.hiddenBy !== field) {
+    } else {       
+      model = update(model, {[fId]: { $merge: {Invisible: isHidden}}});      
     }
 
-    if(isCriteriaMetch) {
-        fieldsToHide.forEach((fId: string) => {
-            let fHide = model.getField(fId);
-            Object.assign(fHide, { IsHidden: true });
-            Object.assign(model, {Fields: _.assign({}, model.Fields, {[fId]: fHide}) });
-        });
-    }
+    formApi.setWidgetTempdata(fId, { hiddenBy: field });
+  });
 
-    return model;
+  return model;
 }
 
 export default {
-    execute
+  execute,
 };

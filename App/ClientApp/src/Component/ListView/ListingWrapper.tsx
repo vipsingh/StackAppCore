@@ -1,4 +1,5 @@
 import React from "react";
+import _ from "lodash";
 
 export default function(ListComp: React.ComponentClass<any,any>) {
     
@@ -9,28 +10,34 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                     Count: number,
                     Page: number,
                     Size: number
-                }
+                },
+                selectedRowKeys: Array<any>
         }> {
     
         constructor(props: any) {
             super(props);
 
             this.state = {
-                IsFetching: true,            
+                IsFetching: false,
                 Rows: [],
                 Pager: {
                     Count: 0,
                     Page: 1,
                     Size: 25
-                }
+                },
+                selectedRowKeys: []
             };
-
+            
             this.loadData();
         }
 
         loadData = (index: number = 1) => {
             const { WidgetId, DataActionLink, ListData, api } = this.props; 
+            if (!DataActionLink) return;
+            
             const { Url } = DataActionLink;      
+            
+            this.setState({IsFetching: true});
 
             _App.Request.getData({
                 url: Url,
@@ -38,8 +45,9 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                 body: {RequestType: 0}
             }).then((res: any) => {
                 const info = res;
-
-                api.updateField(WidgetId,  { ListData: Object.assign({}, ListData, info) });
+                if (api && api.updateField) {
+                    api.updateField(WidgetId,  { ListData: Object.assign({}, ListData, info) });
+                }
             }).finally(() => {
                 this.setState({IsFetching: false});
             });;
@@ -55,6 +63,34 @@ export default function(ListComp: React.ComponentClass<any,any>) {
             // this.loadData(1);
         }
 
+        getSelectedRows() {
+            const { selectedRowKeys } =this.state;
+            const { ListData: { Data } } = this.props;
+
+            return _.filter(Data, k => {
+                return  selectedRowKeys.indexOf(k.RowId) >= 0;
+            });
+        }
+
+        getRowSelection(): any {
+            const { SelectionConfig } = this.props;
+            if (!SelectionConfig) return;
+
+            return {
+                type: (SelectionConfig.IsMultiSelect ? "checkbox" : "radio"),
+                onChange: (selectedRowKeys: any, selectedRows: any) => {                
+                    this.setState({ selectedRowKeys: _.map(selectedRows, x => x.RowId) });
+                },
+                getCheckboxProps: (record: any) => {
+                    return {
+                        //disabled: record.name === 'Disabled User'
+                        name: record.RowId,
+                    };
+                },
+                selectedRowKeys: this.state.selectedRowKeys
+              };
+        }
+
         render() {
             const { ListData } = this.props;
             const { Pager } = this.state;
@@ -67,7 +103,8 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                 return (
                     <ListComp                         
                         listData={ListData} 
-                        pager={Pager}                       
+                        pager={Pager}   
+                        rowSelection={this.getRowSelection()}                        
                     />
                 );
             }

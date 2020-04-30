@@ -17,6 +17,8 @@ CREATE TABLE entitymaster
 	tablename character varying(60) ,
 	primaryfield character varying(100) ,
 	namefield character varying(60) ,
+	createdon timestamp without time zone,	
+    updatedon timestamp without time zone,
 	CONSTRAINT entitymaster_pkey PRIMARY KEY (id),
 	CONSTRAINT entitymaster_name_key UNIQUE (name)
 )
@@ -90,3 +92,13 @@ create table lookup_master(
 	datacode character varying(60) ,
 	primary key(id,dataid)
 )
+
+insert into entity_itemtype(id,entityid,name,code)
+values(4,9002,'Default','0');
+insert into entity_itemtype(id,entityid,name,code)
+values(3,9001,'Default','0');
+
+insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
+values(4,9002,4,'','0', null);
+insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
+values(3,9001,3,'','0', null);

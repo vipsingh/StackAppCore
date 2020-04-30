@@ -1,5 +1,6 @@
 import axios from "axios";
-//import request from "request";
+//import { entity_detail, entity_edit, widget_data } from "../../mockupdata";
+
 
 function processRequest(resolve: Function, reject: Function, params: RequestParam = { type: "POST", body: null, contentType: "", url: "" }) {
     const myHeaders = new Headers();
@@ -9,28 +10,32 @@ function processRequest(resolve: Function, reject: Function, params: RequestPara
     let url = params.url;
     //const _w: any = window;
     url = "/" + url;
-    url = `${url.replace("//","/")}&_x=${new Date().getTime()}`;
+    url = `${url.replace("//","/")}${url.indexOf("?") >= 0 ? "&": "?"}_ajax=1&_x=${new Date().getTime()}`;
     
     //console.log(url);
 
     contentType = "application/json";
     if (contentType) {
         myHeaders.append("Content-Type", contentType);
+        //myHeaders.append("X-PAjax", "true");
     }   
 
     let f = null;
-    if (requestType === "POST") {
-        const instance = axios.create({
-            headers: myHeaders
-          });
+    const instance = axios.create({
+        headers: myHeaders
+    });
 
+    if (requestType === "POST") {        
         f = instance({
             method: 'post',
             url: url,
             data: requestBody
           });       
     } else {
-        f = axios.get(url);
+        f = instance({
+            method: 'get',
+            url: url
+          });     
     }
 
     f.then(({data}) => {
@@ -46,70 +51,24 @@ function processRequest(resolve: Function, reject: Function, params: RequestPara
       });
 }
 
-// function processRequest1(resolve, reject, params) {
-//     const myHeaders = new Headers();
-
-//     let requestBody;
-//     const requestType = (typeof params.type === "string") ? params.type.toUpperCase() : "POST";
-//     let contentType = params.contentType ? params.contentType : null;
-
-//     contentType = "application/json";
-//     if (contentType) {
-//         myHeaders.append("Content-Type", contentType);
-//     }
-//     const myInit = {
-//         method: requestType,
-//         //mode: "cors",
-//         cache: "default",
-//         //credentials: "same-origin",
-//         headers: myHeaders,
-//         body: requestBody
-//     };
-
-//     fetch(`${_AppSetting.ApiUrl}${params.url}`, myInit)
-//             .then(function (response) {
-//                 if (response.ResponseStatus === 200) {
-//                     resolve(response.Data);
-//                 } else {
-//                     reject(response.Data);
-//                 }
-//             })
-//             .catch(function (resError) {
-                
-//                 //__debug.errorLog("Http request failed.", params.url, myInit, resError);
-
-//                 resError.message = "OOPS!!! Something went wrong. Seems like you are not connected to internet.";
-//                 reject(resError);
-//             });
-// }
-
-// const convertToFormData = function (rawObject) {
-//     const formData = new FormData();
-//     for (const key in rawObject) {
-//         formData.append(key, encodeURIComponent(JSON.stringify(rawObject[key])));
-//     }
-
-//     return formData;
-// };
-
-// const convertToUrlEncodedData = function (rawObject) {
-//     const keys = Object.keys(rawObject);
-//     let requestString = "";
-//     keys.forEach((key, index) => {
-//         requestString += `${key}=${encodeURIComponent(JSON.stringify(rawObject[key]))}`;
-//         if (index < keys.length - 1) {
-//             requestString += "&";
-//         }
-//     });
-
-//     return requestString;
-// };
-
 function getData(params: RequestParam) {
-    return new Promise(function (resolve, reject) {
-        processRequest(resolve, reject, params);
+    return new Promise(function (resolve, reject) {        
+            //getMockupData(resolve, reject, params);
+        
+            processRequest(resolve, reject, params);        
     });
 }
+
+// function getMockupData(resolve: Function, reject: Function, params: any) {
+//     const url = params.url;
+//     if (url.indexOf("entity/detail") >= 0) {
+//         resolve(entity_detail);
+//     } else  if (url.indexOf("entity/edit") >= 0) {
+//         resolve(entity_edit);
+//     } else  if (url.toLowerCase().indexOf("widget/getpickerdata") >= 0) {
+//         resolve(widget_data);
+//     }
+// }
 
 var Request = {
     getData

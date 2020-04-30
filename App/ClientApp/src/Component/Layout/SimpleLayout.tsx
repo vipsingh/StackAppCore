@@ -1,6 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import { Row, Col } from "antd";
+import { Row } from "antd";
 import { UIField } from ".";
 // import { Paper } from "~/Core/Ui";
 
@@ -16,10 +16,10 @@ export default class SimpleLayout extends React.Component<{
         <div>
             {
                 _.map(Fields, (s) => {
+                    if (!s.WidgetType) return;
+                    
                     return (<Row>
-                        <Col>
-                            <UIField key={s.WidgetId} FieldId={s.WidgetId} getControl={getControl} />
-                        </Col>
+                            <UIField key={s.WidgetId} FieldId={s.WidgetId} getControl={getControl} FullRow />
                     </Row>);
                 })
             }

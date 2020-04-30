@@ -1,18 +1,22 @@
-import _, { Dictionary } from "lodash";
-import { ViewPageInfo } from "../../../../Component/Form/Form";
+import _ from "lodash";
+import { rangeAdaptor } from "./Range";
 
-function validateForm(model: ViewPageInfo): PromiseLike<Dictionary<{IsValid: boolean, Message: string}>> {
+function validateForm(entityInfo: IPageInfo, dataModel: IDictionary<IFieldData>): PromiseLike<IDictionary<{IsValid: boolean, Message: string}>> {
     return new Promise((resolve, reject) => {
-        const { Widgets } = model;
-        const cErrors: Dictionary<{IsValid: boolean, Message: string}> = {};
-        _.forIn(Widgets, (v, k) => {
-            const vRes = validateField(v);
+        //const { Widgets } = model;
+        const cErrors: IDictionary<{IsValid: boolean, Message: string}> = {};
+        _.forIn(dataModel, (v, k) => {
+            const field = entityInfo.getField(k);
+            let vRes = validateField({...field, ...v}, entityInfo, dataModel);
+            if (!vRes) {
+                vRes = { IsValid: true };
+            }
             //this.updateField(v.WidgetId, { HasError: !vRes.IsValid });
 
             if (vRes.IsValid) {
-                delete cErrors[v.WidgetId];
+                delete cErrors[field.WidgetId];
             } else {
-                cErrors[v.WidgetId] = vRes;
+                cErrors[field.WidgetId] = vRes;
             }
         });
         
@@ -21,7 +25,13 @@ function validateForm(model: ViewPageInfo): PromiseLike<Dictionary<{IsValid: boo
     });
 }
 
-function validateField(controlInfo: WidgetInfoProps) {
+function validateField(controlInfo: WidgetInfoProps, entityInfo?: IPageInfo, dataModel?: IDictionary<IFieldData>) {
+    if (controlInfo.IsRequired) {
+        let v = validator["REQUIRED"](controlInfo);
+
+        return v || { IsValid: true };
+    }
+
     const Validation = controlInfo.Validation;
     if (Validation) {
         let r: any = null;
@@ -29,11 +39,15 @@ function validateField(controlInfo: WidgetInfoProps) {
             if (validator[k] && !r) {
                 const vRes = validator[k](controlInfo, v);
                 if (vRes && !vRes.IsValid) {
-                    r = vRes;                    
+                    r = vRes; 
                 }
             }
         });
-        if (r) return r;
+        if (r) {
+            if (!r.Message)
+                r.Message = "Invalid field value!";
+            return r;
+        }
     }
 
     return {
@@ -41,16 +55,18 @@ function validateField(controlInfo: WidgetInfoProps) {
     };
 }
 
-const validator: Dictionary<Function> = {
-    REQUIRED: (widgetInfo: WidgetInfoProps, validationInfo: any) => {
+const validator: IDictionary<Function> = {
+    REQUIRED: (widgetInfo: WidgetInfoProps, validationInfo: any = {}) => {
         const value = widgetInfo.Value;
         if (!value) {
+            let msg = validationInfo.Msg || "${caption} is required.";
             return {
                 IsValid: false,
-                Message: validationInfo.Msg
+                Message: _App.FormatString(msg, { caption: widgetInfo.Caption })
             };
         }
-    }
+    },
+    RANGE: rangeAdaptor
 };
 
 export default { validateForm, validateField };

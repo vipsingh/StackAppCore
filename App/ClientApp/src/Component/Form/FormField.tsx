@@ -11,11 +11,11 @@ export default class FormField extends React.Component<WidgetInfoProps> {
         return true;
       }
       
-      return nextProps.Value !== this.props.Value || nextProps.HasError !== this.props.HasError;
+      return nextProps.Value !== this.props.Value || nextProps.HasError !== this.props.HasError || nextProps.Invisible !== this.props.Invisible || nextProps.VisibleOptions !== this.props.VisibleOptions;
     }
 
     render() {        
-        const { WidgetId, Caption, HasError, api } = this.props;
+        const { WidgetId, Caption, HasError, api, Invisible, IsHidden } = this.props;
         
         const formItemLayout = {
             labelCol: {
@@ -34,13 +34,16 @@ export default class FormField extends React.Component<WidgetInfoProps> {
 
         let validResult: any;
         if (HasError) {
-          validResult = api.getErrorResult(WidgetId)
+          validResult = api.getErrorResult(WidgetId);
+        }
+        if (IsHidden || Invisible) {
+          return <div>{this.props.children}</div>;
         }
 
         return (
             <FormItem
             {...formItemLayout}            
-            label={Caption}        
+            label={(IsHidden || Invisible) ? "" : Caption}        
             >
             <div className={cs("form-field-control", {"ant-form-item-has-error": HasError})}>
               {this.props.children}

@@ -15,6 +15,7 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
+    [SPA]
     public class EntityController : StackErp.UI.Controllers.BaseController
     {
         public EntityController(ILogger<EntityController> logger): base(logger)
@@ -22,6 +23,10 @@ namespace StackErp.App.Controllers
 
         }
 
+        public IActionResult Index()
+        { 
+            return RedirectToAction("Desk", new { entityName = "UserMaster" });
+        }
         public IActionResult New()
         {            
 
@@ -83,8 +88,12 @@ namespace StackErp.App.Controllers
             return CreateResult(res);
         }
 
-        public IActionResult Desk()
+        public IActionResult Desk(string id)
         {
+            if (!string.IsNullOrEmpty(id)) {
+                this.RequestQuery.EntityId = EntityCode.Get(id);
+            }
+
             var context = new DeskPageContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
             context.Build();
 

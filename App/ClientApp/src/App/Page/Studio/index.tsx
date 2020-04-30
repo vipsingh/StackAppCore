@@ -2,13 +2,22 @@ import React, { Component } from "react";
 import _ from "lodash";
 import { Layout, Row, Col, Button, Input, Form, Card } from "antd";
 import FieldProps from "./FieldProps";
-import EntityPage from "./EntityPage";
+import { fieldTypes } from "./helper";
+import { openDialog } from "../../../Component/UI/Dialog";
+import update from "immutability-helper";
+import { DndProvider, useDrag, DragSourceMonitor, useDrop } from 'react-dnd'
+import Backend from 'react-dnd-html5-backend'
 
 const { Content } = Layout;
 
-export default class Studio extends Component<any, { form: any, selectedField: number, isEntityView: boolean }> {
+export default class Studio extends Component<
+  any,
+  { form: any; selectedField: number, FieldBox: Array<{ Id: number, FieldId: number }> }
+  > {
   fieldsType: Array<any>
   nextId: number
+  nextBoxId: number
+  fieldPropDlg: any
   constructor(props: any) {
     super(props);
     this.state = {
@@ -16,173 +25,234 @@ export default class Studio extends Component<any, { form: any, selectedField: n
         Id: 0,
         Name: "",
         Text: "",
-        Fields: []
+        Fields: []        
       },
+      FieldBox: [{Id: 1, FieldId: -1}],
       selectedField: -1,
-      isEntityView: true
     };
-
+    
     this.fieldsType = [];
-    this.nextId = 0;
+    this.nextId = 1;
+    this.nextBoxId = 2;
+
   }
 
-  renderFields() {}
+  addFieldBox() {
+    this.setState({ FieldBox: update(this.state.FieldBox, { $push: [{Id: this.nextBoxId++, FieldId: -1}]}) });
+  }
 
-  addF = (item: any) => {
+  renderFields() { }
+
+  addF = (item: any, fieldBoxId: number) => {
     var fields = this.state.form.Fields.splice(0);
+    const id = this.nextId++;
 
     var f = {
-      Id: this.nextId++,
-      Name: "",
+      Id: id,
+      FieldName: "Field " + id,
       Label: "",
-      Type: item.Id,
-      Type__text: item.Text,
+      FieldType: item.Value,
+      Length: 0,
       IsRequired: false,
-      RefObject: ""
-    };
+      LinkEntity: 0,
+      OtherSetting: ""
+    };    
 
     fields.push(f);
 
     this.setState({
       form: Object.assign({}, this.state.form, { Fields: fields }),
-      selectedField: f.Id
+      selectedField: f.Id,
     });
+
+    let fieldBox = update(this.state.FieldBox, { $push: [{Id: this.nextBoxId++, FieldId: -1}]});
+    const ix = _.findIndex(fieldBox, { Id: fieldBoxId });
+    fieldBox = update(fieldBox, {[ix]: { $set: Object.assign({}, fieldBox[ix], { FieldId: f.Id })} });
+    this.setState({ FieldBox: fieldBox });    
+
+    setTimeout(() => {
+      this.onFieldSelect(f);
+    }, 100);
   };
 
-  onFieldSelect = (f: any) => {
-    this.setState({ selectedField: f.Id });
-  };
-
-  setFieldProp = (field: string, value: any) => {
-    const { form, selectedField } = this.state;
-    var fields = form.Fields.splice(0);
-
-    var f = _.find(fields, { Id: selectedField });
-    f = Object.assign(f, { [field]: value });
-
-    this.setState({
-      form: Object.assign({}, this.state.form, { Fields: fields })
-    });
-  };
-
-  changeView = (isEntityView: boolean) => {
-    this.setState({isEntityView});
+  validateFieldForm() {
+    
   }
 
-  saveEntity() {}
+  onFieldSelect = (f: any) => {
+    //this.setState({ selectedField: f.Id });
+    const selectedF = f;//_.find(this.state.form.Fields, { Id: f.Id });
+    this.fieldPropDlg = openDialog("Field", (<FieldProps
+      selectedField={selectedF}
+      setFieldProp={this.setFieldProp}
+    />), { hideCommands: true, size: "lg" });
+  };
 
-  validate() {}
+  setFieldProp = (toSaveModel: any) => {
+    const { form, selectedField } = this.state;
+    var fields = form.Fields.splice(0);
+    var f = _.find(fields, { Id: selectedField });
+    _.forIn(toSaveModel.Widgets, (w, k) => {
+      Object.assign(f, { [k]: w.Value });
+    });    
+
+    this.setState({
+      form: Object.assign({}, this.state.form, { Fields: fields }),
+    });
+
+    this.fieldPropDlg.cleanup();
+  };
+
+  saveEntity() { }
+
+  validate() { }
 
   renderFieldTypes() {
     return (
       <div>
-        {
-          _.map(fieldTypes, (item) => {
-            return (<Button
-              type="default"
-              icon="list"
-              block
-              onClick={() => {
-                this.addF(item);
-              }}
-            >
-              {item.Text}
-            </Button>)
-          })
+        {_.map(fieldTypes, (item) => {
+          return (<Box item={item} addField={(typeId: string, fieldBoxId: string) => {
+              this.addF(_.find(fieldTypes, {Value: parseInt(typeId)}), parseInt(fieldBoxId));
+            }} />
+          );
+        })}
+      </div>
+    );
+  }
+
+  renderFieldBox = (fieldId: number) => {
+    let fieldItem = _.find(this.state.form.Fields, { Id: fieldId });
+    return (
+      <Form.Item label={fieldItem.FieldName} labelCol={{span: 6}} wrapperCol={{span: 18}}>
+      <Input
+        addonAfter={
+          <Button
+            type="link"
+            onClick={() => {
+              this.onFieldSelect(fieldItem);
+            }}
+          >
+            {"###"}
+          </Button>
         }
-      </div>);      
+        placeholder={fieldItem.FieldName}
+        disabled
+      />
+    </Form.Item>
+    );
   }
 
   render() {
-    const { form, selectedField } = this.state;
-    const selectedF = _.find(form.Fields, { Id: selectedField });
-    const formItemLayout = {
-      labelCol: { span: 4 },
-      wrapperCol: { span: 14 }
-    };
     const panelStyle = {
       background: "#fff",
       padding: 12,
       margin: 0,
-      minHeight: 280
+      minHeight: 280,
     };
-
-    if (this.state.isEntityView) {
-      return (<EntityPage onChangeView={this.changeView} />);
-    }
 
     return (
       <Layout className="layout">
         <Content>
+        <DndProvider backend={Backend}>
           <Row>
             <Col span={4}>
-              <Card size="small" title={"Fields"} style={panelStyle}>{this.renderFieldTypes()}</Card>
-            </Col>
-            <Col span={14}>
-              <div style={panelStyle}>                
-                <Form>
-                  {_.map(form.Fields, f => {
-                    return (
-                      <Form.Item label={"Field " + f.Name} {...formItemLayout}>
-                        <Input
-                          addonAfter={
-                            <a
-                              href="#"
-                              onClick={() => {
-                                this.onFieldSelect(f);
-                              }}
-                            >
-                              {"###"}
-                            </a>
-                          }
-                          placeholder={f.Name}
-                          disabled
-                        />
-                      </Form.Item>
-                    );
-                  })}
-                </Form>
-                <Button type="primary">{"Save"}</Button>
-              </div>
-            </Col>
-            <Col span={6}>
-              <Card size="small" title={"Field Props"}>
-                <FieldProps
-                  selectedField={selectedF}
-                  setFieldProp={this.setFieldProp}
-                />
+              <Card size="small" title={"Fields"} style={panelStyle}>
+                {this.renderFieldTypes()}
               </Card>
             </Col>
+            <Col span={20}>
+              <div style={panelStyle}>
+                <Form>
+                {
+                  _.map(this.state.FieldBox, (b) => {
+                    return <FieldPanel 
+                      {...b} 
+                      render={this.renderFieldBox}/>
+                  })
+                }
+                <Button type="primary">{"Save"}</Button>
+                </Form>
+              </div>
+            </Col>
           </Row>
+          </DndProvider>
         </Content>
       </Layout>
     );
   }
 }
 
-var fieldTypes = [
-  { Id: 1, Text: "Text", Icon: "edit" },
-  { Id: 2, Text: "Integer", Icon: "" },
-  { Id: 3, Text: "Decimal", Icon: "" },
-  { Id: 4, Text: "DateTime", Icon: "" },
-  { Id: 5, Text: "Date", Icon: "" },
-  { Id: 6, Text: "MonataryAmount", Icon: "" },
-  { Id: 7, Text: "Bool", Icon: "" },
-  { Id: 8, Text: "Time", Icon: "" },
-  { Id: 9, Text: "Select", Icon: "" },
-  { Id: 10, Text: "ObjectLink", Icon: "" },
-  { Id: 11, Text: "ObjectNumber", Icon: "" },
-  { Id: 12, Text: "BigInt", Icon: "" },
-  { Id: 13, Text: "LongText", Icon: "" },
-  { Id: 14, Text: "Image", Icon: "" },
-  { Id: 15, Text: "Email", Icon: "" },
-  { Id: 16, Text: "Url", Icon: "" },
-  { Id: 17, Text: "Html", Icon: "" },
-  { Id: 18, Text: "Xml", Icon: "" },
-  { Id: 19, Text: "KeyPair", Icon: "" },
-  { Id: 20, Text: "ObjectList", Icon: "" },
-  { Id: 21, Text: "Computed", Icon: "" },
-  { Id: 22, Text: "Password", Icon: "" },
-  { Id: 23, Text: "File", Icon: "" },
-  { Id: 24, Text: "Json", Icon: "" }
-];
+const styleBox: React.CSSProperties = {
+  border: '1px dashed gray',
+  backgroundColor: 'white',
+  padding: '0.5rem',
+  marginRight: '1rem',
+  marginBottom: '0.5rem',
+  cursor: 'move',
+  float: 'left',
+}
+
+interface BoxProps {
+  name: string
+}
+
+const Box: React.FC<{
+  item: any,
+  addField: Function
+}> = ({ item, addField }) => {
+  const [{ isDragging }, drag] = useDrag({
+    item: { name: item.Value.toString(), type: "FIELDBOX" },
+    end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
+      const dropResult = monitor.getDropResult()
+      if (item && dropResult && dropResult.fieldId <= 0) {
+        addField(item.name, dropResult.name);
+      }
+    },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+  const opacity = isDragging ? 0.4 : 1
+
+  return (
+    <div ref={drag} style={{ ...styleBox, opacity }}>
+      {item.Text}
+    </div>
+  )
+}
+
+const style: React.CSSProperties = {
+  height: '2.5rem',
+  width: '15rem',
+  margin: '0.5rem',
+  float: 'left',
+  border: "1px solid black"
+}
+
+const FieldPanel: React.FC<any> = ({Id, FieldId, render}) => {
+  const [{ canDrop, isOver }, drop] = useDrop({
+    accept: "FIELDBOX",
+    drop: () => ({ name: Id, fieldId: FieldId }),
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+    }),
+  })
+
+  const isActive = canDrop && isOver
+  let backgroundColor = '#fff'
+  if (isActive) {
+    backgroundColor = 'darkgreen'
+  } else if (canDrop) {
+    backgroundColor = 'darkkhaki'
+  }
+
+  return (<Row>
+        <Col span={24}>
+          <div ref={drop} style={{ ...style, backgroundColor }}>
+            {FieldId < 0 || render(FieldId)}
+          </div>
+        </Col>
+    </Row>
+  );
+}

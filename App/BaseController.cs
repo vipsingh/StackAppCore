@@ -65,5 +65,18 @@ namespace StackErp.UI.Controllers
 
             return Json(result);
         }
+
+        public IActionResult SPAApp()
+        {
+             var page = new App.PageLayout(this.StackAppContext);
+            var m = page.Build();
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(m);
+
+            ViewBag.OrignalUrl = Request.Path.Value + (this.Request.QueryString != null ? this.Request.QueryString.ToString(): "");
+            ViewBag.PageData = json;
+            ViewBag.Host = Request.Scheme + "://" + Request.Host.ToUriComponent();
+
+            return View("_App", m);
+        }   
     }
 }

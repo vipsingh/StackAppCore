@@ -1,0 +1,28 @@
+
+
+export const fieldTypes = [
+    { Value: 1, Text: "Text", Icon: "edit" },
+    { Value: 2, Text: "Integer", Icon: "" },
+    { Value: 3, Text: "Decimal", Icon: "" },
+    { Value: 4, Text: "DateTime", Icon: "" },
+    { Value: 5, Text: "Date", Icon: "" },
+    { Value: 6, Text: "MonataryAmount", Icon: "" },
+    { Value: 7, Text: "Bool", Icon: "" },
+    { Value: 8, Text: "Time", Icon: "" },
+    { Value: 9, Text: "Select", Icon: "" },
+    { Value: 10, Text: "ObjectLink", Icon: "" },
+    { Value: 11, Text: "ObjectNumber", Icon: "" },
+    { Value: 12, Text: "BigInt", Icon: "" },
+    { Value: 13, Text: "LongText", Icon: "" },
+    { Value: 14, Text: "Image", Icon: "" },
+    { Value: 15, Text: "Email", Icon: "" },
+    { Value: 16, Text: "Url", Icon: "" },
+    { Value: 17, Text: "Html", Icon: "" },
+    { Value: 18, Text: "Xml", Icon: "" },
+    { Value: 19, Text: "KeyPair", Icon: "" },
+    { Value: 20, Text: "ObjectList", Icon: "" },
+    { Value: 21, Text: "Computed", Icon: "" },
+    { Value: 22, Text: "Password", Icon: "" },
+    { Value: 23, Text: "File", Icon: "" },
+    { Value: 24, Text: "Json", Icon: "" },
+  ];

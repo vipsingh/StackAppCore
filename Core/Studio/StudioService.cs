@@ -62,7 +62,7 @@ namespace StackErp.Core.Studio
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("NAMEFIELD", f);
 
-            var d = new DBEntity(9001, "DbEntity", fs);
+            var d = new DBEntity(9001, entityName, fs);
             EntityCode.AllEntities.Add(entityName.ToUpper(), 9001);
 
             entities.Add(9001, d);
