@@ -1,5 +1,5 @@
-insert into entitymaster(name,text,tablename,primaryfield,namefield)
-values('UserRole','UserRole','UserRole','id','name');
+insert into entitymaster(id,name,text,tablename,primaryfield,namefield)
+values(2,'UserRole','UserRole','UserRole','id','name');
 ---------------------------
 insert into entityschema(id, entityid,fieldname,label,fieldtype,length,isrequired
 ,dbname,tablename,viewtype,defaultvalue

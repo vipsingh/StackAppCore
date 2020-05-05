@@ -10,7 +10,7 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel.FormWidget
 {
-    public class BaseWidget
+    public class BaseWidget: IWidget
     {
         [JsonIgnore]
         public WidgetContext Context { get; }
@@ -21,6 +21,8 @@ namespace StackErp.ViewModel.FormWidget
         public object Value { protected set; get; }
         public DynamicObj AdditionalValue { protected set; get; }
         public string FormatedValue { protected set; get; }
+        [JsonIgnore]
+        public BaseTypeCode BaseType { protected set; get; }
         public string WidgetFormatInfo { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
@@ -30,7 +32,6 @@ namespace StackErp.ViewModel.FormWidget
         public bool IsReadOnly { private set; get; }
         public bool IsRequired { private set; get; }
         public ActionInfo DataActionLink { protected set; get; }
-        public ActionInfo ActionLink { protected set; get; }
         public List<int> RuleToFire  { protected set; get; }
         // Dependency: { Parents: Array<{Id: string}>, Children: Array<{Id: string}> }
         // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }
@@ -53,6 +54,7 @@ namespace StackErp.ViewModel.FormWidget
             this.PostValue = context.PostValue;
             this.IsReadOnly = context.IsReadOnly;
             this.IsRequired = context.IsRequired;
+            this.BaseType = context.BaseType;
         }
         private bool _isCompiled = false;
         public virtual void OnCompile()

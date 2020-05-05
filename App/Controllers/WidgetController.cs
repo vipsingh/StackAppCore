@@ -29,5 +29,14 @@ namespace StackErp.App.Controllers
             
             return CreateResult(res);
         }
+
+        [HttpPost]
+        public IActionResult GetFilterFieldForms([FromBody] CustomRequestInfo request)
+        {  
+            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext, this.RequestQuery);
+            var page = form.Generate(request);
+            
+            return CreatePageResult(page);
+        }
     }
 }

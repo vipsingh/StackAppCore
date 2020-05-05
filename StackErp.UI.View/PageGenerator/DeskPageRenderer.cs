@@ -10,7 +10,7 @@ namespace StackErp.UI.View.PageGenerator
     {
         public DeskPageRenderer(DeskPageContext context) : base(context)
         {
-            FieldCompiler = new LayoutFieldCompiler(context);
+            
         }
 
         protected override void Compile(LayoutContext layoutContext)

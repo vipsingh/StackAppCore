@@ -56,6 +56,11 @@ namespace StackErp.App.Controllers
             return Json(new { x = result });
         }
 
+        [HttpPost]
+        public IActionResult Esprima([FromBody] string scr)
+        {
+            return Content(StackErp.StackScript.StackScriptParser.Parse(scr));
+        }
         public IActionResult Privacy()
         {
             return View();
@@ -65,6 +70,17 @@ namespace StackErp.App.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult QueryParser()
+        {
+            var q = new RequestQueryString();
+            if (Request.Query.ContainsKey("q"))
+            {
+                q.Load(Request.Query["q"].ToString());
+            }
+
+            return Json(q);       
         }
     }
 }

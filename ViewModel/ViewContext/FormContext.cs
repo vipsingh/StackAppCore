@@ -22,8 +22,8 @@ namespace StackErp.ViewModel.ViewContext
         public DynamicObj Properties { get => _props; }
 
         public ObjectModelInfo EntityModelInfo { protected set; get;}
-        private InvariantDictionary<BaseWidget> _controls;
-        public InvariantDictionary<BaseWidget> Widgets { get => _controls;}
+        private InvariantDictionary<IWidget> _controls;
+        public InvariantDictionary<IWidget> Widgets { get => _controls;}
         public bool IsViewMode { protected set; get;}
         public PageActions Actions { get;}
         public UIFormModel SubmitModel {protected set; get;}
@@ -50,7 +50,7 @@ namespace StackErp.ViewModel.ViewContext
             Context = context;
             RequestQuery = requestQuery;
             _entity = entity;
-            _controls = new InvariantDictionary<BaseWidget>();
+            _controls = new InvariantDictionary<IWidget>();
             _parms = new DynamicObj();
             _props = new DynamicObj();
             Actions = new PageActions();
@@ -65,12 +65,12 @@ namespace StackErp.ViewModel.ViewContext
             this.AddEntityContext();
         }
 
-        public void AddControl(BaseWidget control) 
+        public void AddControl(IWidget control) 
         {
             this.Widgets.Add(control.WidgetId, control);
         }
 
-        public BaseWidget GetWidget(string widgetId) 
+        public IWidget GetWidget(string widgetId) 
         {
             if (this.Widgets.ContainsKey(widgetId))
                 return this.Widgets[widgetId];
@@ -99,9 +99,9 @@ namespace StackErp.ViewModel.ViewContext
         {
             this._parms.Add(key, value, true);
         }
-        public BaseField GetField(string fieldViewName)
+        public BaseField GetField(string fieldName)
         {
-            return this.Entity.GetFieldSchemaByViewName(fieldViewName);
+            return this.Entity.GetFieldSchema(fieldName);
         }
 
         public TView GetLayoutView()

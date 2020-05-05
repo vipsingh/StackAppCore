@@ -18,8 +18,8 @@ export function cellRenderer(widget: WidgetInfo, val: any): any {
 
     if (AdditionalValue && AdditionalValue.ViewLink) {
         const { ViewLink } = AdditionalValue;
-        
-        return (<ActionLink ActionId={"VIEW"} {...ViewLink} Title={d} />);
+        let link = { Url: ViewLink };
+        return (<ActionLink ActionId={"VIEW"} {...link} Title={d} />);
     }
 
     if ([3,5].indexOf(WidgetType) >= 0) isRightAlign = true;

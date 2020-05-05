@@ -118,12 +118,12 @@ namespace StackErp.Core
             throw new EntityException("Record not found.");
         }
 
-        public EntityModelBase GetAll(FilterExpression filter)
+        public List<EntityModelBase> GetAll(FilterExpression filter)
         {
             throw new NotImplementedException();
         }
 
-        public EntityModelBase GetAll(int[] ids)
+        public List<EntityModelBase> GetAll(int[] ids)
         {
             throw new NotImplementedException();
         }
@@ -168,14 +168,14 @@ namespace StackErp.Core
 
             return null;
         }
-        public BaseField GetFieldSchemaByViewName(string fieldViewName)
-        {
-            var res = this.Fields.Where(x => x.Value.ViewName == fieldViewName);
-            if (res.Count() > 0)
-                return res.First().Value;
+        // public BaseField GetFieldSchemaByViewName(string fieldViewName)
+        // {
+        //     var res = this.Fields.Where(x => x.Value.ViewName == fieldViewName);
+        //     if (res.Count() > 0)
+        //         return res.First().Value;
 
-            return null;
-        }
+        //     return null;
+        // }
         #endregion
 
         public EntityModelBase GetDefault()

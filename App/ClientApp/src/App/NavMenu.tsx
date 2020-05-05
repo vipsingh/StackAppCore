@@ -18,11 +18,11 @@ export default class NavMenu extends React.PureComponent {
     }
   }
 
-  renderItem(action: any) {
+  renderItem(action: ActionInfo) {
 
     return (
       <MenuItem key={_.uniqueId("menu")}>
-            <ActionButton {...action} />
+            <Link to={action.Url as any}>{action.Title}</Link>
       </MenuItem>
     );
   }

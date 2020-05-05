@@ -32,7 +32,7 @@ namespace StackErp.App
                     {
                         // Use the default property (Pascal) casing
                         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
-
+                        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                         // Configure a custom converter
                         options.SerializerSettings.Converters.Add(new DynamicObjJsonConverter());
                         options.SerializerSettings.Converters.Add(new EntityCodeJsonConverter());

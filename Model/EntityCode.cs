@@ -41,5 +41,8 @@ namespace StackErp.Model
         public const int None = 0;
         public const int User = 1;
         public const int UserRole = 2;
+
+        public const int EntityMaster = 9001;
+        public const int EntitySchema = 9002;
     }
 }

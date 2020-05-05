@@ -151,8 +151,8 @@ namespace StackErp.Core.Layout
             foreach (var f in layoutF)
             {
                 var field = new TField();
-                field.FieldId = f.ViewName;
-                field.FieldName = f.Name;
+                field.FieldId = f.Name;
+                //field.FieldName = f.Name;
 
                 if (col_r.Count == 1)
                     start_new_r = true;
@@ -216,8 +216,8 @@ namespace StackErp.Core.Layout
             foreach (var f in layoutF)
             {
                 var field = new TField();
-                field.FieldId = f.ViewName;
-                field.FieldName = f.Name;
+                field.FieldId = f.Name;
+                //field.FieldName = f.Name;
                 view.Fields.Add(field);
             }
             

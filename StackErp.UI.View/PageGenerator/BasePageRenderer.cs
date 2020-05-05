@@ -5,6 +5,8 @@ using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.Model.Form;
 using StackErp.Model.Layout;
+using StackErp.ViewModel;
+using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -18,7 +20,8 @@ namespace StackErp.UI.View.PageGenerator
         public ViewPage View {private set; get;}
         public BasePageRenderer(FormContext cntxt)
         {
-            FormContext = cntxt;            
+            FormContext = cntxt;       
+            FieldCompiler = new LayoutFieldCompiler(cntxt);     
         }
 
         public void Generate(LayoutContext layoutContext)
@@ -36,7 +39,7 @@ namespace StackErp.UI.View.PageGenerator
             this.CompileWidgets(layoutContext.View);
             this.CompileActions(layoutContext.View);
 
-            this.OnCompileComplete();                        
+            this.OnCompileComplete(layoutContext);                        
         }
 
         protected virtual void CompileWidgets(TView view)
@@ -48,17 +51,14 @@ namespace StackErp.UI.View.PageGenerator
 
             foreach(var field in FormContext.MissingFields)
             {
-                CompileWidget(new TField(){ FieldName = field }); 
+                CompileWidget(new TField(){ FieldId = field }); 
             }
         }
 
         private void CompileWidget(TField field)
         {
             BaseField fieldSchema;
-            if(!String.IsNullOrEmpty(field.FieldName))
-                fieldSchema = this.FormContext.Entity.GetFieldSchema(field.FieldName);
-            else
-                fieldSchema = this.FormContext.GetField(field.FieldId);
+            fieldSchema = this.FormContext.GetField(field.FieldId);
 
             if(fieldSchema != null)
             {
@@ -88,11 +88,19 @@ namespace StackErp.UI.View.PageGenerator
 
         protected virtual void OnRenderComplete()
         {
-            
+            var pageTitle = new DynamicObj();
+            var entity = this.FormContext.Entity;
+            if (entity != null) {
+                pageTitle.Add(ViewConstant.PageTitle, entity.Text);
+            }
+
+            View.PageTitle = pageTitle;
         }    
 
-        protected virtual void OnCompileComplete()
+        protected virtual void OnCompileComplete(LayoutContext layoutContext)
         {
+            this.AddPageTitle();
+
             foreach(var formrule in View.FormRules)
             {
                 var cFields = formrule.Criteria.GetCriteriaFields();
@@ -100,9 +108,14 @@ namespace StackErp.UI.View.PageGenerator
                 {
                     var w = this.FormContext.GetWidget(f);
                     if(w!= null)
-                        w.SetRule(formrule.Id);
+                        ((BaseWidget)w).SetRule(formrule.Id);
                 }
             }
+        }
+
+        protected void AddPageTitle() 
+        {
+
         }      
 
         public virtual ViewPage GetViewPage()

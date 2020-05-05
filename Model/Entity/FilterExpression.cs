@@ -5,7 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace StackErp.Model.DataList
+namespace StackErp.Model.Entity
 {
     public class FilterExpression
     {
@@ -55,7 +55,9 @@ namespace StackErp.Model.DataList
     {
         public string FieldName {get;}
         public string Value {get;}
+        public BaseField Field {get;}
         public FilterOperationType Op {get;}
+        public FilterValueType ValueType {get;}
 
         public Int16 SeqId {set;get;}
         internal bool IsValueResolved = true;
@@ -63,9 +65,34 @@ namespace StackErp.Model.DataList
             FieldName = field;
             Op=op;
             Value = value;
+            ValueType = FilterValueType.Value;
 
-            if (!String.IsNullOrWhiteSpace(value) && value.StartsWith("@"))
+            if (!String.IsNullOrWhiteSpace(value) && value.StartsWith("${")) 
+            {
                 this.IsValueResolved = false;
+                ValueType = FilterValueType.EntityField;
+                if (value.Contains("stack.")) 
+                {
+                    ValueType = FilterValueType.AppField;
+                }
+                Value = value.Replace("${", "").Replace("}", "").Trim();
+            }
+        }
+
+        public static object[] GetValueSet(String val, Type type)
+        {
+            ArrayList list = new ArrayList();
+            String[] vals = val.Split(',');
+
+            foreach (String s in vals)
+            {
+                if (s.Trim().Length > 0)
+                {
+                    list.Add(Convert.ChangeType(s.Trim(), type));
+                }
+            }
+
+            return (object[])list.ToArray(typeof(object));
         }
     }
 
@@ -88,7 +115,15 @@ namespace StackErp.Model.DataList
     NotSpecified = 15,
     Between = 16,
     FixedExpression = 17, //expression is given like xy < 45
-    Expression = 18
+    Expression = 18,
+    AnyOf = 19
+    }
+
+    public enum FilterValueType 
+    {
+        Value = 0,
+        EntityField = 1,
+        AppField = 2
     }
 }
 

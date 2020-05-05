@@ -18,7 +18,11 @@ namespace StackErp.Model
             {
                 if (input != null)
                 {
-                    if (!Int32.TryParse(input.ToString(), out ret))
+                    var valType = input.GetType();
+
+                    if (valType.IsEnum)
+                        ret = Convert.ToInt32(input);
+                    else if (!Int32.TryParse(input.ToString(), out ret))
                         ret = valueIfNull;
                 }
             }
@@ -261,6 +265,47 @@ namespace StackErp.Model
             }
 
             return numberList;
+        }
+
+        public static bool IsValid(object value, TypeCode typeCode, dynamic threashHold)
+        {
+            switch (typeCode)
+            {
+                case TypeCode.DateTime:
+                    return (DateTime)value != DateTime.MinValue;
+                case TypeCode.Decimal:
+                    if (threashHold == null)
+                    {
+                        threashHold = 1;
+                    }
+                    return (decimal)value >= (decimal)threashHold;
+                case TypeCode.Int16:
+                    if (threashHold == null)
+                    {
+                        threashHold = 1;
+                    }
+                    return (short)value >= (short)threashHold;
+                case TypeCode.Int32:
+                    if (threashHold == null)
+                    {
+                        threashHold = 1;
+                    }
+                    return ToInt(value, 0) >= (int)threashHold;
+                case TypeCode.Double:
+                    if (threashHold == null)
+                    {
+                        threashHold = 1;
+                    }
+                    return (Double)value >= (Double)threashHold;
+                case TypeCode.Int64:
+                    if (threashHold == null)
+                    {
+                        threashHold = 1;
+                    }
+                    return (long)value >= (long)threashHold;
+                default:
+                    return !string.IsNullOrWhiteSpace( value.ToString());
+            }
         }
     }
 }

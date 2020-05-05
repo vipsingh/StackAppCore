@@ -21,7 +21,7 @@ namespace StackErp.Core.Form
                 Text = "View 1",
                 ExecType = ActionExecutionType.Redirect,
                 QueryParam = new List<EvalParam>() { 
-                    new EvalParam() { Name= "EntityId", Value= new EvalParamValue(){ Source = EvalSourceType.Constant, Value = "UserRole" } },
+                    new EvalParam() { Name= "EntityId", Value= new EvalParamValue(){ Source = EvalSourceType.Constant, Value = 2 } },
                     new EvalParam() { Name= "ItemId", Value= new EvalParamValue(){ Source = EvalSourceType.ModelField, Value = "Role" } } 
                     }
             };
@@ -35,7 +35,7 @@ namespace StackErp.Core.Form
                 Text = "FUN 1",
                 ExecType = ActionExecutionType.Custom,
                 DataParam = new List<EvalParam>() { 
-                    new EvalParam() { Name= "EntityId", Value= new EvalParamValue(){ Source = EvalSourceType.RequestQuery, Value = "UserRole" } },
+                    new EvalParam() { Name= "EntityId", Value= new EvalParamValue(){ Source = EvalSourceType.RequestQuery, Value = "EntityId" } },
                     new EvalParam() { Name= "ItemId", Value= new EvalParamValue(){ Source = EvalSourceType.ModelField, Value = "Role" } } 
                     }
             };

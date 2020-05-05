@@ -4,6 +4,7 @@
     <ProjectReference Include="..\DB\StackErp.DB.csproj" />
     <ProjectReference Include="..\Model\StackErp.Model.csproj" />
     <ProjectReference Include="..\StackErp.Utils\StackErp.Utils.csproj" />
+    <ProjectReference Include="..\StackErp.StackScript\StackErp.StackScript.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -8,18 +8,19 @@ namespace StackErp.ViewModel.ViewContext
     public class WidgetContext
     {
         public StackAppContext AppContext {private set;get;}
-        public string Caption {private set;get;}
-        public string ControlId {private set;get;}
+        public string Caption {set;get;}
+        public string ControlId {set;get;}
         public FormControlType WidgetType {set;get;}
-        public string UIParams {private set;get;}
+        public string UIParams {set;get;}
         public BaseField FieldSchema {private set;get;}
         public FormContext FormContext {get;}
-        public ControlDefinition ControlDefinition {private set;get;}
+        public ControlDefinition ControlDefinition {set;get;}
         public bool IsViewMode {get;}
-        public IFieldValidation Validation {private set;get;}
-        public bool IsReadOnly { private set; get; }
-        public bool IsRequired { private set; get; }
-        public FormatInfo FormatInfo { private set; get; }
+        public BaseTypeCode BaseType { protected set; get; }
+        public IFieldValidation Validation {set;get;}
+        public bool IsReadOnly { set; get; }
+        public bool IsRequired { set; get; }
+        public FormatInfo FormatInfo { set; get; }
         private DynamicObj _parameters;
         public DynamicObj Parameters
         {
@@ -41,18 +42,11 @@ namespace StackErp.ViewModel.ViewContext
 
         public void Build(BaseField field, TField LayoutField)
         {
-            if (LayoutField != null)
-            {
-                ControlId = LayoutField.FieldId;
-                Caption = LayoutField.Text;
-                WidgetType = LayoutField.Widget;
-            }
-            
             if (field != null) 
-            {
+            {   
                 ControlId = field.ViewName;
-                if (Caption == null)
-                    Caption = field.Text;
+                Caption = field.Text;
+                BaseType = field.BaseType;
                 WidgetType = field.ControlType;
                 Validation = field.Validations;
                 IsRequired = field.IsRequired;
@@ -60,6 +54,42 @@ namespace StackErp.ViewModel.ViewContext
                 FormatInfo = field.FormatInfo;
                 IsReadOnly = field.IsReadOnly;
             }
+
+            if (LayoutField != null)
+            {
+                if (String.IsNullOrEmpty(ControlId))
+                    ControlId = LayoutField.FieldId;
+                if (String.IsNullOrEmpty(Caption))
+                    Caption = LayoutField.Text;
+                if (WidgetType == FormControlType.None)
+                    WidgetType = LayoutField.Widget;
+            }
+        }
+
+        public void BuildCodeWidget() {
+            //code component
+        }
+
+        public bool IsVisibile(Services.Evaluator Evaluator)
+        {
+            if (ControlDefinition != null)
+            {
+                var visibility = ControlDefinition.Visibility;
+
+                if (visibility != null)
+                    return Evaluator.EvaluateCondition(FormContext, visibility /* .Expression */);
+            }
+
+            return true;
+        }
+
+        public static WidgetContext BuildContext(FormContext formContext, string widgetId, ControlDefinition controlDef = null) 
+        {
+            var cnxt = new WidgetContext(formContext);
+            cnxt.ControlId = widgetId;
+            cnxt.ControlDefinition = controlDef;
+
+            return cnxt;
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using StackErp.Model;
+using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -9,7 +10,7 @@ namespace StackErp.UI.View.PageGenerator
     {
         public DetailFormRenderer(DetailFormContext context) : base(context)
         {
-            FieldCompiler = new LayoutFieldCompiler(context);
+            
         }
 
         protected override void Compile(LayoutContext layoutContext)
@@ -41,7 +42,7 @@ namespace StackErp.UI.View.PageGenerator
             foreach(var widgetKey in this.FormContext.Widgets)
             {
                 var widget = widgetKey.Value;
-                var fieldAttr = widget.Context.ControlDefinition.FieldAttribute;
+                var fieldAttr = ((BaseWidget)widget).Context.ControlDefinition.FieldAttribute;
 
                 var value = recordModel.GetValue(fieldAttr.ValueField);
                 widget.SetValue(value);

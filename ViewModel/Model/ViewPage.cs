@@ -12,11 +12,12 @@ namespace StackErp.ViewModel.Model
     public class ViewPage
     {
         public AppPageType PageType {set;get;}
-        public Dictionary<string, BaseWidget> Widgets {get;set;}   
+        public Dictionary<string, IWidget> Widgets {get;set;}   
         public List<FormRule> FormRules {get;set;}   
         public string PostUrl {get;}
         public InvariantDictionary<ActionInfo> Actions {get;set;}
         public ObjectModelInfo EntityInfo {set;get;}
+        public DynamicObj PageTitle {set;get;}
         public string ErrorMessage {set;get;}
 
         public TView Layout {set;get;}
@@ -27,6 +28,12 @@ namespace StackErp.ViewModel.Model
             this.Widgets = formContext.Widgets; 
 
             this.PostUrl = formContext.Context.AppRoot + "entity/save?" + formContext.RequestQuery.ToQueryString();
+        }
+
+        public ViewPage()
+        {
+            PageType = AppPageType.Detail;
+            this.Widgets = new Dictionary<string, IWidget>();
         }
     }
 }

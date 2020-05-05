@@ -34,11 +34,7 @@ namespace StackErp.Model.Entity
         {
             foreach(var f in view.Fields)
             {
-                if (String.IsNullOrEmpty(f.FieldName)) {
-                    f.FieldName = Entity.GetFieldSchemaByViewName(f.FieldId).Name;
-                } 
-                
-                AddField(f.FieldName, true);
+                AddField(f.FieldId, true);
             }
         }
 

@@ -16,5 +16,6 @@
     <ProjectReference Include="..\Core\StackErp.Core.csproj" />
     <ProjectReference Include="..\StackErp.UI.View\StackErp.UI.View.csproj" />
     <ProjectReference Include="..\StackErp.Utils\StackErp.Utils.csproj" />
+    <ProjectReference Include="..\StackErp.StackScript\StackErp.StackScript.csproj" />
   </ItemGroup>
 </Project>

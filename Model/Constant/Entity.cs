@@ -28,7 +28,8 @@ public enum FieldType {
     Password = 22,
     File = 23,
     Json = 24,
-    ObjectKey = 25
+    ObjectKey = 25,
+    FilterField = 26
 }
 
 public enum BaseTypeCode {

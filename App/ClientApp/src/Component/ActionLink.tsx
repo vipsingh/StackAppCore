@@ -36,7 +36,7 @@ export default class ActionLink extends React.Component<ActionInfo> {
         const title = Title || ActionId;
         let caption = OnlyIcon ? "" : title;
 
-        if (ExecutionType === 4 && Url) {
+        if ((!ExecutionType || ExecutionType === 4) && Url) {
             let u = `/${Url}`;
             u = u.replace("//", "/");
 

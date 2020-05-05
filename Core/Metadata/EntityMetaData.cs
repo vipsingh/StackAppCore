@@ -50,7 +50,7 @@ namespace StackErp.Core
                     entities.Add(entid, e);
                 }
 
-                StackErp.Core.Studio.StudioService.BuildSchema(ref entities);
+                Metadata.FixedEntities.BuildSchema(ref entities);
 
                 foreach (var entK in entities)
                 {
@@ -147,6 +147,9 @@ namespace StackErp.Core
                 case FieldType.Select:
                     field = new SelectField();
                     break;
+                case FieldType.FilterField:
+                    field = new FilterField();
+                    break;
                 default:
                     field = new StringField();
                     break;
@@ -199,6 +202,9 @@ namespace StackErp.Core
                     break;
                 case FieldType.Image:
                     t = FormControlType.Image;
+                    break;
+                case FieldType.FilterField:
+                    t = FormControlType.EntityFilter;
                     break;
 
             }

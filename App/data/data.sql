@@ -47,23 +47,26 @@ values(1,1,1,'','<view entity="UserMaster">
 	</header>
 	<pages display="TAB">
 		<page text="general">
-			<group text="section 1">									
-					<row>
-						<field id="Password" />
-						<field id="Role" domain="[[&quot;Category&quot;,0, &quot;@Type&quot;]]"/>
-					</row>
-					<row>
-						<field id="Type" />
-						<field id="RoleInfo" />
-					</row>
-					<row>
-						<field id="SubmitAmount" invisible="[[&quot;Type&quot;,0, 2]]" />
-						<field id="AssignDate" />
-					</row>
+			<group text="section 1">
+				<row>
+				    <field id="AssignDate" />
+					<field id="Role" domain="[[&quot;Category&quot;,0, &quot;@Type&quot;]]"/>
+				</row>
+				<row>
+					<field id="Type" />
+				</row>
+				<row>
+					<field id="SubmitAmount" />
+				</row>
 			</group>
 		</page>
 	</pages>
 	<commands>
-		<!-- <command id="" text="Send" action_type="Redirect" action="sendToNext" actionParam="[{Name:&quot;xx&quot;, Source: {Type: &quot;QS&quot;, Name: &quot;Entity&quot;}}]" operation="" icon="" visibility="{}"/> -->
+		<command id="ACT_1" text="View Role" />
+		<command id="FUN_1" text="Call FUN" />
 	</commands>
+	<rules>
+	    <rule type="hidden" criteria="[[&quot;Type&quot;,0, 2]]" fields="SubmitAmount" />
+	    <rule type="readonly" criteria="[[&quot;Type&quot;,0, 2]]" fields="Role" />
+	</rules>
 </view>');

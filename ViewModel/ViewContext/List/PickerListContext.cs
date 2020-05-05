@@ -20,7 +20,7 @@ namespace StackErp.ViewModel.ViewContext
         protected override void Init()
         {
             base.Init();
-            Field = this.SourceEntity.GetFieldSchemaByViewName(RequestQuery.WidgetId);
+            Field = this.SourceEntity.GetFieldSchema(RequestQuery.WidgetId);
         }        
     }
 }

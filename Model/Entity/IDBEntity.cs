@@ -19,11 +19,11 @@ namespace StackErp.Model.Entity
 
         Dictionary<string, BaseField> GetFields();
         BaseField GetFieldSchema(string fieldName);
-        BaseField GetFieldSchemaByViewName(string fieldViewName);
+        //BaseField GetFieldSchemaByViewName(string fieldViewName);
         EntityModelBase GetSingle(int id);
         EntityModelBase GetDefault();
-        EntityModelBase GetAll(FilterExpression filter);
-        EntityModelBase GetAll(int[] ids);
+        List<EntityModelBase> GetAll(FilterExpression filter);
+        List<EntityModelBase> GetAll(int[] ids);
         AnyStatus Save(EntityModelBase model);
         bool Write(int id, DynamicObj model);
         DBModelBase Read(int id, List<string> fields);

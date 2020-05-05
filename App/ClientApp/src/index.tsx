@@ -9,6 +9,8 @@ import { getResource } from "./Core/Utils/Localization";
 import * as serviceWorker from './serviceWorker';
 import './index.css';
 import _ from 'lodash';
+import "./Core/Utils/ScriptParser";
+
 
 window._App = {
     Notify,

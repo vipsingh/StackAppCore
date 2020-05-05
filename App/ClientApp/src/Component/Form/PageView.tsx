@@ -11,32 +11,30 @@ export default class PageView extends React.Component<{
 }> {
  
     renderTemplate() {
-        const {getControl, entityModel: { Layout }} = this.props;        
+        const {getControl, entityModel: { Layout, PageTitle }} = this.props;        
         
         return (<div className="page-view">
                     {
-                        this.renderHeader(Layout)
+                        this.renderHeader(Layout, PageTitle)
                     }
                     <UIView template={Layout} getControl={getControl} />
             </div>
         );
     }
 
-    renderHeader(layout: any) {
-        if(!layout.Header) return;
-        
+    renderHeader(layout: any, pageTitle: any) {                
         const { getFormActions, getControl } = this.props;
 
         return (<div className="paper mb-g">
         <PageHeader
             ghost={false}
-            title="User Master"
-            subTitle="user x"
+            title={pageTitle.PageTitle}
+            // subTitle="user x"
             // tags={<Tag color="blue">Running</Tag>}
             extra={getFormActions()}
             avatar={{ src: 'https://avatars1.githubusercontent.com/u/8186664?s=460&v=4' }}
         >            
-                <PageSheet getControl={getControl} sheet={layout.Header} key={"header_0"} />
+                {!layout.Header || <PageSheet getControl={getControl} sheet={layout.Header} key={"header_0"} />}
         </PageHeader>
         </div>);
 

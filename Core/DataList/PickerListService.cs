@@ -33,7 +33,7 @@ namespace StackErp.Core.DataList
             var tList = new TList();
             foreach(var f in ds.Fields)
             {
-                tList.Fields.Add(new TField(){ FieldName = f });
+                tList.Fields.Add(new TField(){ FieldId = f });
             }
 
             return tList;

@@ -15,11 +15,12 @@ namespace StackErp.UI.View.PageGenerator
             this.FormContext = context;
         }
 
-        public virtual void Compile(BaseField field, TField LayoutField)
+        public virtual void Compile(BaseField field, TField LayoutField = null)
         {
-            if (LayoutField.FieldId == null && field != null) {
-                LayoutField.FieldId = field.ViewName;
+            if (LayoutField == null || LayoutField.FieldId == null) {
+                LayoutField = new TField(){ FieldId = field.Name };
             }
+            
             if(!this.FormContext.Widgets.ContainsKey(LayoutField.FieldId))
             {
                 var widget = BuildWidget(field, LayoutField);

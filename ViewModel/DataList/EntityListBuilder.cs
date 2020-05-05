@@ -29,7 +29,7 @@ namespace StackErp.ViewModel.DataList
         {
             var formContext = new ViewContext.DetailFormContext(context.Context, context.SourceEntityId, context.Context.RequestQuery);
             
-            AddField(context, formContext, new TField { FieldName = context.IdColumn });
+            AddField(context, formContext, new TField { FieldId = context.IdColumn });
 
             foreach(var tField in defn.Layout.Fields)
             {
@@ -40,15 +40,9 @@ namespace StackErp.ViewModel.DataList
         protected void AddField(DataListContext context, FormContext formContext, TField tField)
         {
                 BaseField field = null;
-                if (!String.IsNullOrEmpty(tField.FieldName))
-                {
-                    field = context.SourceEntity.GetFieldSchema(tField.FieldName);
-                    tField.FieldId = field.ViewName;
-                } else {
-                    field = context.SourceEntity.GetFieldSchemaByViewName(tField.FieldId);
-                }
+                field = context.SourceEntity.GetFieldSchema(tField.FieldId);
 
-                if (field != null && !context.Fields.ContainsKey(tField.FieldId.ToUpper()))
+                if (field != null && !context.Fields.ContainsKey(tField.FieldId))
                 {
                     var w = BuildWidget(formContext, field);
                     context.Fields.Add(tField.FieldId.ToUpper(), w);
@@ -90,7 +84,7 @@ namespace StackErp.ViewModel.DataList
         {
             if (!String.IsNullOrEmpty(defn.ItemViewField) && widget.WidgetId == defn.ItemViewField)
             {
-                widget.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(defn.EntityId, row.Get(ViewConstant.RowId, 0)));                
+                widget.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(defn.EntityId, row.Get(ViewConstant.RowId, 0)).Url);
             }
         }
     }

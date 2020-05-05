@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using StackErp.Model.DataList;
+using StackErp.Model.Entity;
 using StackErp.Model.Layout;
 using StackErp.Model.Localization;
 using StackErp.ViewModel.Model;

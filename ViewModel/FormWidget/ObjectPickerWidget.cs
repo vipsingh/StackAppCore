@@ -39,7 +39,7 @@ namespace StackErp.ViewModel.FormWidget
             if (value is SelectOption)
             {
                 val = value;
-                this.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(this.Context.ControlDefinition.FieldAttribute.RefEntity, ((SelectOption)val).Value));
+                this.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(this.Context.ControlDefinition.FieldAttribute.RefEntity, ((SelectOption)val).Value).Url);
             }
             
             return base.OnFormatSetData(val);

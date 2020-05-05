@@ -58,7 +58,7 @@ namespace StackErp.Model.Layout
     public class TField
     {
         [JsonIgnore]
-        public string FieldName { set; get; }
+        public string ViewName { set; get; }
         public string FieldId { set; get; }
         public string Text { set; get; }
         public bool FullRow { set; get; }
