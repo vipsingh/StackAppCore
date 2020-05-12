@@ -37,16 +37,22 @@ namespace StackErp.ViewModel
         {
             foreach(var modelField in model.Widgets)
             {
-                var field = modelField.Value;
-                var fieldSchema = this._formContext.GetField(field.WidgetId);
-                var widget = BuildWidget(fieldSchema, field);
+                ResolveFieldValue(modelField.Value);
+            }
+        }
+
+        public object ResolveFieldValue(UIFormField formField) 
+        {
+                var fieldSchema = this._formContext.GetField(formField.WidgetId);
+                var widget = BuildWidget(fieldSchema, formField);
                 if (widget != null)
                 {
                     this._formContext.AddControl(widget);
 
-                    SetValue(widget, field, fieldSchema);
+                    return SetValue(widget, formField, fieldSchema);
                 }
-            }
+
+                return null;
         }
 
         public BaseWidget BuildWidget(BaseField field, UIFormField fieldValue)
@@ -60,17 +66,21 @@ namespace StackErp.ViewModel
             return widget;
         }
 
-        protected void SetValue(BaseWidget widget, UIFormField fieldValue, BaseField fieldSchema)
+        protected object SetValue(BaseWidget widget, UIFormField fieldValue, BaseField fieldSchema)
         {
             //if CustomValueBinder exists then call it else
             var value = widget.GetValue();
 
             SetModelValue(fieldSchema, value);
+
+            return value;
         }   
 
-        private  void SetModelValue(BaseField fieldSchema, object value)
+        private void SetModelValue(BaseField fieldSchema, object value)
         {
-            RecordModel.SetValue(fieldSchema.Name, value);
+            if (RecordModel != null) {
+                RecordModel.SetValue(fieldSchema.Name, value);
+            }
         }     
 
         private bool IsVaildField(UIFormField formFieldsValue)

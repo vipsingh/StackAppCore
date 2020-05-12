@@ -33,7 +33,8 @@ public enum FormControlType {
 }
 
 public enum EntityLayoutType {
-    None = 0,
+    None = -1,
+    All = 0,
     Edit = 1,
     View = 2,
     QuickView = 3,

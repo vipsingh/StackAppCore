@@ -10,13 +10,18 @@ namespace StackErp.ViewModel.FormWidget
 {
     public class DropdownWidget: BaseWidget
     {
-        public override FormControlType WidgetType { get => FormControlType.Dropdown; }        
+        public override FormControlType WidgetType { get => FormControlType.Dropdown; }       
+        public bool IsMultiSelect {private set; get;} 
         public DropdownWidget(WidgetContext cntxt): base(cntxt)
         {
         }
 
         public override void OnCompile()
         {
+            if (this.Context.ControlDefinition != null) 
+            {
+                IsMultiSelect = this.Context.ControlDefinition.IsMultiSelect;
+            }
             BuildLookupData();
         }
 
@@ -50,28 +55,41 @@ namespace StackErp.ViewModel.FormWidget
             return true;
         }
 
-        private SelectOption SetOption(object value)
+        private object SetOption(object value)
         {
-            SelectOption val = null;
-            if (value != null && value is int)
+            object val = null;
+            if (value != null)
             {
+                List<int> values;
+                if (value is int) {
+                    values = new List<int>(){ (int) value };
+                } else {
+                    values = (List<int>)value;
+                }
+
                 List<SelectOption> data;
                 if (this.Options != null) {
-                    data = this.Options.Where(o => o.Value == (int)value).ToList();
+                    data = this.Options.Where(o => values.Contains(o.Value)).ToList();
                 }
                 else
-                    data = LookupDataHelper.GetLookupData(this.Context, new List<int>() { (int)value });   
+                    data = LookupDataHelper.GetLookupData(this.Context, values);
 
-                if (data.Count > 0) 
-                    val = data[0];
+                if (data.Count > 0) {
+                    val = data;
+                    if (!IsMultiSelect) {
+                        val = data[0];
+                    }
+                }
                 else 
                 {
-                    var op  = new SelectOption();
-                    op.Add(ViewConstant.Text, value.ToString());
-                    op.Add(ViewConstant.Value, value);
-                    AddOption(op);
-                    val = op;
-                }        
+                    if (!IsMultiSelect) {
+                        var op  = new SelectOption();
+                        op.Add(ViewConstant.Text, value.ToString());
+                        op.Add(ViewConstant.Value, value);
+                        AddOption(op);
+                        val = op;
+                    }
+                }
             }
 
             return val;
@@ -98,7 +116,17 @@ namespace StackErp.ViewModel.FormWidget
             {
                 var v = (JObject)PostValue;
                 Value = v["Value"].ToString();
-            } else {
+            } else if (PostValue is JArray) {
+                var postVals = new List<int>();
+                foreach(var o in (JArray)PostValue) {
+                    if (o is JObject)
+                        postVals.Add((int)DataHelper.GetDataValue(o["Value"], TypeCode.Int32));
+                    else
+                        postVals.Add((int)DataHelper.GetDataValue(o, TypeCode.Int32));
+                }
+                Value = postVals;
+            }
+            else {
                 Value = DataHelper.GetDataValue(PostValue, TypeCode.Int32);
             }
             

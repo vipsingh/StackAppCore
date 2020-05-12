@@ -16,7 +16,7 @@ namespace StackErp.ViewModel.ViewContext
         public FormContext FormContext {get;}
         public ControlDefinition ControlDefinition {set;get;}
         public bool IsViewMode {get;}
-        public BaseTypeCode BaseType { protected set; get; }
+        public TypeCode BaseType { protected set; get; }
         public IFieldValidation Validation {set;get;}
         public bool IsReadOnly { set; get; }
         public bool IsRequired { set; get; }
@@ -57,9 +57,9 @@ namespace StackErp.ViewModel.ViewContext
 
             if (LayoutField != null)
             {
-                if (String.IsNullOrEmpty(ControlId))
+                if (!String.IsNullOrEmpty(LayoutField.FieldId))
                     ControlId = LayoutField.FieldId;
-                if (String.IsNullOrEmpty(Caption))
+                if (!String.IsNullOrEmpty(LayoutField.Text))
                     Caption = LayoutField.Text;
                 if (WidgetType == FormControlType.None)
                     WidgetType = LayoutField.Widget;

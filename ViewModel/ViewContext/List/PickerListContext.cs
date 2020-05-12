@@ -19,8 +19,15 @@ namespace StackErp.ViewModel.ViewContext
         }
         protected override void Init()
         {
+            RelatedEntityId = RequestQuery.EntityId;    
+            var RefEntity = Core.EntityMetaData.Get(RelatedEntityId);
+                    
+            Field = RefEntity.GetFieldSchema(RequestQuery.WidgetId);
+            if (Field.ControlInfo.DataSource != null)
+            {
+                SourceEntityId = Field.ControlInfo.DataSource.Entity;
+            }
             base.Init();
-            Field = this.SourceEntity.GetFieldSchema(RequestQuery.WidgetId);
         }        
     }
 }

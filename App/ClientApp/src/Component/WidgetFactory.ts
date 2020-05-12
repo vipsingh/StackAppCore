@@ -3,6 +3,7 @@ import LabelField from "./Form/Control/LabelField";
 import ListView from "./ListView";
 import { Dictionary } from "lodash";
 import { FormControlType } from "../Constant";
+import FilterBox from "./Form/Control/FilterBox";
 
 
 export function getComponent(controlType: number, isViewMode?: boolean) {
@@ -60,8 +61,9 @@ const widgets: Dictionary<{edit: any, view: any}> = {};
 export function registerWidget(type: number, editComponent: any, viewComponent: any = null, config: any = null) {
     widgets[type] = {
         edit: editComponent,
-        view: viewComponent
+        view: viewComponent? viewComponent : editComponent
     };
 }
 
-registerWidget(100, ListView, ListView);
+registerWidget(100, ListView);
+registerWidget(101, FilterBox);

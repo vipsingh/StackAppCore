@@ -10,10 +10,10 @@ namespace StackErp.Core.Entity
         public static IEnumerable<DbObject> GetLookupData(int lookupId, List<int> values = null)
         {
             if (values != null) {
-                var op = StackErp.DB.Entity.LookupService.GetLookupOption(lookupId, values[0]);
-                return new List<DbObject>() { op };
+                return StackErp.DB.Entity.LookupService.GetLookupData(lookupId, values);
             }
-             return StackErp.DB.Entity.LookupService.GetLookupData(lookupId);
+            
+            return StackErp.DB.Entity.LookupService.GetLookupData(lookupId);
         }
 
     }

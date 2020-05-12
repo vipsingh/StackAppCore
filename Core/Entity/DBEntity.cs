@@ -56,7 +56,7 @@ namespace StackErp.Core
             fields.Add("UPDATEDON", new DateTimeField()
             {
                 Type = FieldType.DateTime,
-                BaseType = BaseTypeCode.DateTime,
+                BaseType = TypeCode.DateTime,
                 Name = "UpdatedOn",
                 DBName = "UpdatedOn",
                 IsReadOnly = true,
@@ -149,11 +149,13 @@ namespace StackErp.Core
         {
             var fs = new List<BaseField>();
             foreach (var f in this.Fields)
-            {
+            {                
                 if (f.Key == "CREATEDON" || f.Key == "UPDATEDON")
                     continue;
-
-                fs.Add(f.Value);
+                if (f.Value.ViewId == 0 || f.Value.ViewId == Convert.ToInt16(type))
+                {
+                    fs.Add(f.Value);
+                }
             }
 
             return fs;
@@ -167,6 +169,11 @@ namespace StackErp.Core
             }
 
             return null;
+        }
+        public BaseField GetFieldSchema(int fieldId)
+        {
+            var f = this.Fields.Where(x => x.Value.FieldId == fieldId);
+            return f.Count() > 0? f.First().Value : null;
         }
         // public BaseField GetFieldSchemaByViewName(string fieldViewName)
         // {

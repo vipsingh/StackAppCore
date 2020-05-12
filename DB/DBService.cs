@@ -71,11 +71,60 @@ namespace StackErp.DB
             }
         }
 
-        public static DbType GetDbType(BaseTypeCode type)
+        public static DbType GetDbType(FieldType fieldType, TypeCode type)
         {
-            var t = (int)type;
+            DbType t = DbType.String;
+            switch(type) {
+                case TypeCode.Object:
+                    t = DbType.Object;
+                    break;
+                case TypeCode.Boolean:
+                 t = DbType.Boolean;
+                    break;
+                case TypeCode.Char:
+                 t = DbType.StringFixedLength;
+                    break;
+                case TypeCode.SByte:
+                 t = DbType.SByte;
+                    break;
+                case TypeCode.Byte:
+                 t = DbType.Byte;
+                    break;
+                case TypeCode.Int16:
+                    t = DbType.Int16;
+                    break;
+                case TypeCode.UInt16:
+                                 t = DbType.UInt16;
+                    break;
+                case TypeCode.Int32:
+                                 t = DbType.Int32;
+                    break;
+                case TypeCode.UInt32:
+                                 t = DbType.UInt32;
+                    break;
+                case TypeCode.Int64:
+                                 t = DbType.Int64;
+                    break;
+                case TypeCode.UInt64:
+                                 t = DbType.UInt64;
+                    break;
+                case TypeCode.Single:
+                                 t = DbType.Single;
+                    break;
+                case TypeCode.Double:
+                                 t = DbType.Double;
+                    break;
+                case TypeCode.Decimal:
+                                 t = DbType.Decimal;
+                    break;
+                case TypeCode.DateTime:
+                    t = DbType.DateTime;
+                    break;
+
+
+            }
         
-            return (DbType)t;
+            return t;
         }
     }
 }

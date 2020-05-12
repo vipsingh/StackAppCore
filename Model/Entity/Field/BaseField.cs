@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using StackErp.Model.Form;
 
 namespace StackErp.Model.Entity
 {
@@ -7,7 +8,8 @@ namespace StackErp.Model.Entity
     {
         public IDBEntity Entity  { set; get; }
         public FieldType Type { set; get; }
-        public BaseTypeCode BaseType { set; get; }
+        public TypeCode BaseType { set; get; }
+        public int FieldId { set; get; }
         public string Name { set; get; }
         public string DBName { set; get; }
         public string Text { set; get; }
@@ -26,6 +28,8 @@ namespace StackErp.Model.Entity
         public string Domain { set; get; }
         public DynamicObj Properties { set; get; }
         public string TableName { set; get; }
+        public bool IsMultiSelect { set; get; }
+        public bool IsArrayData { private set; get; }
         
         public FormControlType ControlType { set; get; }
         private string _viewName;
@@ -58,6 +62,9 @@ namespace StackErp.Model.Entity
         public virtual void OnInit()
         {
             ControlInfo.FieldAttribute = new FieldAttribute(){ValueField = this.Name};
+            if (this.IsMultiSelect) {
+                IsArrayData = true;
+            }
         }
         public virtual string ResolveDBName()
         {            
@@ -94,6 +101,7 @@ namespace StackErp.Model.Entity
 
         public FieldAttribute FieldAttribute {set;get;}
         public int LookupId  {set;get;}
+        public bool IsMultiSelect  {set;get;}
     }
 
     public class SourceDataMap {
@@ -119,12 +127,14 @@ namespace StackErp.Model.Entity
 
     public class PickerDataSource
     {
+        public int SourceId {set;get;} 
         public string Type {set;get;} //ENTITY,SERVICE,FUNCTION
         public EntityCode Entity {set;get;}
         public List<string> Fields {set;get;}
         public string IdField {set;get;}
         public string SortOnField {set;get;}
         public string FunctionName {set;get;}
+        public List<EvalParam> ParamMappings {set;get;}
         public string Domain {set;get;}
     }
 

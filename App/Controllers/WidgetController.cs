@@ -33,10 +33,19 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult GetFilterFieldForms([FromBody] CustomRequestInfo request)
         {  
-            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext, this.RequestQuery);
-            var page = form.Generate(request);
+            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
+            var page = form.Generate(request, this.RequestQuery);
             
             return CreatePageResult(page);
+        }
+
+        [HttpPost]
+        public IActionResult GetFilterFieldData([FromBody] CustomRequestInfo request)
+        {  
+            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
+            var page = form.BuildWithData(request, this.RequestQuery);
+            
+            return CreateResult(page);
         }
     }
 }

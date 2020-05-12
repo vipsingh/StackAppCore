@@ -19,6 +19,7 @@ namespace StackErp.Model.Entity
 
         Dictionary<string, BaseField> GetFields();
         BaseField GetFieldSchema(string fieldName);
+        BaseField GetFieldSchema(int fieldId);
         //BaseField GetFieldSchemaByViewName(string fieldViewName);
         EntityModelBase GetSingle(int id);
         EntityModelBase GetDefault();

@@ -95,7 +95,7 @@ namespace StackErp.Core.Rules
         {
             var field = criteria.Field;
             object[] inSet = null;
-            if (lVal is DateTime || rVal is DateTime || (field != null && field.BaseType == BaseTypeCode.DateTime))
+            if (lVal is DateTime || rVal is DateTime || (field != null && field.BaseType == TypeCode.DateTime))
             {
                 //return DateCompare(criteria, lVal, rVal, rFieldType);
             }

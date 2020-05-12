@@ -18,8 +18,6 @@ namespace StackErp.ViewModel.ViewContext
         public LayoutContext LayoutContext { set; get;}
         private DynamicObj _parms;
         public DynamicObj Parameters { get => _parms; }
-        private DynamicObj _props;
-        public DynamicObj Properties { get => _props; }
 
         public ObjectModelInfo EntityModelInfo { protected set; get;}
         private InvariantDictionary<IWidget> _controls;
@@ -52,7 +50,6 @@ namespace StackErp.ViewModel.ViewContext
             _entity = entity;
             _controls = new InvariantDictionary<IWidget>();
             _parms = new DynamicObj();
-            _props = new DynamicObj();
             Actions = new PageActions();
             MissingFields = new List<string>();
 
@@ -62,7 +59,7 @@ namespace StackErp.ViewModel.ViewContext
         public virtual void Build(UIFormModel model = null)
         {
             this.SubmitModel = model;
-            this.AddEntityContext();
+            this.PrepareEntityContext();
         }
 
         public void AddControl(IWidget control) 
@@ -78,7 +75,7 @@ namespace StackErp.ViewModel.ViewContext
             return null;
         }
 
-        public virtual void AddEntityContext() {
+        protected virtual void PrepareEntityContext() {
             var entityCntxt = new ObjectModelInfo(this.ObjectId, this._entity);     
             this.EntityModelInfo = entityCntxt;
             // if (this.SubmitModel != null)
@@ -87,14 +84,16 @@ namespace StackErp.ViewModel.ViewContext
             // }
         }
 
-        public void AddProperty(string key, object value)
+        public void AddEntityModelInfo(string key, object value)
         {
-            this._props.Add(key, value, true);
+            if (this.EntityModelInfo != null) {
+                this.EntityModelInfo.Add(key, value);
+            }            
         }
-        public T GetProperty<T>(string key, T def)
-        {
-            return this._props.Get(key, def);
-        }
+        // public T GetEntityModelInfo<T>(string key, T def)
+        // {
+        //     return this._props.Get(key, def);
+        // }
         public void AddParameter(string key, object value)
         {
             this._parms.Add(key, value, true);

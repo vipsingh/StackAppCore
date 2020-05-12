@@ -62,14 +62,14 @@ namespace StackErp.Core.Metadata
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("NAMEFIELD", f);
 
-            var d = new DBEntity(9001, entityName, fs);
-            EntityCode.AllEntities.Add(entityName.ToUpper(), 9001);
+            var d = new DBEntity(1, entityName, fs);
+            EntityCode.AllEntities.Add(entityName.ToUpper(), 1);
 
-            entities.Add(9001, d);
+            entities.Add(1, d);
 
             var entitySchema = BuildEntitySchemaFields();
-            EntityCode.AllEntities.Add(entitySchema.Name, 9002);
-            entities.Add(9002, entitySchema);
+            EntityCode.AllEntities.Add(entitySchema.Name, 2);
+            entities.Add(2, entitySchema);
         }
 
         private static DBEntity BuildEntitySchemaFields()
@@ -90,7 +90,7 @@ namespace StackErp.Core.Metadata
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("FIELDTYPE", f);
 
-            var d = new DBEntity(9002, entityName, fs);            
+            var d = new DBEntity(2, entityName, fs);
             d.TextField = "fieldname";
             return d;
         }

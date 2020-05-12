@@ -22,7 +22,7 @@ namespace StackErp.ViewModel.FormWidget
         public DynamicObj AdditionalValue { protected set; get; }
         public string FormatedValue { protected set; get; }
         [JsonIgnore]
-        public BaseTypeCode BaseType { protected set; get; }
+        public TypeCode BaseType { protected set; get; }
         public string WidgetFormatInfo { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
@@ -79,6 +79,10 @@ namespace StackErp.ViewModel.FormWidget
             if (value is SelectOption)
             {
                 FormatedValue = ((SelectOption)value).Text;
+            }
+            else if (value is ICollection<SelectOption>)
+            {
+                FormatedValue = String.Join(",", ((List<SelectOption>)value).Select(x => x.Text));
             }
             else
                 FormatedValue = value.ToString();

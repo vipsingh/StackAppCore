@@ -16,7 +16,7 @@ namespace StackErp.Core.Entity
         {
             if (value == null) return value;
 
-            if (formatInfo.FieldBaseType == BaseTypeCode.DateTime || formatInfo.FieldBaseType == BaseTypeCode.Date)
+            if (formatInfo.FieldBaseType == TypeCode.DateTime)
             {
                 return this.FormatDate(value);
             }

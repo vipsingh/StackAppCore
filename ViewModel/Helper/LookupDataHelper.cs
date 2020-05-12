@@ -16,10 +16,12 @@ namespace StackErp.ViewModel.Helper
                 var list = new List<SelectOption>();
                 foreach(var o in data)
                 {
-                    var d = new SelectOption();
-                    d.Add("Value", o.Get("Value", 0));
-                    d.Add("Text", o.Get("Text", ""));
-                    list.Add(d);
+                    if (o != null) {
+                        var d = new SelectOption();
+                        d.Add("Value", o.Get("Value", 0));
+                        d.Add("Text", o.Get("Text", ""));
+                        list.Add(d);
+                    }
                 }
 
                 return list;

@@ -11,6 +11,8 @@ namespace StackErp.Model.Entity
     {
         private List<FilterExpField> _data;
         public EntityCode EntityId {get;}
+        
+        public FilterGroup FilterGroup { get; set; }
         public FilterExpression(EntityCode entityid) {
             EntityId = entityid;
             _data = new List<FilterExpField>();
@@ -29,25 +31,45 @@ namespace StackErp.Model.Entity
             return _data;
         }
 
-        public static FilterExpression BuildFromSimpleJson(EntityCode entity, string json) 
+        public string ToJSONFormat() 
         {
-            //ex1: [["F1", 0, "VV"],[,,]]
+            var jo = new JObject();
+            var filterArr = new JArray();
+            foreach(var field in this._data) {
+                filterArr.Add(field.ToJSONObj());
+            }
+            jo.Add(this.FilterGroup == FilterGroup.OR? "$or": "$and", filterArr);
+
+            return jo.ToString();
+        }
+
+        public static FilterExpression BuildFromJson(EntityCode entity, string json) 
+        {
             if (String.IsNullOrWhiteSpace(json))
                 return null;
             var exp = new FilterExpression(entity);
 
-            var arr = (JArray)JsonConvert.DeserializeObject(json);
-            if (arr != null) {
-                foreach(var jr in arr)
-                {
-                    if (jr is JArray) {
-                        var hr = (JArray)jr;
-                        exp.Add(new FilterExpField(hr.First().ToString(), (FilterOperationType)Convert.ToInt32(hr[1].ToString()), hr[2].ToString()));
-                    }
+            var arr = JsonConvert.DeserializeObject(json);
+            string groupOp = "$and";
+            if (arr is JObject) {
+                if (((JObject)arr).Count > 0) {
+                    var groupElm = ((JObject)arr).Properties().First();
+                    groupOp = groupElm.Name;
+                    var filters = (JArray)groupElm.Value;
+                    ProcessFilterJson(filters, ref exp);
                 }
+            } else if(arr is JArray) {
+                ProcessFilterJson((JArray)arr, ref exp);
             }
+            exp.FilterGroup = groupOp == "$or"? FilterGroup.OR: FilterGroup.AND;
 
             return exp;
+        }
+
+        private static void ProcessFilterJson(JArray filters, ref FilterExpression exp) {
+            foreach(JObject obj in filters) {
+                exp.Add(FilterExpField.BuildFromJson(obj));
+            }
         }
     }
 
@@ -79,6 +101,17 @@ namespace StackErp.Model.Entity
             }
         }
 
+        internal JObject ToJSONObj()
+        {
+            var jo = new JObject();
+            var arr = new JArray();
+            arr.Add((int)this.Op);
+            arr.Add(this.Value);
+            jo.Add(this.FieldName, arr);
+
+            return jo;
+        }
+
         public static object[] GetValueSet(String val, Type type)
         {
             ArrayList list = new ArrayList();
@@ -93,6 +126,19 @@ namespace StackErp.Model.Entity
             }
 
             return (object[])list.ToArray(typeof(object));
+        }
+
+        internal static FilterExpField BuildFromJson(JObject json)
+        {
+             if (json.Count > 0) {
+                    var fieldElm = json.Properties().First();
+                    var field = fieldElm.Name;
+                    var data = (JArray)fieldElm.Value;
+                    var v = new FilterExpField(field, (FilterOperationType)((int)data[0]),data[1].ToString());
+
+                    return v;
+                }
+            return null;
         }
     }
 
@@ -125,14 +171,31 @@ namespace StackErp.Model.Entity
         EntityField = 1,
         AppField = 2
     }
+
+    public enum FilterGroup 
+    {
+        AND = 0,
+        OR = 1
+    }
 }
 
 /*
-where: {
-    name: 'a project',
-    [Op.or]: [
-      { id: [1,2,3] },
-      { id: { [Op.gt]: 10 } }
+Format 1
+  {
+    "$or": [
+      {
+        "status": [0, "A"]
+      },
+      {
+        "qty": [2, 30]
+      },
+      {
+        "role.name": [0, "admin"]
+      }
     ]
   }
+
+  Format 2
+    [{},,] default and
+
 */

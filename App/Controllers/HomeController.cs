@@ -25,41 +25,12 @@ namespace StackErp.App.Controllers
             return View();
         }
 
-        [lizzie.Bind(Name = "write")]
-        object WriteLine(lizzie.Binder<HomeController> binder, lizzie.Arguments arguments)
-        {
-            Console.WriteLine(arguments.Get(0));
-            return null;
-        }
-        [lizzie.Bind(Name = "ev")]
-        object Eval(lizzie.Binder<HomeController> binder, lizzie.Arguments arguments)
-        {
-            var str = arguments.Get(0);
-            return null;
-        }
-
-        public IActionResult lizz()
-        {
-
-            /*
-            should be parse (2 + 3) as +(2,3)
-            */
-            string code = @"
-                var(@foo, 5)
-                ev(foo + 11)
-                
-            ";
-
-            var lambda = lizzie.LambdaCompiler.Compile(new HomeController(null), code);
-            var result = lambda();
-
-            return Json(new { x = result });
-        }
-
         [HttpPost]
-        public IActionResult Esprima([FromBody] string scr)
+        public IActionResult StackScript([FromBody] string scr)
         {
-            return Content(StackErp.StackScript.StackScriptParser.Parse(scr));
+            new StackErp.StackScript.StackScriptExecuter().ExecuteScript(scr);
+
+            return Content("executed");
         }
         public IActionResult Privacy()
         {
@@ -81,6 +52,14 @@ namespace StackErp.App.Controllers
             }
 
             return Json(q);       
+        }
+
+        [HttpPost]
+        public IActionResult TempX([FromBody] string p)
+        {
+            var fx = Model.Entity.FilterExpression.BuildFromJson(EntityCode.User, p);
+
+            return Content(fx.ToJSONFormat());
         }
     }
 }

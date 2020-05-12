@@ -1,4 +1,8 @@
 --User ID=eiklvzyt;Password=tJ_N5qAB8jMMwtPYATj6CBaIPjNEGnkZ;Host=isilo.db.elephantsql.com;Port=5432;Database=eiklvzyt;Pooling=true;
+--entity ids => 1, 101 , user>10000
+--fields     => 1-10000, 10001-1000000, user>1000000+
+
+--user defind id shoul start with 1000000 (on master tables which have system defined entries)
 
 truncate table autoid;
 
@@ -35,6 +39,7 @@ CREATE TABLE entityschema
 	linkentity integer,
 	linkentity_domain character varying(500),	
 	lookupid int,
+	ismultiselect boolean,
 	isrequired boolean,
 	isreadonly boolean,
 	defaultvalue character varying(200),
@@ -92,13 +97,15 @@ create table lookup_master(
 	datacode character varying(60) ,
 	primary key(id,dataid)
 )
+insert into autoid values(1, 10000);
+insert into autoid values(2, 1000000);
 
 insert into entity_itemtype(id,entityid,name,code)
-values(4,9002,'Default','0');
-insert into entity_itemtype(id,entityid,name,code)
-values(3,9001,'Default','0');
+values(1,1,'Default','0');
+insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
+values(1,1,1,'','0', null);
 
+insert into entity_itemtype(id,entityid,name,code)
+values(2,2,'Default','0');
 insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
-values(4,9002,4,'','0', null);
-insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
-values(3,9001,3,'','0', null);
+values(2,2,2,'','0', null);

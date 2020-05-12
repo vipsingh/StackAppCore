@@ -6,11 +6,25 @@ export function getFormDataToSubmit(entitySchema: IPageInfo, model: IDictionary<
     const f: any = {};
     _.forIn(model, (val, key) => {
         if (!onlyChanged || val.IsDirty) {
+            if (key === "_UniqueId") return;
+            
             const fieldInfo = entitySchema.getField(key);
+            let value = val.Value;
+            if (value && value._model) {
+                value = getFormDataToSubmit(value._schema, value._model, false);
+            } else if (_.isArray(value)) {
+                value = _.map(val.Value, v => {
+                    if (v && v._model) {
+                        return getFormDataToSubmit(v._schema, v._model, false);
+                    } else {
+                        return v;
+                    }
+                });
+            }
             f[key] = {
                 Properties: fieldInfo.Properties,
                 WidgetId: fieldInfo.WidgetId,
-                Value: val.Value,
+                Value: value,
                 WidgetType: fieldInfo.WidgetType
             };
         }

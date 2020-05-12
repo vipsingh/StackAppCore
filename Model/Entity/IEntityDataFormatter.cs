@@ -11,7 +11,7 @@ namespace StackErp.Model.Entity
 
     public class FormatInfo
     {
-        public BaseTypeCode FieldBaseType {set;get;}
+        public TypeCode FieldBaseType {set;get;}
         public string FormatString {set;get;}
         public string ColorCode {set;get;}
         public string FontSize {set;get;}

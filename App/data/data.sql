@@ -35,8 +35,8 @@ values(1,'Role','Role',10,0,false
 insert into entity_itemtype(id,entityid,name,code)
 values(1,1,'Default','0');
 
-insert into entity_viewlayout(id,entityid,itemtype,states,layoutxml)
-values(1,1,1,'','<view entity="UserMaster">
+
+update entity_viewlayout set layoutxml= '<view entity="UserMaster">
 	<header>
 		<group>
 			<row>
@@ -50,7 +50,7 @@ values(1,1,1,'','<view entity="UserMaster">
 			<group text="section 1">
 				<row>
 				    <field id="AssignDate" />
-					<field id="Role" domain="[[&quot;Category&quot;,0, &quot;@Type&quot;]]"/>
+					<field id="Role" domain="[{&quot;Category&quot;:[0, &quot;@Type&quot;]}]"/>
 				</row>
 				<row>
 					<field id="Type" />
@@ -66,7 +66,7 @@ values(1,1,1,'','<view entity="UserMaster">
 		<command id="FUN_1" text="Call FUN" />
 	</commands>
 	<rules>
-	    <rule type="hidden" criteria="[[&quot;Type&quot;,0, 2]]" fields="SubmitAmount" />
-	    <rule type="readonly" criteria="[[&quot;Type&quot;,0, 2]]" fields="Role" />
+	    <rule type="hidden" criteria="[{&quot;Type&quot;:[0, 2]}]" fields="SubmitAmount" />
+	    <rule type="readonly" criteria="[{&quot;Type&quot;:[0, 2]}]" fields="Role" />
 	</rules>
-</view>');
+</view>' where id=10001;

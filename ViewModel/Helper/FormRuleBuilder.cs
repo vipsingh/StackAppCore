@@ -35,7 +35,7 @@ namespace StackErp.ViewModel.Helper
             if(!String.IsNullOrEmpty(tRule.Criteria))
             {
                 var rule = new FormRule();
-                var expression = FilterExpression.BuildFromSimpleJson(formContext.Entity.EntityId, tRule.Criteria);
+                var expression = FilterExpression.BuildFromJson(formContext.Entity.EntityId, tRule.Criteria);
                 rule.Criteria = FormFilterExpression.Build(formContext, expression);
                 rule.Type = tRule.Type;
                 rule.Fields = new List<string>();

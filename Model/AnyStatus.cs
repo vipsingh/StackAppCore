@@ -45,5 +45,7 @@ public struct AnyStatus {
     public const int PermissionDenied = 11;
     public const int InvalidPostData = 20;
     public const int InvalidUrl = 30;
+     public const int InvalidScript = 31;
+     public const int ScriptFailure = 32;
 }
 }

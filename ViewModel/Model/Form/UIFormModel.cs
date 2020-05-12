@@ -5,12 +5,7 @@ using StackErp.Model;
 using StackErp.Model.Form;
 
 namespace StackErp.ViewModel.Model
-{
-    public class XForm {
-        public string XYZ  {set; get;}
-        public ObjectModelInfo EntityInfo {set; get;}
-        //public InvariantDictionary<UIFormField> Widgets {set; get;}
-    }
+{    
     public class UIFormModel
     {
         public DynamicObj Properties {set; get;}

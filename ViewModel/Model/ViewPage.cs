@@ -24,6 +24,7 @@ namespace StackErp.ViewModel.Model
         public ViewPage(FormContext formContext)
         {
             PageType = AppPageType.Detail;
+            EntityInfo = formContext.EntityModelInfo;
                         
             this.Widgets = formContext.Widgets; 
 

@@ -45,7 +45,7 @@ namespace StackErp.Core.DataList
                 {
                     if (field.IsSelect)
                     {
-                        row.Add(field.Field.ViewName, onFormattedFieldValue(field.Field.ViewName, field.Field.ResolveDbValue(dataRow), row), true);
+                        row.Add(field.Field.Name, onFormattedFieldValue(field.Field.Name, field.Field.ResolveDbValue(dataRow), row), true);
                     }
                 }                                
 

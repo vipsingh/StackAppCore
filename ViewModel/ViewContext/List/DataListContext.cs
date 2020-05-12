@@ -35,12 +35,12 @@ namespace StackErp.ViewModel.ViewContext
             _props = new DynamicObj();
             Fields = new InvariantDictionary<BaseWidget>();
              _RequestMode = ListRequest.RequestType;
+             SourceEntityId = RequestQuery.EntityId;
             Init();
         }
 
         protected virtual void Init()
-        {           
-            SourceEntityId = RequestQuery.EntityId;
+        {                       
             SourceEntity = Core.EntityMetaData.Get(SourceEntityId);
         }
 

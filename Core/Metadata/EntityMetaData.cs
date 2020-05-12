@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using StackErp.Core.Entity;
 using StackErp.DB;
 using StackErp.Model;
 using StackErp.Model.Entity;
@@ -46,8 +47,7 @@ namespace StackErp.Core
                         fields.Add(fname.ToUpper(), field);
                     }
 
-                    var e = new DBEntity(entid, name, fields);
-                    entities.Add(entid, e);
+                    entities.Add(entid, GetDBEntity(entid, name, fields));
                 }
 
                 Metadata.FixedEntities.BuildSchema(ref entities);
@@ -71,11 +71,13 @@ namespace StackErp.Core
 
         internal static BaseField BuildField(string entName, string table, DbObject sch, List<DbObject> dbentities)
         {
+            var fieldId = sch.Get("id", 0);
             var typ = sch.Get("fieldtype", 0);
             var fname = sch.Get("FIELDNAME", "");
 
             var field = CreateField((FieldType)typ);
 
+            field.FieldId = fieldId;
             field.Name = fname;
             field.Type = (FieldType)typ;
             field.DBName = fname;
@@ -99,7 +101,8 @@ namespace StackErp.Core
             {
                 var lookupid = sch.Get("lookupid", 0);
                 ((SelectField)field).LookupId = lookupid;
-            }                
+            }      
+            field.IsMultiSelect = sch.Get("ismultiselect", false);
 
             field.ControlType = GetDefaultControl(field.Type);
 
@@ -157,12 +160,17 @@ namespace StackErp.Core
             return field;
         }
 
-        public static DBEntity Get(EntityCode id)
+        public static T GetAs<T>(EntityCode id) where T: DBEntity
         {
             if (entities.Keys.Contains(id.Code))
-                return entities[id.Code];
+                return (T)entities[id.Code];
 
             throw new EntityException($"Requested Entity {id.Code} # {id.Name} not found.");
+        }
+
+        public static DBEntity Get(EntityCode id)
+        {
+            return GetAs<DBEntity>(id);
         }
 
         static FormControlType GetDefaultControl(FieldType type)
@@ -210,6 +218,18 @@ namespace StackErp.Core
             }
 
             return t;
+        }
+
+        private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields)
+        {
+            DBEntity e;
+            if (entid == 1) {
+                e = new UserDbEntity(entid, name, fields);
+            } else {
+                e = new DBEntity(entid, name, fields);
+            }
+
+            return e;
         }
     }
 }

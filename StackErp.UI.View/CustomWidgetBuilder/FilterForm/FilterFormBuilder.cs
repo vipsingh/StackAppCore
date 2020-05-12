@@ -11,62 +11,107 @@ using StackErp.UI.View.PageGenerator;
 using StackErp.ViewModel;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
+using StackErp.ViewModel.Model.ViewResponse;
 using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.UI.View.CustomWidgetBuilder
 {    
     public class FilterFormBuilder
-    {
-        protected FormContext FormContext {private set; get;}
+    {     
+        StackAppContext Context;
         //protected LayoutFieldCompiler FieldCompiler {set; get;}
-        public FilterFormBuilder(StackAppContext appContext, RequestQueryString requestQuery)
-        {
-            var formContext = new EditFormContext(appContext, EntityCode.User, requestQuery);
-            formContext.Build();
-
-            FormContext = formContext;
+        public FilterFormBuilder(StackAppContext appContext)
+        {                     
+            Context = appContext;
+            //FormContext = formContext;
             //FieldCompiler = new LayoutFieldCompiler(formContext);
         }
 
-        public ViewPage Generate(CustomRequestInfo request)
+        public FilterWidgetResponse Generate(CustomRequestInfo request, RequestQueryString requestQuery)
+        {
+            var formContext = new EditFormContext(Context, EntityCode.User, requestQuery);
+            formContext.Build();   
+            if (request != null && request.Value != null) 
+            {
+                var fieldId = request.Value.Value;
+                var fieldInfo = formContext.Entity.GetFieldSchema(Convert.ToInt32(fieldId));
+                if (fieldInfo == null) {
+                    throw new EntityException("Invalid field!");
+                }
+
+                CreateWidgets(formContext, fieldInfo);
+                
+            }
+
+            var page = new ViewPage(formContext);
+
+            var filtersRes = new List<ViewPage>(){ page };
+            
+            return new FilterWidgetResponse() { Filters = filtersRes };
+        }
+
+        public FilterWidgetResponse BuildWithData(CustomRequestInfo request, RequestQueryString requestQuery) 
         {
             if (request != null && request.Value != null) 
             {
-                var fieldName = request.Value.Value.ToString();
-                var fieldInfo = FormContext.Entity.GetFieldSchema(fieldName);
+                var filtersRes = new List<ViewPage>();
+                var filterJson = request.Value.Value;
+                var exp = FilterExpression.BuildFromJson(requestQuery.EntityId, filterJson.ToString());
+                foreach(var field in exp.GetAll()) 
+                {
+                    var formContext = new EditFormContext(Context, EntityCode.User, requestQuery);
+                    formContext.Build();   
 
-                FormContext.AddControl(AddFieldName(fieldInfo));
+                    var fieldInfo = formContext.Entity.GetFieldSchema(field.FieldName);
+                    CreateWidgets(formContext, fieldInfo, field);
 
-                var widgetContext = new WidgetContext(this.FormContext);            
+                    var page = new ViewPage(formContext);
+                    filtersRes.Add(page);
+                }
+            
+                return new FilterWidgetResponse() { Filters = filtersRes };
+            }
+
+            return null;
+        }
+
+        private void CreateWidgets(FormContext formContext, BaseField fieldInfo, FilterExpField filterField = null) 
+        {
+            formContext.AddEntityModelInfo("FieldName", fieldInfo.Name);                
+
+                formContext.AddControl(AddFieldName(formContext, fieldInfo));
+
+                var widgetContext = new WidgetContext(formContext);            
                 widgetContext.Build(fieldInfo, new TField() { FieldId = "Field" });
                 widgetContext.IsRequired = false;
                 widgetContext.Validation = null;
 
                 var widget = WidgetFactory.Create(widgetContext);
                 widget.OnCompile();
-                FormContext.AddControl(widget);
+                if (filterField != null) {
+                    widget.SetValue(filterField.Value);
+                }
+                formContext.AddControl(widget);
 
-                AddOperationField(fieldInfo);
-            }
-
-            var page = new ViewPage(FormContext);
-            
-            return page;
+                AddOperationField(formContext, fieldInfo, filterField);
         }
 
-        private void AddOperationField(BaseField fieldInfo) 
+        private void AddOperationField(FormContext formContext,BaseField fieldInfo, FilterExpField filterField = null) 
         {
-            var widgetContext = WidgetContext.BuildContext(FormContext, "OP"); 
+            var widgetContext = WidgetContext.BuildContext(formContext, "OP"); 
             widgetContext.WidgetType = FormControlType.Dropdown;
 
             DropdownWidget widget = (DropdownWidget)ViewModel.FormWidget.WidgetFactory.Create(widgetContext);
             widget.Options = GetOptions(fieldInfo.BaseType, fieldInfo.Type);
             widget.OnCompile();
+            if (filterField != null) {
+                widget.SetValue((int)filterField.Op);
+            }
 
-            FormContext.AddControl(widget);
+            formContext.AddControl(widget);
         }
 
-        private List<SelectOption> GetOptions(BaseTypeCode type, FieldType fieldType) 
+        private List<SelectOption> GetOptions(TypeCode type, FieldType fieldType) 
         {
             var ops = new List<SelectOption>();
             var opList = new List<FilterOperationType>();
@@ -77,7 +122,7 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             {
                 opList.Add(FilterOperationType.In);
             }
-            else if (type == BaseTypeCode.Int32 || type == BaseTypeCode.Decimal)
+            else if (type == TypeCode.Int32 || type == TypeCode.Decimal)
             {
                 opList.Add(FilterOperationType.GreaterThan);
             }
@@ -93,9 +138,9 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             return ops;
         }
 
-        private IWidget AddFieldName(BaseField fieldInfo)
+        private IWidget AddFieldName(FormContext formContext, BaseField fieldInfo)
         {
-            var widgetContext = WidgetContext.BuildContext(FormContext, "Name"); 
+            var widgetContext = WidgetContext.BuildContext(formContext, "Name"); 
             var label = new LabelWidget(widgetContext);
             label.SetValue(fieldInfo.Text);
 

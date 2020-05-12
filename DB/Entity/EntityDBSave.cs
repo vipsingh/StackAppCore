@@ -78,7 +78,6 @@ namespace StackErp.DB
                 return CreateUpdateQuery(model.DbTableName, fls);
             }
 
-
             foreach (var f in fls)
             { 
                 if(!toInsert.Contains(f.Item1, StringComparer.InvariantCultureIgnoreCase))
@@ -119,11 +118,20 @@ namespace StackErp.DB
             foreach (var f in model.Attributes)
             {
                 var attr = f.Value;
-                var dbName = attr.Field.DBName;
-
+                var dbName = attr.Field.DBName;                
+                var dbType = DBService.GetDbType(attr.Field.Type, attr.Field.BaseType);
                 if (attr.IsChanged)
                 {
-                    var param = new DynamicDbParam(f.Key, attr.Value, DBService.GetDbType(attr.Field.BaseType));
+                    var val = attr.Value;
+                    if (attr.Field.IsArrayData) {
+                        if (val is IEnumerable<int>) {
+                            val = string.Join(",", ((IEnumerable<int>)val));
+                        } else if (val is IEnumerable<string>)
+                            val = string.Join(",", ((IEnumerable<string>)val));
+
+                        dbType = DbType.String;
+                    }
+                    var param = new DynamicDbParam(f.Key, val, dbType);
                     qryA.Add((dbName, param));
                 }
             }

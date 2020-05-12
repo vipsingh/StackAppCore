@@ -26,12 +26,12 @@ namespace StackErp.StackScript
             _binder.Add("log", Log);
         }
 
-        public static Function Get(string name)
+        internal static Function Get(string name)
         {
             return _binder[name];
         }
 
-        public static bool ContainsKey(string name)
+        internal static bool ContainsKey(string name)
         {
             return _binder.ContainsKey(name);
         }
@@ -42,14 +42,14 @@ namespace StackErp.StackScript
                 _binder.Add(name, function);
         }
 
-        public static Function Log => new Function((arguments) =>
+        internal static Function Log => new Function((arguments) =>
         {
             System.Diagnostics.Debug.WriteLine(arguments.Get(0));
             return null;
         });
 
         #region DataType
-        public static Function Collection => new Function((arguments) =>
+        internal static Function Collection => new Function((arguments) =>
         {
             var list = new List<object>();
             list.AddRange(arguments);
@@ -58,7 +58,7 @@ namespace StackErp.StackScript
         #endregion
 
         #region Conditional
-        public static Function IfTrue => new Function((arguments) =>
+        internal static Function IfTrue => new Function((arguments) =>
         {
             if (arguments.Count <= 1 )
                 throw new ScriptException("Invalid arguments in IfNull");

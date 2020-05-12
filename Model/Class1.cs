@@ -3,9 +3,11 @@ using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StackErp.Model.Utils;
 
 namespace StackErp.Model
 {
+    [JsonConverter(typeof(DynamicObjJsonConverter))]
     public class DynamicObj
     {
         public Dictionary<string, Object> _d;

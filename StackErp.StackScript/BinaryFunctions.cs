@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace StackErp.StackScript
 {
-    public static class BinaryFunctions
+    internal static class BinaryFunctions
     {
         static Dictionary<BinaryOperator, Function> _binder;
         static BinaryFunctions()
@@ -20,14 +20,16 @@ namespace StackErp.StackScript
             _binder = new Dictionary<BinaryOperator, Function>();
             _binder.Add(BinaryOperator.Plus, Add);
             _binder.Add(BinaryOperator.Equal, IsEqual);
+
+            _binder.Add(BinaryOperator.LogicalAnd, LogicalAnd);
         }
 
-        public static Function Get(BinaryOperator op)
+        internal static Function Get(BinaryOperator op)
         {
             return _binder[op];
         }
 
-        public static Function Add => new Function((arguments) =>
+        internal static Function Add => new Function((arguments) =>
         {
             dynamic result = arguments.Get(0);
             foreach (dynamic ix in arguments.Skip(1)) {
@@ -37,7 +39,7 @@ namespace StackErp.StackScript
             return result;
         });
 
-        public static Function IsEqual => new Function((arguments) =>
+        internal static Function IsEqual => new Function((arguments) =>
         {
             var arg1 = arguments.Get(0);
             var arg2 = arguments.Get(1);
@@ -47,6 +49,16 @@ namespace StackErp.StackScript
                 return (object)false;
                 
             return (object)true;
+        });
+
+        internal static Function LogicalAnd => new Function((arguments) =>
+        {
+            var arg1 = arguments.Get(0);
+            var arg2 = arguments.Get(1);
+            if (arg1 == (object)true && arg2 == (object)true )
+                return (object)true;
+                
+            return (object)false;
         });
     }
 }

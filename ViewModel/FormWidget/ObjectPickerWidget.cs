@@ -7,7 +7,7 @@ namespace StackErp.ViewModel.FormWidget
 {
     public class ObjectPickerWidget: BaseWidget
     {
-        public override FormControlType WidgetType { get => FormControlType.EntityPicker; }       
+        public override FormControlType WidgetType { get => FormControlType.EntityPicker; }    
         public ObjectPickerWidget(WidgetContext cntxt): base(cntxt)
         {
         }

@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using StackErp.Model.Utils;
 
 namespace StackErp.Model
 {
+    [JsonConverter(typeof(EntityCodeJsonConverter))]
     public struct EntityCode 
     {
         public int Code;
@@ -39,10 +41,10 @@ namespace StackErp.Model
         public static Dictionary<string, int> AllEntities;
 
         public const int None = 0;
-        public const int User = 1;
-        public const int UserRole = 2;
+        public const int User = 101;
+        public const int UserRole = 102;
 
-        public const int EntityMaster = 9001;
-        public const int EntitySchema = 9002;
+        public const int EntityMaster = 1;
+        public const int EntitySchema = 2;
     }
 }

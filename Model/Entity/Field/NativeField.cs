@@ -7,7 +7,7 @@ namespace StackErp.Model.Entity
     {
         public StringField(): base() {
             Type = FieldType.Text;
-            BaseType = BaseTypeCode.String;
+            BaseType = TypeCode.String;
         }
 
         public override object ResolveSetValue(object val, out bool isValid)
@@ -69,7 +69,7 @@ namespace StackErp.Model.Entity
     {
         public IntegerField(): base() {
             Type = FieldType.Integer;
-            BaseType = BaseTypeCode.Int32;
+            BaseType = TypeCode.Int32;
         }
 
         public override object ResolveSetValue(object val, out bool isValid)
@@ -93,7 +93,7 @@ namespace StackErp.Model.Entity
     {
         public BigIntField(): base() {
             Type = FieldType.BigInt;
-            BaseType = BaseTypeCode.Int64;
+            BaseType = TypeCode.Int64;
         }
     }
 
@@ -101,7 +101,7 @@ namespace StackErp.Model.Entity
     {
         public DecimalField(): base() {
             Type = FieldType.Decimal;
-            BaseType = BaseTypeCode.Decimal;
+            BaseType = TypeCode.Decimal;
         }
 
         public override object ResolveSetValue(object value, out bool isValid)
@@ -158,14 +158,14 @@ namespace StackErp.Model.Entity
     {
         public BoolField(): base() {
             Type = FieldType.Bool;
-            BaseType = BaseTypeCode.Boolean;            
+            BaseType = TypeCode.Boolean;            
         }
 
         public override object ResolveSetValue(object val, out bool isValid)
         {
             isValid = true;
             
-            var d = DataHelper.GetDataValue(val, TypeCode.Boolean);
+            var d = DataHelper.GetDataValue(val, BaseType);
 
             return d;
         }
@@ -176,7 +176,7 @@ namespace StackErp.Model.Entity
             if(v == null)
                 return false;
             else
-                return DataHelper.GetDataValue(v, TypeCode.Boolean);
+                return DataHelper.GetDataValue(v, BaseType);
         }
     }
 
@@ -184,7 +184,7 @@ namespace StackErp.Model.Entity
     {
         public DateTimeField(): base() {
             Type = FieldType.DateTime;
-            BaseType = BaseTypeCode.DateTime;
+            BaseType = TypeCode.DateTime;
         }
 
         public override object ResolveDbValue(DbObject db)
@@ -216,7 +216,7 @@ namespace StackErp.Model.Entity
     {
         public ImageField(): base() {
             Type = FieldType.Image;
-            BaseType = BaseTypeCode.String;
+            BaseType = TypeCode.String;
         }
     }
 }

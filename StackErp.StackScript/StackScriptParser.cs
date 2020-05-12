@@ -9,6 +9,7 @@ using Esprima.Ast;
 using Esprima.Utils;
 using Newtonsoft.Json;
 using System.Globalization;
+using StackErp.Model;
 
 namespace StackErp.StackScript
 {    
@@ -18,9 +19,7 @@ namespace StackErp.StackScript
         {
             var parser =  new JavaScriptParser(code);
             var program = parser.ParseScript();
-            var exec =  new StackScriptExecuter(program);
             
-
             //StringBuilder sb = new StringBuilder();
             //StringWriter sw = new StringWriter(sb);
             //var w = new JsonTextWriter(sw);
@@ -31,15 +30,46 @@ namespace StackErp.StackScript
     }
 
     public class StackScriptExecuter {
-        public Dictionary<string, object> _Vars;
-        public StackScriptExecuter(Script program)
+        private Dictionary<string, object> _Vars;
+        private ObjectDataProvider _DataProvider;
+        public StackScriptExecuter()
         {
             _Vars = new Dictionary<string, object>();
             //_Vars.Add("coll", new List<object>() { "x", "v", "z" });
+            
+        }
+
+        public AnyStatus ExecuteScript(string codeStr) 
+        {
+            AnyStatus sts = AnyStatus.Success;
+            try {
+                var parser =  new JavaScriptParser(codeStr);
+                var program = parser.ParseScript();
+
+                ExecuteScript(program);
+            } catch(Exception ex) {
+                sts = AnyStatus.ScriptFailure;
+                sts.Message = ex.Message;
+            }
+
+            return  sts;
+        }
+
+        public void ExecuteScript(Script program) 
+        {
+            _DataProvider = new ObjectDataProvider();
             ExecuteBody(program.Body);
         }
 
-        public void ExecuteBody(NodeList<IStatementListItem> bodyColl) 
+        public object ExecuteExpression(string code, EntityModelBase model)
+        {
+            var parser =  new JavaScriptParser(code);
+            var expression = parser.ParseExpression();
+
+            return GetVarFromExp(expression);
+        }
+
+        private void ExecuteBody(NodeList<IStatementListItem> bodyColl) 
         {
             foreach(IStatementListItem body in bodyColl)
             {                
@@ -80,20 +110,24 @@ namespace StackErp.StackScript
         }
 
         private object GetVarFromExp(Expression exp) {
-            if (exp is Literal) {
+            if (exp.Type == Nodes.Literal) {
                 return LteralExp(exp as Literal);
             }
-            else if (exp is Identifier) {
+            else if (exp.Type == Nodes.Identifier) {
               return GetVar(exp as Identifier);
             }
-            else if (exp is BinaryExpression) {
+            else if (exp.Type == Nodes.BinaryExpression || exp.Type == Nodes.LogicalExpression) {
                  return BinaryExpression(exp as BinaryExpression);
             }
-            else if (exp is CallExpression) {
+            else if (exp.Type == Nodes.CallExpression) {
                return CallExpression(exp as CallExpression);
             }
+            else if (exp.Type == Nodes.MemberExpression) {
+               return MemberExpression(exp as MemberExpression);
+            }
+            else
+                throw new ScriptParsingException("Expression not allowed: " + exp.Type.ToString());
 
-            return null;
         }
 
         private object GetVar(Identifier idf) {
@@ -131,25 +165,49 @@ namespace StackErp.StackScript
             }
         }
         private object CallExpression(CallExpression expression) {
-            var fun = ((Identifier)expression.Callee).Name;
-            if (fun == "foreach") {
-                ProcessForeach(expression.Arguments);
-                return null;
-            }
-            else if (ScriptFunctions.ContainsKey(fun)) {
-                var args = new Arguments();
-                foreach(var e in expression.Arguments) {                    
-                    args.Add(GetVarFromExp(e as Expression));
+            if (expression.Callee is Identifier)
+            {
+                var fun = ((Identifier)expression.Callee).Name;
+                if (fun == "foreach") {
+                    ProcessForeach(expression.Arguments);
+                    return null;
                 }
-                try {
-                    return ScriptFunctions.Get(fun).Invoke(args);
-                } catch(Exception ex) {
-                    throw new ScriptException($"Function '{fun}' error:: {ex.Message}");
-                }
+                else if (ScriptFunctions.ContainsKey(fun)) {
+                    try {
+                        return ScriptFunctions.Get(fun).Invoke(GetArguments(expression.Arguments));
+                    } catch(Exception ex) {
+                        throw new ScriptException($"Function '{fun}' error:: {ex.Message}");
+                    }
 
-            } else {
-                throw new ScriptException($"Function with name {fun} is not defined");
+                } else {
+                    throw new ScriptException($"Function with name {fun} is not defined");
+                }
+            } else if (expression.Callee is MemberExpression) {
+                return MemberExpression(expression.Callee as MemberExpression, GetArguments(expression.Arguments));
             }
+            else {
+                throw new ScriptException($"Expression with name {expression.Type.ToString()} is not allowed");
+            }
+        }
+
+        private Arguments GetArguments(NodeList<ArgumentListElement> args)
+        {
+            var l = new Arguments();
+            foreach(var e in args) {                    
+                l.Add(GetVarFromExp(e as Expression));
+            }
+            return l;
+        }
+
+        private object MemberExpression(MemberExpression expression, Arguments args = null)
+        {
+            var objName = ((Identifier)expression.Object).Name;
+            if (expression.Property is Identifier)
+            {
+                return _DataProvider.GetData(objName, ((Identifier)expression.Property).Name, args);
+            }
+
+            return null;
         }
 
         private void ProcessForeach(NodeList<ArgumentListElement> args)
@@ -184,13 +242,19 @@ namespace StackErp.StackScript
                 } else {
                     throw new ScriptException("Invalid foreach statement");
                 }
-            } catch(Exception ex) {
+            } catch(Exception) {
                 throw;
             }
         }
     }        
 }
+/*Example
+var coll = Collection('v', 'f', 'bb');
+foreach(coll, (v)=>{
+	log(v);
+});
 
+*/
 /* 
 SystemVariable-----------------
 $app.  userid, approot

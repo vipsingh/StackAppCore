@@ -14,6 +14,9 @@ namespace StackErp.ViewModel.FormWidget
 
         protected override bool OnSetData(object value)
         {
+            if (value != null && value is string) {
+                value = DataHelper.GetData<DateTime>(value, DateTime.MinValue);
+            }
             if (value is DateTime)
             {
                 var v =(DateTime)value;

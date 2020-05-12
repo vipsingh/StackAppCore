@@ -1,3 +1,4 @@
+
 insert into entitymaster(id,name,text,tablename,primaryfield,namefield)
 values(2,'UserRole','UserRole','UserRole','id','name');
 ---------------------------
@@ -29,4 +30,6 @@ values(1,2,'Default','0');
 
 insert into entity_viewlayout(id,entityid,itemtype,states,viewtype,layoutxml)
 values(2,2,2,'','0', null);
+
+insert into autoid values(1, 0);
 --------------------------------------

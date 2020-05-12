@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackErp.Model.Utils;
-using StackErp.App.Helpers;
 
 namespace StackErp.App
 {
@@ -32,10 +31,14 @@ namespace StackErp.App
                     {
                         // Use the default property (Pascal) casing
                         options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                        
                         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
-                        // Configure a custom converter
-                        options.SerializerSettings.Converters.Add(new DynamicObjJsonConverter());
-                        options.SerializerSettings.Converters.Add(new EntityCodeJsonConverter());
+                        options.SerializerSettings.ObjectCreationHandling = Newtonsoft.Json.ObjectCreationHandling.Replace;
+                        options.SerializerSettings.MissingMemberHandling = Newtonsoft.Json.MissingMemberHandling.Ignore;
+                        options.SerializerSettings.DefaultValueHandling = Newtonsoft.Json.DefaultValueHandling.Include;
+                        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
+                        options.SerializerSettings.Error = (serializer, args) => args.ErrorContext.Handled = true;
+                        options.SerializerSettings.StringEscapeHandling = Newtonsoft.Json.StringEscapeHandling.EscapeHtml;
                         
                     });
 

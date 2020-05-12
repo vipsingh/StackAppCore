@@ -110,11 +110,30 @@ namespace StackErp.Model.Entity
         public string Alias {set;get;}   
         public string DbName {set;get;}
         public string Format {set;get;}
-        public BaseTypeCode DataType {set;get;}
+        public TypeCode DataType {set;get;}
         public string SummaryType {set;get;}
     }
 }
 
 /*
-
+{
+  "entity": "usermaster",
+  "idfield": "id",
+  "select": ["name", "status", "role.name"],
+  "additional": [],
+  "where": {
+    "$or": [
+      {
+        "status": [0, "A"]
+      },
+      {
+        "qty": [2, 30]
+      },
+      {
+        "role.name": [0, "admin"]
+      }
+    ]
+  },
+  "orderby": ["name"]
+}
 */

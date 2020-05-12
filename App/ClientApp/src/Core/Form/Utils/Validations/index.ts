@@ -57,8 +57,8 @@ function validateField(controlInfo: WidgetInfoProps, entityInfo?: IPageInfo, dat
 
 const validator: IDictionary<Function> = {
     REQUIRED: (widgetInfo: WidgetInfoProps, validationInfo: any = {}) => {
-        const value = widgetInfo.Value;
-        if (!value) {
+        const value: any = widgetInfo.Value;
+        if (!value || (_.isArray(value) && value.length === 0) || (_.has(value, "Value") && !value.Value)) {
             let msg = validationInfo.Msg || "${caption} is required.";
             return {
                 IsValid: false,

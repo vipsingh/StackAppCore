@@ -18,7 +18,7 @@ namespace StackErp.Model.DataList
     {
         public FieldType FieldType {set;get;}
         public string Name {set;get;}
-        public BaseTypeCode BaseType {set;get;}
+        public TypeCode BaseType {set;get;}
         public string Caption {set;get;}
         public string IsHidden {set;get;}
         public int width {set;get;}        

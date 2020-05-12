@@ -196,9 +196,10 @@ export default class Form extends React.Component<FormProps, {
                 _.forIn(entitySchema.Widgets, (v, k) => {
                     model = update(model, {[k]: { HasError: {$set: errors[k]? !errors[k].IsValid: false}}});                    
                 });
-
+                
+                this.setState({ errors });
                 this.setDataModel(model, { updateBy: "VALIDATE" });
-                this.setState({ errors })
+                
                 if (Object.keys(errors).length > 0) {
                     const msg = _.map(errors, v => (<span>{v.Message}<br/></span>));
                     notification.error({ message: __L("Error"), description: <div>{msg}</div> });
@@ -334,6 +335,7 @@ export default class Form extends React.Component<FormProps, {
         const { render } = this.props;
         const formProps = {
             entityModel: this.getEntitySchema(),
+            dataModel: this.props.dataModel,
             getControl: this.getControl.bind(this),
             executeAction: this.executeAction,
             handleSubmit: this.handleSubmit,
