@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using StackErp.Core.Form;
 using StackErp.DB;
@@ -24,12 +25,14 @@ namespace StackErp.Core
         public string IDField { get; private set; }
         public List<IEntityRelation> Relations { private set; get; }
 
+        public List<string> ComputeOrderSeq { private set; get; }
+
         private string _detailQry;
-        public DBEntity(int id, string name, Dictionary<string, BaseField> fields)
+        public DBEntity(int id, string name, Dictionary<string, BaseField> fields, string dbName = "")
         {
             this.EntityId = id;
             this.Name = name;
-            this.DBName = name.ToLower();
+            this.DBName = dbName; //t_{namespace}
             this.IDField = "ID";
             this.Text = name;
 
@@ -41,7 +44,9 @@ namespace StackErp.Core
                     Type = FieldType.ObjectKey,
                     Name = "ID",
                     DBName = "ID",
-                    Entity = this
+                    IsReadOnly = true,
+                    Entity = this,
+                    IsDbStore = true
                 });
             }
 
@@ -51,7 +56,8 @@ namespace StackErp.Core
                 Name = "CreatedOn",
                 DBName = "CreatedOn",
                 IsReadOnly = true,
-                Copy = false
+                Copy = false,
+                IsDbStore = true
             });
             fields.Add("UPDATEDON", new DateTimeField()
             {
@@ -60,7 +66,26 @@ namespace StackErp.Core
                 Name = "UpdatedOn",
                 DBName = "UpdatedOn",
                 IsReadOnly = true,
-                Copy = false
+                Copy = false,
+                IsDbStore = true
+            });
+            fields.Add("CREATEDBY", new IntegerField()
+            {
+                Type = FieldType.DateTime,
+                Name = "CreatedBy",
+                DBName = "CreatedBy",
+                IsReadOnly = true,
+                Copy = false,
+                IsDbStore = true
+            });
+            fields.Add("UPDATEDBY", new IntegerField()
+            {
+                Type = FieldType.DateTime,
+                Name = "UpdatedBy",
+                DBName = "UpdatedBy",
+                IsReadOnly = true,
+                Copy = false,
+                IsDbStore = true
             });
 
             foreach (var f in fields)
@@ -86,6 +111,8 @@ namespace StackErp.Core
             var qBuilder = new EntityQueryBuilder(this);
             _detailQry = qBuilder.BuildDetailQry();
 
+            PrepareComputeOrderSeq();
+
             _isInit = true;
         }
 
@@ -96,10 +123,37 @@ namespace StackErp.Core
                 if (field.Value.Type == FieldType.ObjectLink)
                 {
                     var childE = EntityMetaData.Get(field.Value.RefObject);
-                    var rel = new EntityRelation(EntityRelationType.LINK, this.EntityId, field.Value.RefObject, field.Value, childE.GetFieldSchema(childE.TextField));
+                    var rel = new EntityRelation(EntityRelationType.LINK, this.EntityId, field.Value.RefObject, field.Value, null, childE.GetFieldSchema(childE.TextField));                    
+                    this.Relations.Add(rel);
+                }
+                else if (field.Value.Type == FieldType.OneToMany)
+                {
+                    var relField = (OneToManyField)field.Value;
+                    var childE = EntityMetaData.Get(relField.RefObject);
+                    var rel = new EntityRelation(EntityRelationType.OneToMany, this.EntityId, relField.RefObject, field.Value, childE.GetFieldSchema(relField.RefFieldName), null);
                     this.Relations.Add(rel);
                 }
             }
+        }
+
+        private void PrepareComputeOrderSeq()
+        {
+            var comFields = this.Fields.Where(f => f.Value.IsComputed).Select(x => x.Value);
+            if (comFields.Count() == 0)
+                this.ComputeOrderSeq = new List<string>();
+            var seqArr = comFields.Select(f => f.Name.ToLower()).ToList();            
+
+            foreach(var f in comFields)
+            {
+                    var keys = f.ComputeExpression.KeyWords;
+                    foreach(var k in keys)
+                    {
+                        if (seqArr.IndexOf(k) > seqArr.IndexOf(f.Name.ToLower()))
+                            DataHelper.Swap(seqArr, seqArr.IndexOf(k), seqArr.IndexOf(f.Name.ToLower()));
+                    }                
+            }
+
+            this.ComputeOrderSeq = seqArr;
         }
 
         #region Data Fetch
@@ -110,7 +164,7 @@ namespace StackErp.Core
             if (arr.Count() > 0)
             {
                 var d = arr.First();
-                var model = new EntityModelBase(this);
+                var model = new EntityRecordModel(this);
                 model.BuiltWithDB(d);
 
                 return model;
@@ -150,7 +204,7 @@ namespace StackErp.Core
             var fs = new List<BaseField>();
             foreach (var f in this.Fields)
             {                
-                if (f.Key == "CREATEDON" || f.Key == "UPDATEDON")
+                if (new List<string>(){ "CREATEDON","UPDATEDON","CREATEDBY","UPDATEDBY" }.Contains(f.Key))
                     continue;
                 if (f.Value.ViewId == 0 || f.Value.ViewId == Convert.ToInt16(type))
                 {
@@ -187,7 +241,7 @@ namespace StackErp.Core
 
         public EntityModelBase GetDefault()
         {
-            EntityModelBase model = new EntityModelBase(this);
+            EntityRecordModel model = new EntityRecordModel(this);
             model.CreateDefault();
 
             return model;
@@ -197,7 +251,7 @@ namespace StackErp.Core
             return Core.EntityMetaData.Get(id);
         }
 
-        public AnyStatus Save(EntityModelBase model)
+        public AnyStatus Save(StackAppContext appContext, EntityModelBase model)
         {
             AnyStatus status = AnyStatus.NotInitialized;
             try
@@ -205,12 +259,19 @@ namespace StackErp.Core
                 if (model.IsNew)
                 {
                     model.SetValue("CREATEDON", DateTime.Now.ToUniversalTime());
+                    model.SetValue("CREATEDBY", 1);
+                    model.SetMasterId(appContext.MasterId);
                 }
                 model.SetValue("UPDATEDON", DateTime.Now.ToUniversalTime());
-
+                model.SetValue("UPDATEDBY", 1);
+            
                 if (this.Validate(model))
                 {
-                    status = EntityDBService.SaveEntity(this, model);                    
+                    if (model is EntityRecordModel)
+                    {
+                        ((EntityRecordModel)model).ResolveComputedFields();
+                    }
+                    status = EntityDBService.SaveEntity(appContext, this, model);
                 }
                 else 
                 {
@@ -223,7 +284,7 @@ namespace StackErp.Core
                 status.Message = ex.Message;
             }
             return status;
-        }
+        }        
         
         private bool Validate(EntityModelBase model)
         {
@@ -248,10 +309,24 @@ namespace StackErp.Core
             return IsValid;
         }
 
+        public virtual AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
+        {
+            var sts = AnyStatus.Success;
+           
+            return sts;
+        }
+
+        public virtual AnyStatus OnBeforeDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
+        {
+            var sts = AnyStatus.Success;
+            if (model is EntityRecordModel)
+                ((EntityRecordModel)model).PrepareSaveImageField(appContext);
+            return sts;
+        }
         public bool Write(int id, DynamicObj model)
         {
             throw new NotImplementedException();
-        }
+        }        
 
         //private Hooks
         /*
@@ -267,16 +342,19 @@ namespace StackErp.Core
         public EntityCode ChildName { private set; get; }
         public BaseField ParentRefField { private set; get; }
         public BaseField ChildRefField { private set; get; }
+        //Used in Link Field to display data
+        public BaseField ChildDisplayField { private set; get; }
 
         public List<(string, string)> OtherChildFields { set; get; }
 
-        public EntityRelation(EntityRelationType type, EntityCode parent, EntityCode child, BaseField parentField, BaseField childField)
+        public EntityRelation(EntityRelationType type, EntityCode parent, EntityCode child, BaseField parentField, BaseField childField, BaseField childDisplayField)
         {
             Type = type;
             ParentName = parent;
             ChildName = child;
             ParentRefField = parentField;
             ChildRefField = childField;
+            ChildDisplayField = childDisplayField;
         }
     }
 }

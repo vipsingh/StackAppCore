@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
@@ -47,25 +48,33 @@ namespace StackErp.ViewModel.ViewContext
         public T GetModelInfo<T>(string key, T defaultVal)
         {
             var requset = ListRequest.RequestInfo;
-            if (requset == null || requset.ModelInfo == null)
+            if (requset == null || requset.EntityInfo == null)
                 return defaultVal;
 
-            return requset.ModelInfo.Get(key, defaultVal);
+            return requset.EntityInfo.Get(key, defaultVal);
         }
 
         public virtual void BuildSource(DataListDefinition defn)
         {
-            var entity = Core.EntityMetaData.Get(defn.EntityId);
+            var entity = Core.EntityMetaData.Get(defn.DataSource.Entity);
             this.DbQuery = new DbQuery(entity);
-            this.DbQuery.ItemIdField = defn.ItemIdField;
-            
-            if (defn.Layout != null)
-            {
-                this.DbQuery.BuildWithLayout(defn.Layout);
-            }
-            this.DbQuery.ResolveFields();
-            this.IdColumn = defn.ItemIdField;
+            this.DbQuery.BuildListDefn(defn);
+            this.IdColumn = this.DbQuery.ItemIdField;
             this.ItemViewField = defn.ItemViewField;
+
+            // this.DbQuery.ItemIdField = defn.ItemIdField;
+            
+            // if (defn.Layout != null)
+            // {
+            //     this.DbQuery.BuildWithLayout(defn.Layout);
+            // }            
+            
+            // this.IdColumn = defn.ItemIdField;
+            // this.ItemViewField = defn.ItemViewField;
+            
+            PrepareFilter(this.DbQuery, defn);
+
+            this.DbQuery.ResolveFields();
 
             var gridReq = ListRequest.GridRequest;
             if (gridReq != null)
@@ -74,6 +83,10 @@ namespace StackErp.ViewModel.ViewContext
             } 
             else
                 DbQuery.WithPage(0, defn.PageSize);
+        }
+
+        protected virtual void PrepareFilter(DbQuery query, DataListDefinition defn) 
+        {           
         }
     }
 }

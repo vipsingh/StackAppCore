@@ -18,5 +18,7 @@ namespace StackErp.ViewModel.Model
         public Dictionary<string, ActionInfo> ActionButtons {get;}
         public int PageSize {set;get;}
         public int PageIndex {set;get;}
+
+        public List<DynamicObj> FilterBar {set; get;} 
     }
 }

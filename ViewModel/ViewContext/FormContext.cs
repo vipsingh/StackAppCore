@@ -5,6 +5,7 @@ using StackErp.Model.Entity;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.FormWidget;
 using StackErp.Model.Layout;
+using StackErp.ViewModel.ValueProvider;
 
 namespace StackErp.ViewModel.ViewContext
 {
@@ -26,6 +27,7 @@ namespace StackErp.ViewModel.ViewContext
         public PageActions Actions { get;}
         public UIFormModel SubmitModel {protected set; get;}
         public EntityModelBase EntityModel {protected set; get;}
+        public CustomRequestInfo Customrequest {protected set; get;}
 
         public virtual bool IsNew
         {
@@ -98,34 +100,25 @@ namespace StackErp.ViewModel.ViewContext
         {
             this._parms.Add(key, value, true);
         }
+        public T GetParameter<T>(string key, T value)
+        {
+            return this._parms.Get(key, value);
+        }
         public BaseField GetField(string fieldName)
         {
             return this.Entity.GetFieldSchema(fieldName);
+        }
+
+        public void AddMissingField(string field)
+        {
+            if (!this.MissingFields.Contains(field))
+                this.MissingFields.Add(field);
         }
 
         public TView GetLayoutView()
         {
             return this.LayoutContext.View;
         }
-
-    //     addRules(ruleType: string, criteria: FilterCriteria, fields: string[]): number {
-    //     if (!this.FormRules) this.FormRules = [];
-        
-    //     this.FormRules.push({Type: ruleType, Index: this._ruleIndex, Criteria: criteria, Fields: fields});
-    //     this._ruleIndex++;
-    //     return this._ruleIndex - 1;
-    // }
-
-    // setFieldDependency(field: string, depandUpon: string[], type: string = "") {
-    //     if (!this.FieldDependency) this.FieldDependency = [];
-
-    //     this.FieldDependency.push({Type: type, Field: field, Parent: depandUpon});
-
-    //     depandUpon.forEach(f => {
-    //         if (this.RefFields.indexOf(f) < 0) {
-    //             this.RefFields.push(f);
-    //         }
-    //     });
-    // }
+            
     }
 }

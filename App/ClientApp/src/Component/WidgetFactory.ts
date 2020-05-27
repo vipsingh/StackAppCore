@@ -37,6 +37,9 @@ export function getComponent(controlType: number, isViewMode?: boolean) {
         case FormControlType.Label:
             editComponent = LabelField;
             break;
+        case FormControlType.Image:
+            editComponent = viewComponent =  CTRL.ImageField;
+            break;
         default:
             const w = widgets[controlType];
             if (w) {

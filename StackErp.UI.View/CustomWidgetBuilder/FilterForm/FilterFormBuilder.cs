@@ -33,7 +33,7 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             formContext.Build();   
             if (request != null && request.Value != null) 
             {
-                var fieldId = request.Value.Value;
+                var fieldId = request.Value;
                 var fieldInfo = formContext.Entity.GetFieldSchema(Convert.ToInt32(fieldId));
                 if (fieldInfo == null) {
                     throw new EntityException("Invalid field!");
@@ -55,7 +55,7 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             if (request != null && request.Value != null) 
             {
                 var filtersRes = new List<ViewPage>();
-                var filterJson = request.Value.Value;
+                var filterJson = request.Value;
                 var exp = FilterExpression.BuildFromJson(requestQuery.EntityId, filterJson.ToString());
                 foreach(var field in exp.GetAll()) 
                 {

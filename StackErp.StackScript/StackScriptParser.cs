@@ -32,6 +32,7 @@ namespace StackErp.StackScript
     public class StackScriptExecuter {
         private Dictionary<string, object> _Vars;
         private ObjectDataProvider _DataProvider;
+        private ObjectDataProvider _VarProvider;
         public StackScriptExecuter()
         {
             _Vars = new Dictionary<string, object>();
@@ -63,6 +64,8 @@ namespace StackErp.StackScript
 
         public object ExecuteExpression(string code, EntityModelBase model)
         {
+            _DataProvider = new ObjectDataProvider();
+            _VarProvider = new EntityModelDataProvider(model);
             var parser =  new JavaScriptParser(code);
             var expression = parser.ParseExpression();
 
@@ -131,11 +134,18 @@ namespace StackErp.StackScript
         }
 
         private object GetVar(Identifier idf) {
+            if (this._VarProvider != null && !_Vars.ContainsKey(idf.Name))
+            {
+                return this._VarProvider.GetVarData(idf.Name);
+            }
+
             return _Vars[idf.Name];
         }
 
         private object LteralExp(Literal exp) 
         {
+            if (exp.Value is double)
+                return Convert.ToDecimal(exp.Value);
             return exp.Value;
         }
 
@@ -204,7 +214,7 @@ namespace StackErp.StackScript
             var objName = ((Identifier)expression.Object).Name;
             if (expression.Property is Identifier)
             {
-                return _DataProvider.GetData(objName, ((Identifier)expression.Property).Name, args);
+                return _DataProvider.GetObjectData(objName, ((Identifier)expression.Property).Name, args);
             }
 
             return null;

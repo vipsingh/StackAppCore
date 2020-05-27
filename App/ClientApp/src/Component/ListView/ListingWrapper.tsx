@@ -1,5 +1,6 @@
 import React from "react";
 import _ from "lodash";
+import FilterBox from "../Form/Control/FilterBox";
 
 export default function(ListComp: React.ComponentClass<any,any>) {
     
@@ -91,6 +92,12 @@ export default function(ListComp: React.ComponentClass<any,any>) {
               };
         }
 
+        renderFilterPanel() {
+            const { FilterBox: filterInfo } = this.props;
+
+            return (<FilterBox {...filterInfo} />);
+        }
+
         render() {
             const { ListData } = this.props;
             const { Pager } = this.state;
@@ -101,13 +108,28 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                 return (<label>something went wrong..</label>);
             } else {
                 return (
-                    <ListComp                         
-                        listData={ListData} 
-                        pager={Pager}   
-                        rowSelection={this.getRowSelection()}                        
-                    />
+                    <div>
+                        {
+                            this.renderFilterPanel()
+                        }
+                    
+                        <ListComp                         
+                            listData={ListData} 
+                            pager={Pager}   
+                            rowSelection={this.getRowSelection()}                        
+                        />
+                    </div>
                 );
             }
         }
+    }
+}
+
+class FilterBar extends React.Component {
+
+    render() {
+        return (<div>
+
+        </div>);
     }
 }

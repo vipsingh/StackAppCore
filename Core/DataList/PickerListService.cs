@@ -14,27 +14,45 @@ namespace StackErp.Core.DataList
     {
         public DataListDefinition GetListDefn(BaseField field)
         {
-            var defn = new DataListDefinition();            
-            var ds = field.ControlInfo.DataSource;
-            defn.EntityId = ds.Entity;
+            var defn = GetEntityListDefn(field.ControlInfo.DataSource);
+            return defn;
+        }
+
+        public DataListDefinition GetEntityListDefn(FieldDataSource source)
+        {
+            var defn = new DataListDefinition();
+            var ds = source;
+            defn.DataSource = ds;
+            //defn.EntityId = ds.Entity;
             var _Entity = Core.EntityMetaData.Get(ds.Entity);
             
             defn.ItemIdField = "Id";
             defn.ItemViewField = _Entity.GetFieldSchema(_Entity.TextField).ViewName;
-            defn.Id = "_" + field.Name;
-            defn.Layout = PrepareLayout(ds);
+            
+            defn.Layout = PrepareLayout(defn, _Entity);
             defn.PageSize = 25;
-
+            if (ds.Domain != null)
+            {
+                defn.FixedFilter = ds.Domain;
+            }
+            
             return defn;
         }
 
-        private TList PrepareLayout(PickerDataSource ds)
+
+        private TList PrepareLayout(DataListDefinition ds, DBEntity entity)
         {
+            var fields = new String[] { ds.ItemIdField, ds.ItemViewField };
             var tList = new TList();
-            foreach(var f in ds.Fields)
+            tList.Fields = new List<TField>();
+            foreach(var f in fields)
             {
-                tList.Fields.Add(new TField(){ FieldId = f });
-            }
+                var tfield = new TField()
+                {
+                    FieldId = f
+                };
+                 tList.Fields.Add(tfield);
+            }            
 
             return tList;
         }        

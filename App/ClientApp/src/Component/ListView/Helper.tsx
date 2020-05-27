@@ -1,6 +1,7 @@
 import ActionLink from "../ActionLink";
 import React from "react";
 import { formatValue } from "../../Core/Utils/DataFormatter";
+import { FormControlType } from "../../Constant";
 
 export function cellRenderer(widget: WidgetInfo, val: any): any {
     if (!val) return <div></div>;
@@ -20,6 +21,8 @@ export function cellRenderer(widget: WidgetInfo, val: any): any {
         const { ViewLink } = AdditionalValue;
         let link = { Url: ViewLink };
         return (<ActionLink ActionId={"VIEW"} {...link} Title={d} />);
+    } else if (WidgetType === FormControlType.Image) {
+        return <img alt="example" src={FormatedValue} style={{ width: "200px" }} />;
     }
 
     if ([3,5].indexOf(WidgetType) >= 0) isRightAlign = true;

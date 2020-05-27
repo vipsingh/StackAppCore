@@ -11,7 +11,7 @@ namespace StackErp.DB
 {
     public static partial class EntityDBService
     {
-        public static AnyStatus SaveEntity(IDBEntity entity, EntityModelBase model)
+        public static AnyStatus SaveEntity(StackAppContext appContext, IDBEntity entity, EntityModelBase model)
         {
             var sts = AnyStatus.UpdateFailure;
 
@@ -28,10 +28,19 @@ namespace StackErp.DB
 
                 using (var transaction = connection.BeginTransaction())
                 {
-                    eSave.Save(model, connection, transaction);
-                    transaction.Commit();
-                    
-                    sts = AnyStatus.Success;                    
+                    sts = entity.OnBeforeDbSave(appContext, model, connection, transaction);
+                    if (sts == AnyStatus.Success)
+                    {
+                        eSave.Save(model, connection, transaction);
+                        sts = entity.OnAfterDbSave(appContext, model, connection, transaction);
+                        if (sts != AnyStatus.Success)
+                        {
+                            transaction.Rollback();
+                        } 
+                        else {
+                            transaction.Commit();                            
+                        }                        
+                    }                                        
                 }
             }
 
@@ -73,6 +82,10 @@ namespace StackErp.DB
             toInsert.Add("ID");
             toInsertP.Add("@ID");
             parameters.AddParam(new DynamicDbParam("ID", model.ID, DbType.Int32));
+
+            toInsert.Add("masterid");
+            toInsertP.Add("@MASTERID");
+            parameters.AddParam(new DynamicDbParam("MASTERID", model.MasterId, DbType.Int32));
 
             if (!model.IsNew) {
                 return CreateUpdateQuery(model.DbTableName, fls);
@@ -118,6 +131,8 @@ namespace StackErp.DB
             foreach (var f in model.Attributes)
             {
                 var attr = f.Value;
+                if (!attr.Field.IsDbStore) continue;
+                
                 var dbName = attr.Field.DBName;                
                 var dbType = DBService.GetDbType(attr.Field.Type, attr.Field.BaseType);
                 if (attr.IsChanged)

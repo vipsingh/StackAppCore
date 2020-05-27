@@ -211,12 +211,5 @@ namespace StackErp.Model.Entity
             Type = FieldType.Time;
         }
     }
-
-    public class ImageField: JsonField
-    {
-        public ImageField(): base() {
-            Type = FieldType.Image;
-            BaseType = TypeCode.String;
-        }
-    }
+    
 }

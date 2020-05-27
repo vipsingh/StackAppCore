@@ -26,10 +26,18 @@ namespace StackErp.App
 
             StackErp.Core.Studio.StudioService ser = new Core.Studio.StudioService();
             var enyts = ser.GetAllEntities();
+            
+            var data = new Dictionary<int, string>();
+            data.Add(111, "Customers");
+            data.Add(112, "Product Category");
+            data.Add(113, "Uom");
+            data.Add(115, "Product");
+            data.Add(131, "Area");
+            data.Add(99, "Test");
 
-            foreach(var e in enyts)
+            foreach(var e in data)
             {
-                menues.Add(new ActionInfo("/entity/desk", new RequestQueryString(){ EntityId = e.Get("ID", 0) }, e.Get("ID", "")){ Title = e.Get("Name", ""), ExecutionType = ActionExecutionType.Redirect });
+                menues.Add(new ActionInfo("/entity/desk", new RequestQueryString(){ EntityId = e.Key }, "MENU_" + e.Key.ToString()){ Title = e.Value, ExecutionType = ActionExecutionType.Redirect });
             }
             page.SideMenues = menues;
         }

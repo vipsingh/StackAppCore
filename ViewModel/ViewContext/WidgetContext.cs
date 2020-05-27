@@ -21,6 +21,7 @@ namespace StackErp.ViewModel.ViewContext
         public bool IsReadOnly { set; get; }
         public bool IsRequired { set; get; }
         public FormatInfo FormatInfo { set; get; }
+        public TField LayoutField { set; get; }
         private DynamicObj _parameters;
         public DynamicObj Parameters
         {
@@ -40,10 +41,11 @@ namespace StackErp.ViewModel.ViewContext
             AppContext = formContext.Context;
         }
 
-        public void Build(BaseField field, TField LayoutField)
+        public void Build(BaseField field, TField layoutField)
         {
             if (field != null) 
             {   
+                FieldSchema = field;
                 ControlId = field.ViewName;
                 Caption = field.Text;
                 BaseType = field.BaseType;
@@ -55,14 +57,16 @@ namespace StackErp.ViewModel.ViewContext
                 IsReadOnly = field.IsReadOnly;
             }
 
-            if (LayoutField != null)
-            {
-                if (!String.IsNullOrEmpty(LayoutField.FieldId))
-                    ControlId = LayoutField.FieldId;
-                if (!String.IsNullOrEmpty(LayoutField.Text))
-                    Caption = LayoutField.Text;
+            if (layoutField != null)
+            {   
+                this.LayoutField = layoutField;
+
+                if (!String.IsNullOrEmpty(layoutField.FieldId))
+                    ControlId = layoutField.FieldId;
+                if (!String.IsNullOrEmpty(layoutField.Text))
+                    Caption = layoutField.Text;
                 if (WidgetType == FormControlType.None)
-                    WidgetType = LayoutField.Widget;
+                    WidgetType = layoutField.Widget;
             }
         }
 

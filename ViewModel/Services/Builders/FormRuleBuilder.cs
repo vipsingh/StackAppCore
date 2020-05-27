@@ -7,7 +7,7 @@ using StackErp.Model.Localization;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
-namespace StackErp.ViewModel.Helper
+namespace StackErp.ViewModel.Services
 {
     public class FormRuleBuilder
     {

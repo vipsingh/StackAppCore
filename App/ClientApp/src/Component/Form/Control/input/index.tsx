@@ -6,6 +6,7 @@ export { EntityPicker } from "./EntityPicker";
 export { TextBox, TextArea } from "./TextBox";
 export { DecimalBox, NumberBox } from "./NumberBox";
 export { DateBox } from "./DateBox";
+export { ImageField } from "./ImageField";
 
 export class CheckBox extends React.Component<WidgetInfoProps> {
 

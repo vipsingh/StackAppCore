@@ -13,7 +13,7 @@ namespace StackErp.Core.Metadata
             var entityName = "entitymaster";
 
             var fs = new Dictionary<string, BaseField>();
-            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""Name"",""isrequired"": true}");
+            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""Name"",""dbname"": ""Name"",""isrequired"": true}");
             
             var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("NAME", f);
@@ -22,7 +22,8 @@ namespace StackErp.Core.Metadata
                 {
                     ""fieldtype"": 1,
                     ""fieldname"": ""text"",
-                    ""isrequired"": true
+                    ""isrequired"": true,
+                    ""dbname"": ""text""
                 }
             ");
             
@@ -33,7 +34,8 @@ namespace StackErp.Core.Metadata
                 {
                     ""fieldtype"": 1,
                     ""fieldname"": ""tablename"",
-                    ""isrequired"": true
+                    ""isrequired"": true,
+                    ""dbname"": ""tablename""
                 }
             ");
             
@@ -44,7 +46,8 @@ namespace StackErp.Core.Metadata
                 {
                     ""fieldtype"": 1,
                     ""fieldname"": ""primaryfield"",
-                    ""isrequired"": true
+                    ""isrequired"": true,
+                    ""dbname"": ""primaryfield""
                 }
             ");
             
@@ -55,7 +58,8 @@ namespace StackErp.Core.Metadata
                 {
                     ""fieldtype"": 1,
                     ""fieldname"": ""namefield"",
-                    ""isrequired"": true
+                    ""isrequired"": true,
+                    ""dbname"": ""namefield""
                 }
             ");
             
@@ -78,15 +82,15 @@ namespace StackErp.Core.Metadata
 
             var fs = new Dictionary<string, BaseField>();
             
-            var dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true}");
+            var dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true,""dbname"": ""entityid""}");
             var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("ENTITYID", f);
 
-            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""fieldname"",""isrequired"": true}");
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""fieldname"",""isrequired"": true,""dbname"": ""fieldname""}");
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("FIELDNAME", f);
 
-            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""fieldtype"",""isrequired"": true}");
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""fieldtype"",""isrequired"": true,""dbname"": ""fieldtype""}");
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
             fs.Add("FIELDTYPE", f);
 

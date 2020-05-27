@@ -4,7 +4,7 @@ using StackErp.Model.Form;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
-namespace StackErp.ViewModel.CustomValueBinder
+namespace StackErp.ViewModel.ValueProvider
 {
     public interface ICustomValueBinder
     {

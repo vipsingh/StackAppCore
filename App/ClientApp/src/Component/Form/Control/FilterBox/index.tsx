@@ -5,13 +5,16 @@ import Form from "../../Form";
 import ViewPageInfo from "../../../../Core/Models/ViewPageInfo";
 import _ from "lodash";
 import { EntityPicker } from "../input";
+import { prepareWidgetRequest } from "../../../../Core/Form/Utils/FormUtils";
 
 export default class FilterBox extends React.Component<WidgetInfoProps> {
 
     componentDidMount() {
         const { DataActionLink, api, WidgetId, Value } = this.props as any;
         if (Value && !_.isArray(Value) && DataActionLink) {
-            const req = api.prepareFieldRequest(WidgetId);
+            let req;
+            if (api) req = api.prepareFieldRequest(WidgetId);
+            else req = prepareWidgetRequest(this.props);
 
             window._App.Request.getData({
                 url: DataActionLink.Url,
@@ -28,7 +31,10 @@ export default class FilterBox extends React.Component<WidgetInfoProps> {
     onFieldSelect = (val: any) => {
         const { FilterFormLink, api, WidgetId, Value } = this.props as any;
         if (FilterFormLink) {
-            const req = api.prepareFieldRequest(WidgetId);
+            let req;
+            if (api) req = api.prepareFieldRequest(WidgetId);
+            else req = prepareWidgetRequest(this.props);
+
             req.Value = Object.assign({}, val);
 
             window._App.Request.getData({
@@ -98,11 +104,11 @@ export default class FilterBox extends React.Component<WidgetInfoProps> {
     }
 
     render() {
-        const { Value, api } = this.props;
+        const { Value } = this.props;
         const { SourcePicker } = this.props as any;
 
         return (<div>
-            <EntityPicker {...SourcePicker} api={api} Value={null} onChange={this.onFieldSelect} />
+            <EntityPicker {...SourcePicker} Value={null} onChange={this.onFieldSelect} />
             {
                 _.map(Value, f => {
                     return this.renderFilterRow(f._schema, f._model);

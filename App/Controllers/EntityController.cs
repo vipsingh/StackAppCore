@@ -109,5 +109,16 @@ namespace StackErp.App.Controllers
             
             return null;
         }
+
+        public IActionResult Testx([FromBody]CustomRequestInfo requestInfo)
+        {
+            var ent = Core.EntityMetaData.Get(EntityCode.User);
+            var m = ent.GetDefault();
+            
+            m.SetValue("SubmitAmount", 200);
+            //m.ResolveComputedFields();
+
+            return Content(m.GetValue("TotalAmount").ToString());
+        }
     }
 }

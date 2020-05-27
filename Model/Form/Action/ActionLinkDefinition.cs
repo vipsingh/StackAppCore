@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using StackErp.Model.Entity;
 
 namespace StackErp.Model.Form
 {
@@ -7,7 +8,7 @@ namespace StackErp.Model.Form
     {
         public ActionType ActionType { set; get; }
         public string ActionId { set; get; }
-        public string Visibility { set; get; }
+        public FilterExpression Visibility { set; get; }
         public EntityCode EntityId { set; get; }
         public EntityLayoutType Viewtype { set; get; }
         public List<int> Operations { set; get; }

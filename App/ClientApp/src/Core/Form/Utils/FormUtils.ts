@@ -45,24 +45,41 @@ export function prepareFieldRequest(entitySchema: IPageInfo, model: IDictionary<
         Value,
         WidgetType,
         Caption,
-        EntityInfo: model.EntityInfo,
+        EntityInfo: model.EntityInfo,        
     };
 
     if (Dependency) {
-        req.DependencyInfo = { Dependency };
+        req.DependencyContext = { Dependency };
 
         if (Dependency.Parents) {
             const refData: any = { };
             _.each(Dependency.Parents, (p) => {
                 const f = model[p.WidgetId];
+                const wInfo = entitySchema.getField(p.WidgetId);
                 if (f) {
-                    refData[p.WidgetId] = f.Value;
+                    refData[p.WidgetId] = { WidgetId: wInfo.WidgetId, WidgetType: wInfo.WidgetType, Value: f.Value };
                 }                
             });
             
-            req.DependencyInfo.RefData = refData;
+            req.DependencyContext.RefData = refData;
         }
     }
+
+    //req.Parameters = {};
+
+    return req;
+}
+
+export function prepareWidgetRequest(widget: WidgetInfoProps) {
+    const { WidgetId, Properties, WidgetType, Caption, Value } = widget;
+
+    const req: any = {
+        WidgetId: WidgetId,
+        Properties,
+        Value,
+        WidgetType,
+        Caption      
+    };
 
     return req;
 }

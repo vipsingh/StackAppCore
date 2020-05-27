@@ -8,6 +8,7 @@ namespace StackErp.Model
     public class DBModelBase
     {
         public string DbTableName {protected set; get;}
+        public int MasterId {private set; get; }    
         protected FieldDataCollection _attr;
         public FieldDataCollection Attributes { get => _attr; }
         public Int32 ID { get; protected set; }
@@ -30,17 +31,22 @@ namespace StackErp.Model
             //this._attr = dbData;
             this.ID = _id = dbData.Get("id", 0);                       
         }
+
+        public void SetMasterId(int masterId)
+        {
+            this.MasterId = masterId;
+        }
     }
     
     public class EntityModelBase: DBModelBase
-    {
+    {        
         public IDBEntity Entity {get;}
         public short RecordStatus { get; }        
                
         public DateTime CreatedOn {private set; get; }
         public DateTime UpdatedOn {private set; get; }
         public int CreatedBy {private set; get; }
-        public int UpdatedBy {private set; get; }        
+        public int UpdatedBy {private set; get; }            
 
         public int LayoutId {private set; get; }
         
@@ -53,9 +59,9 @@ namespace StackErp.Model
         {
             Entity = entity;
             DbTableName = entity.DBName;
-        }
+        }        
 
-        public void CreateDefault() {
+        public virtual void CreateDefault() {
             foreach(var f in Entity.Fields)
             {
                 _attr.Add(f.Key, new FieldData(f.Value, f.Value.DefaultValue));
@@ -108,30 +114,40 @@ namespace StackErp.Model
 
             return null;
         }
+        public virtual FieldData GetValueData(string field)
+        {
+            if (_attr.ContainsKey(field.ToUpper())) {
+                var f = _attr[field.ToUpper()];
 
-        public int CurrentStatusId()
+                return f;
+            }
+
+            return null;
+        }
+
+        public virtual int CurrentStatusId()
         {
             return 1;
         }
 
-        public void CopyTo(EntityModelBase model)
+        public virtual void CopyTo(EntityModelBase model)
         {
 
         }
 
-        public void Validate()
+        public virtual void Validate()
         {
 
         }
 
-        public List<FieldData> GetInvalidFields()
+        public virtual List<FieldData> GetInvalidFields()
         {
             return this.Attributes.Where(x => !x.Value.IsValid).Select(x => x.Value).ToList();
         }
         public void SetChangeTrack(bool isOff)
         {
             this.IsChangeTrackOff = isOff;
-        }
+        }               
 
     }
 }

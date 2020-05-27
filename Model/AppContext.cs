@@ -1,10 +1,12 @@
 using System;
+using System.IO;
 
 namespace StackErp.Model
 {
     public class StackAppContext
     {
         public string AppRoot { set; get; }
+        public int MasterId { private set; get; }
         public ApplicationType AppType { set; get; }
         public string ShortDateFormat { set; get; }
         public string LongDateFormat { set; get; }
@@ -14,9 +16,11 @@ namespace StackErp.Model
         public UserContext UserInfo { set; get; }
         public RequestQueryString RequestQuery { set; get; }
         public string NotSpecifiedText { set; get; }
+        public string ImageStorePath { set; get; }
 
         public void Init()
         {
+            MasterId = 10;
             AppType = ApplicationType.Web;            
             AppRoot = "/";
 
@@ -29,6 +33,8 @@ namespace StackErp.Model
             UserInfo = new UserContext();
 
             NotSpecifiedText = "";
+
+            ImageStorePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "dms");
         }
 
         // public bool IsAllow(ItemType itemType, OperationType operationType)

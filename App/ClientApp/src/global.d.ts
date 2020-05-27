@@ -103,7 +103,8 @@ interface ListingProps extends WidgetInfoProps {
     listingSchema: any,
     ListData: any,
     api?: FormApi,
-    SelectionConfig?: any
+    SelectionConfig?: any,
+    FilterBox?: any
 }
 
 interface ActionInfo {

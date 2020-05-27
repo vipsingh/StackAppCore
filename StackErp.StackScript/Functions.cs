@@ -2,13 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Text;
 using Esprima;
-using Esprima.Ast;
-using Esprima.Utils;
 using Newtonsoft.Json;
 using System.Globalization;
+using StackErp.Model;
 
 namespace StackErp.StackScript
 {
@@ -22,6 +19,9 @@ namespace StackErp.StackScript
             _binder.Add("Collection", Collection); //DataType
 
             _binder.Add("iftrue", IfTrue);
+            _binder.Add("ifnull", IfNull);
+
+            _binder.Add("contains", Contains);
 
             _binder.Add("log", Log);
         }
@@ -55,17 +55,23 @@ namespace StackErp.StackScript
             list.AddRange(arguments);
             return list;
         });
+        internal static Function Map => new Function((arguments) =>
+        {
+            var o = new DynamicObj();
+            //
+            return o;
+        });
         #endregion
 
         #region Conditional
         internal static Function IfTrue => new Function((arguments) =>
         {
             if (arguments.Count <= 1 )
-                throw new ScriptException("Invalid arguments in IfNull");
+                throw new ScriptException("Invalid arguments in IfTrue");
 
             var arg1 = arguments.Get(0);
             if (!(arg1 is Boolean))
-                throw new ScriptException("Invalid condition in IfNull");
+                throw new ScriptException("Invalid condition in IfTrue");
 
             if ((Boolean)arg1 == true) {
                 return arguments.Get(1);
@@ -73,8 +79,45 @@ namespace StackErp.StackScript
                 return arguments.Count > 2 ? arguments.Get(2) : null;
             }
         });
+
+        internal static Function IfNull => new Function((arguments) =>
+        {
+            if (arguments.Count <= 1 )
+                throw new ScriptException("Invalid arguments in IfNull");
+
+            var arg1 = arguments.Get(0);
+
+            if (arg1 == null) {
+                return arguments.Get(1);
+            } else {
+                return arguments.Count > 2 ? arguments.Get(2) : null;
+            }
+        });
         #endregion
         
+        #region Utility
+        internal static Function Contains => new Function((arguments) =>
+        {
+            if (arguments.Count <= 1 )
+                throw new ScriptException("Invalid arguments in Contains");
+
+            var arg1 = arguments.Get(0);
+            var arg2 = arguments.Get(1);
+
+            if (arg1 is string) {
+                if (arg2 is string)
+                    return ((string)arg1).Contains((string)arg2);
+                else
+                    throw new ScriptException("Invalid second argument in Contains");
+            }
+            else if (arg1 is IList)
+            {
+                return ((IList)arg1).Contains(arg2);
+            }
+
+            throw new ScriptException("Invalid arguments in Contains.");
+        });
+        #endregion        
     } 
 
     public class Arguments : IEnumerable<object>

@@ -26,16 +26,19 @@ class GridView extends React.Component<{
     }
 
     prepareAntTableSchema(columns: Dictionary<any>) {
-        return  _.map(Object.keys(columns), (k: string) => {
-            const c =  columns[k];
+        return  _.reduce(Object.keys(columns), (result: Array<any>, value: any) => {
+            const c =  columns[value];
+            if (c.IsHidden) return result;
 
-            return {
+            result.push({
                 title: c.WidgetId,
                 dataIndex: c.WidgetId, 
                 key: c.WidgetId,
                 render: this.formatCell.bind(this, c)
-            };
-        });
+            });
+
+            return result;
+        }, []);
     }    
 
     render() {

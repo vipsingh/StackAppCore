@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model.Entity
 {
-    public class FilterExpression
+    public class FilterExpression: ICloneable
     {
         private List<FilterExpField> _data;
         public EntityCode EntityId {get;}
@@ -71,34 +71,60 @@ namespace StackErp.Model.Entity
                 exp.Add(FilterExpField.BuildFromJson(obj));
             }
         }
+
+        public FilterExpression DeepClone()
+        {
+            var e = (FilterExpression)this.MemberwiseClone(); 
+            var d = new List<FilterExpField>();
+            foreach(var f in this._data)
+            {
+                d.Add((FilterExpField)f.Clone());
+            }
+            e._data = d;
+
+            return e;
+        }
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
     }
 
-    public class FilterExpField
+    public class FilterExpField: ICloneable
     {
         public string FieldName {get;}
-        public string Value {get;}
+        public object Value { private set; get;}
+        public string Exp { private set; get;}
         public BaseField Field {get;}
         public FilterOperationType Op {get;}
-        public FilterValueType ValueType {get;}
+        public FilterValueType ValueType {private set; get;}
 
         public Int16 SeqId {set;get;}
-        internal bool IsValueResolved = true;
-        public  FilterExpField(string field, FilterOperationType op, string value) {
+        public bool IsValueResolved { get => this.ValueType == FilterValueType.Value; }
+        public  FilterExpField(string field, FilterOperationType op, object value) {
             FieldName = field;
             Op=op;
             Value = value;
             ValueType = FilterValueType.Value;
 
-            if (!String.IsNullOrWhiteSpace(value) && value.StartsWith("${")) 
+            if (value is string && !String.IsNullOrWhiteSpace((string)value) && ((string)value).Trim().StartsWith("@")) 
             {
-                this.IsValueResolved = false;
+                var v = (string)value;
                 ValueType = FilterValueType.EntityField;
-                if (value.Contains("stack.")) 
+                if (v.Trim().StartsWith("@$")) 
                 {
                     ValueType = FilterValueType.AppField;
                 }
-                Value = value.Replace("${", "").Replace("}", "").Trim();
+                Value = v.Replace("@", "").Trim();
+                Exp = v;
             }
+            //todo: handle also expression "@x + 1"
+        }
+
+        public void SetResolvedValue(object value)
+        {
+            this.Value = value;
+            this.ValueType = FilterValueType.Value;            
         }
 
         internal JObject ToJSONObj()
@@ -139,6 +165,11 @@ namespace StackErp.Model.Entity
                     return v;
                 }
             return null;
+        }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
         }
     }
 

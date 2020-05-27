@@ -46,6 +46,12 @@ namespace StackErp.Model.Layout
                     }
                 }
         }
+
+        public static TView ParseFromXml(string xml)
+        {
+            var ser = new LayoutViewSerialzer();
+            return ser.SerializeTView(xml);
+        }
     }
     public class TRow
     {
@@ -67,6 +73,9 @@ namespace StackErp.Model.Layout
         public string Domain { set; get; }
         [JsonIgnore]
         public FormControlType Widget { set; get; }
+        public string Format { set; get; }
+        public string Width { set; get; }
+        public DynamicObj Style { set; get; }
         public static TField FromXmlNode(XmlNode node)
         {
             var f = new TField();
@@ -115,15 +124,5 @@ namespace StackErp.Model.Layout
         public string Text {set;get;}
         [XmlAttribute]
         public string Position {set;get;}
-    }
-    public class TList
-    {
-        public string Id  { set; get; }
-        public string Text  { set; get; }
-        public List<TField> Fields { set; get; }
-        public TList()
-        {
-            Fields = new List<TField>();
-        }
-    }
+    }    
 }

@@ -21,11 +21,11 @@ namespace StackErp.Model.Entity
         public bool IsRequired { set; get; }
         public bool IsUnique { set; get; }
         public IFieldValidation Validations { set; get; }
-        public object Computed { set; get; }
+        public bool IsComputed { set; get; }
+        public EvalExpression ComputeExpression { set; get; }
         public bool IsDbStore { set; get; }
         public bool Copy { set; get; }
         public EntityCode RefObject { set; get; }
-        public string Domain { set; get; }
         public DynamicObj Properties { set; get; }
         public string TableName { set; get; }
         public bool IsMultiSelect { set; get; }
@@ -37,13 +37,15 @@ namespace StackErp.Model.Entity
         public ControlDefinition ControlInfo { set; get; }
 
         public string LinkFieldName { set; get; }
-        //Related: {LinkFieldName: string, Field: string}        
+        public FieldPathExpression Related { set; get; }
         //OnChangeInfo: { DependUpon: string[] }
 
         public short DecimalPlace {set;get;}
         public bool AllowZero { get; set; }
 
         public FormatInfo FormatInfo { get; set; }
+
+        public DynamicObj _TempSchemaData { get; set; }
 
         public BaseField() {
             Properties = new DynamicObj();
@@ -58,6 +60,7 @@ namespace StackErp.Model.Entity
             FormatInfo.FieldBaseType = this.BaseType;
             OnInit();
             _isInit  = true;
+            _TempSchemaData = null;
         }
         public virtual void OnInit()
         {
@@ -87,7 +90,7 @@ namespace StackErp.Model.Entity
         {
             var v = db.Get(this.DBName, String.Empty);
 
-            return v;
+            return DataHelper.GetDataValue(v, this.BaseType);
         }
         
     }
@@ -95,12 +98,12 @@ namespace StackErp.Model.Entity
     public class ControlDefinition 
     {
         public object Visibility {set;get;}
-        public object DataLinking {set;get;}
+        //public object DataLinking {set;get;}
         public SourceDataMap DataMapping {set;get;}
-        public PickerDataSource DataSource {set;get;}        
+        public FieldDataSource DataSource {set;get;}        
 
         public FieldAttribute FieldAttribute {set;get;}
-        public int LookupId  {set;get;}
+        public int CollectionId  {set;get;}
         public bool IsMultiSelect  {set;get;}
     }
 
@@ -125,25 +128,26 @@ namespace StackErp.Model.Entity
         public EntityCode RefEntity {set;get;}
     }
 
-    public class PickerDataSource
+    public class FieldDataSource
     {
         public int SourceId {set;get;} 
-        public string Type {set;get;} //ENTITY,SERVICE,FUNCTION
+        public DataSourceType Type {set;get;}
         public EntityCode Entity {set;get;}
-        public List<string> Fields {set;get;}
-        public string IdField {set;get;}
-        public string SortOnField {set;get;}
+        // public List<string> Fields {set;get;}
+        // public string IdField {set;get;}
+        // public string SortOnField {set;get;}
         public string FunctionName {set;get;}
         public List<EvalParam> ParamMappings {set;get;}
-        public string Domain {set;get;}
+        public FilterExpression Domain {set;get;}
     }
 
     public class DummyField: BaseField
     {
-        public DummyField(string name, FieldType type)
+        public DummyField(string name, FieldType type, TypeCode baseType)
         {
             this.Name = DBName = name;
             this.Type = type;
+            this.BaseType = baseType;
         }
     }
 

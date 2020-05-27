@@ -17,7 +17,7 @@ namespace StackErp.ViewModel.FormWidget
         public string Caption { private set; get; }
         public virtual FormControlType WidgetType { get => FormControlType.None; }
         public string WidgetId { private set; get; }
-        public bool IsHidden { private set; get; }
+        public bool IsHidden { set; get; }
         public object Value { protected set; get; }
         public DynamicObj AdditionalValue { protected set; get; }
         public string FormatedValue { protected set; get; }
@@ -33,9 +33,9 @@ namespace StackErp.ViewModel.FormWidget
         public bool IsRequired { private set; get; }
         public ActionInfo DataActionLink { protected set; get; }
         public List<int> RuleToFire  { protected set; get; }
-        // Dependency: { Parents: Array<{Id: string}>, Children: Array<{Id: string}> }
-        // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }
-        public bool IsEditable { protected set; get; }
+        public WidgetDependencyInfo Dependency { set; get; }
+        public WidgetFeatures Features { set; get; }
+        // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }        
         protected object PostValue { private set; get; }
 
         public BaseWidget(WidgetContext context)
@@ -167,6 +167,11 @@ namespace StackErp.ViewModel.FormWidget
         {
             //WidgetFormatInfo
         }
+
+        public virtual void OnCompileComplete(FormContext formContext)
+        {
+
+        }
     }
 
     public class WidgetFormatInfo
@@ -175,5 +180,51 @@ namespace StackErp.ViewModel.FormWidget
         public string ColorCode { set; get; }
         public string FontSize {set;get;}
         public string FontWeight {set;get;}
+    }
+
+    public class ValueWidget: BaseWidget
+    {
+        public override FormControlType WidgetType { get => FormControlType.None; }
+        public ValueWidget(WidgetContext cntxt): base(cntxt)
+        {
+
+        }
+
+        public override void OnCompile()
+        {
+            
+        }
+    }
+
+    public class WidgetFeatures
+    {
+        public WidgetFeature Eval {set;get;}
+        public WidgetFeature Invisible {set;get;}
+        public WidgetFeature Mandatory {set;get;}
+        public List<WidgetFeature> Options {set;get;}
+    }
+
+    public class WidgetFeature: DynamicObj
+    {
+        public FormFilterExpression Criteria { 
+            set {
+                this.Add("Criteria", value, true);
+            } 
+            get
+            {
+                return this.Get<FormFilterExpression>("Criteria", null);
+            }
+        }
+
+        public List<string> Depends { 
+            set {
+                this.Add("Depends", value, true);
+            } 
+            get
+            {
+                return this.Get<List<string>>("Depends", null);
+            }
+        }
+        
     }
 }

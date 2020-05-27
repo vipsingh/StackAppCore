@@ -13,17 +13,24 @@ namespace StackErp.Core.DataList
     {
         public DataListDefinition GetEntityListDefn(EntityCode entityId, int queryId = 0)
         {
-            var layout = new EntityLayoutService(null, entityId);
+            var deff = ListDbService.GetEntityList(entityId);
+            deff.Id = entityId.Code.ToString() + "_" + queryId.ToString();
+            deff.PageSize = 50;
+            //var layout = new EntityLayoutService(null, entityId);
             var _Entity = Core.EntityMetaData.Get(entityId);
-            var defn = new DataListDefinition();
-            defn.EntityId = entityId;
-            defn.ItemIdField = "Id";
-            defn.Id = entityId.Code.ToString() + "_" + queryId.ToString();
-            defn.Layout = layout.PrepareListLayout(queryId);
-            defn.ItemViewField = _Entity.GetFieldSchema(_Entity.TextField).ViewName;
-            defn.PageSize = 50; 
 
-            return defn;
+            //var defn = new DataListDefinition();
+            // defn.DataSource = new FieldDataSource() {
+            //     Type = DataSourceType.Entity,
+            //     Entity = entityId
+            // };
+
+            //defn.Id = entityId.Code.ToString() + "_" + queryId.ToString();
+            //defn.Layout = layout.PrepareListLayout(queryId);
+            //defn.ItemViewField = _Entity.GetFieldSchema(_Entity.TextField).ViewName;
+            //defn.PageSize = 50; 
+
+            return deff;
         }
 
         public List<DynamicObj> ExecuteData(DbQuery query, Func<string, object, DynamicObj, object> onFormattedFieldValue)

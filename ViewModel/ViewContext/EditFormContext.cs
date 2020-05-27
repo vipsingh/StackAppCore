@@ -2,6 +2,7 @@ using System;
 using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.ViewModel.Model;
+using StackErp.ViewModel.ValueProvider;
 
 namespace StackErp.ViewModel.ViewContext
 {
@@ -29,6 +30,23 @@ namespace StackErp.ViewModel.ViewContext
                 EntityModel = this.Entity.GetDefault();
             else
                 EntityModel = this.Entity.GetSingle(this.EntityModelInfo.ObjectId);
+        }
+
+        public void PrepareLinkedData(CustomRequestInfo requestInfo)
+        {
+            if (requestInfo.DependencyContext != null && requestInfo.DependencyContext.RefData != null)
+            {
+                var valueProvider = new FormValueProvider(this);
+                var refrences = new DynamicObj();
+                foreach(var d in requestInfo.DependencyContext.RefData)
+                {
+                    object val;
+                    valueProvider.ResolveFieldValue(d.Value, out val);
+                    refrences.Add(d.Key, val);
+                }
+
+                this.AddParameter(ViewConstant.LinkedData, refrences);
+            }
         }
     }
 }

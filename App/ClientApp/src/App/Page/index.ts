@@ -13,6 +13,7 @@ export default function() {
     PageFactory.addPage(PageType.Desk, Desk);
     PageFactory.addPage(PageType.Edit, NewEdit);
     PageFactory.addPage(PageType.Detail, Detail);
+    PageFactory.addPage(PageType.Error, ErrorPage);
 }
 
 // const getPage = (type: number) => {

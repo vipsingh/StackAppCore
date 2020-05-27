@@ -1,6 +1,6 @@
 using System;
 
-namespace StackErp.ViewModel.CustomValueBinder
+namespace StackErp.ViewModel.ValueProvider
 {
     public static class CustomValueBinderFactory
     {

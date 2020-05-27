@@ -19,13 +19,10 @@ namespace StackErp.Model.Entity
         private void BuildPickerDataSource()
         {
             var refEntity = this.Entity.GetEntity(EntityCode.EntitySchema);
-            this.ControlInfo.DataSource = new PickerDataSource {
-                Type = "ENTITY",
+            this.ControlInfo.DataSource = new FieldDataSource {
+                Type = DataSourceType.Entity,
                 Entity = EntityCode.EntitySchema,
-                Fields = new List<string>(){refEntity.TextField},
-                IdField = refEntity.IDField,
-                SortOnField = "",
-                Domain = "[[entityid,0,1]]" //this.Domain
+                //Domain = "[[entityid,0,1]]" //this.Domain
             };
         }
     }

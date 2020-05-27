@@ -29,15 +29,15 @@ namespace StackErp.ViewModel.DataList
         {
             var formContext = new ViewContext.DetailFormContext(context.Context, context.SourceEntityId, context.Context.RequestQuery);
             
-            AddField(context, formContext, new TField { FieldId = context.IdColumn });
+            AddField(context, formContext, new TField { FieldId = context.IdColumn }, true);
 
-            foreach(var tField in defn.Layout.Fields)
+            foreach(var lField in defn.Layout.GetLayoutFields())
             {
-                AddField(context, formContext, tField);
+                AddField(context, formContext, lField);
             }
         }
 
-        protected void AddField(DataListContext context, FormContext formContext, TField tField)
+        protected void AddField(DataListContext context, FormContext formContext, TField tField, bool isHidden = false)
         {
                 BaseField field = null;
                 field = context.SourceEntity.GetFieldSchema(tField.FieldId);
@@ -45,7 +45,12 @@ namespace StackErp.ViewModel.DataList
                 if (field != null && !context.Fields.ContainsKey(tField.FieldId))
                 {
                     var w = BuildWidget(formContext, field);
+                    w.IsHidden = isHidden;
                     context.Fields.Add(tField.FieldId.ToUpper(), w);
+                }
+                else 
+                {
+                    context.Fields[tField.FieldId].IsHidden = isHidden;
                 }
         }
 
@@ -64,6 +69,9 @@ namespace StackErp.ViewModel.DataList
         {
             EntityListService service = new EntityListService();
             var data = service.ExecuteData(context.DbQuery, (string fieldName, object val, DynamicObj row) => {
+                if (!context.Fields.ContainsKey(fieldName))
+                    return new { Value = val };
+
                 context.Fields[fieldName].ClearValue();
 
                 context.Fields[fieldName].SetValue(val);
@@ -84,8 +92,13 @@ namespace StackErp.ViewModel.DataList
         {
             if (!String.IsNullOrEmpty(defn.ItemViewField) && widget.WidgetId == defn.ItemViewField)
             {
-                widget.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(defn.EntityId, row.Get(ViewConstant.RowId, 0)).Url);
+                widget.SetAdditionalValue(ViewConstant.ViewLink, StackErp.Model.AppLinkProvider.GetDetailPageLink(defn.DataSource.Entity, row.Get(ViewConstant.RowId, 0)).Url);
             }
+        }
+
+        protected virtual void PrepareFilterBar()
+        {
+
         }
     }
 }

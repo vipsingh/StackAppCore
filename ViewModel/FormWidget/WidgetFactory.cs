@@ -12,7 +12,7 @@ namespace StackErp.ViewModel.FormWidget
         static WidgetFactory()
         {
             _widgets = new Dictionary<int, Func<WidgetContext, BaseWidget>>();
-            Add(FormControlType.None, GetLabel);       
+            Add(FormControlType.None, GetValueWidget);
             Add(FormControlType.Label, GetLabel);
             Add(FormControlType.TextBox, GetText);
             Add(FormControlType.DatePicker, GetDatePicker);
@@ -21,7 +21,8 @@ namespace StackErp.ViewModel.FormWidget
             Add(FormControlType.EntityPicker, GetObjectPicker);
             Add(FormControlType.NumberBox, GetNumber);
             Add(FormControlType.CheckBox, GetCheckBox);
-            Add(FormControlType.LongText, GetText);        
+            Add(FormControlType.LongText, GetText);     
+            Add(FormControlType.Image, GetImage);     
 
             Add(FormControlType.EntityListView, GetEntityList);
             Add(FormControlType.EntityFilter, GetFilterWidget);
@@ -56,6 +57,11 @@ namespace StackErp.ViewModel.FormWidget
             return new LabelWidget(cntxt);
         }
 
+        private static BaseWidget GetValueWidget(WidgetContext cntxt)
+        {
+            return new ValueWidget(cntxt);
+        }
+
         private static BaseWidget GetDropdown(WidgetContext cntxt)
         {
             return new DropdownWidget(cntxt);
@@ -83,7 +89,11 @@ namespace StackErp.ViewModel.FormWidget
         {
             return new CheckBoxWidget(cntxt);
         }
-
+        
+        private static BaseWidget GetImage(WidgetContext cntxt)
+        {
+            return new ImageField(cntxt);
+        }
         //**********************
         private static BaseWidget GetEntityList(WidgetContext cntxt)
         {

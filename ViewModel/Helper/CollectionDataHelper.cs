@@ -6,13 +6,13 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel.Helper
 {
-    public class LookupDataHelper
+    public class CollectionDataHelper
     {
-        public static List<SelectOption> GetLookupData(WidgetContext context, List<int> values = null)
+        public static List<SelectOption> GetCollectionData(WidgetContext context, List<int> values = null)
         {
-            if (context.ControlDefinition != null && context.ControlDefinition.LookupId > 0)
+            if (context.ControlDefinition != null && context.ControlDefinition.CollectionId > 0)
             {
-                var data = LookupService.GetLookupData(context.ControlDefinition.LookupId, values);
+                var data = CollectionService.GetCollectionData(context.ControlDefinition.CollectionId, values);
                 var list = new List<SelectOption>();
                 foreach(var o in data)
                 {

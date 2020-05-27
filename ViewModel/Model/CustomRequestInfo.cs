@@ -9,14 +9,15 @@ namespace StackErp.ViewModel.Model
     {
         public int Mode {set;get;}
         public string WidgetId {set;get;}
-        public UIFormField Value {set;get;}
+        public object Value {set;get;}
         public FormControlType WidgetType {set;get;}
         public string Caption {set;get;}
-        public UIFormModel Model {set;get;}
-        public ObjectModelInfo ModelInfo {set;get;}
+        //public UIFormModel Model {set;get;}
+        public ObjectModelInfo EntityInfo {set;get;}
         public DynamicObj Properties {set;get;}
         public RequestQueryString RequestQuery {set;get;}
-        public object LinkInfo {set;get;}
+        public DependencyDataContext DependencyContext  {set;get;}
+        public DynamicObj Parameters {set;get;}
     }
 
     public class ListRequestinfo

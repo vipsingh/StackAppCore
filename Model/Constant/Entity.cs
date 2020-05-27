@@ -23,13 +23,13 @@ public enum FieldType {
     Html = 17,
     Xml = 18,
     KeyPair = 19,
-    ObjectList = 20,
-    Computed = 21,
-    Password = 22,
-    File = 23,
+    OneToMany = 20,
+    OneToOne = 21,
+    Password = 23,    
     Json = 24,
     ObjectKey = 25,
-    FilterField = 26
+    FilterField = 26,
+    File = 27,
 }
     
     public enum EntityRelationType 
@@ -83,4 +83,13 @@ public enum QueryType
         Search = 3
     }
 
+   public enum DataSourceType
+    {
+        Entity = 1,
+        StackScript = 2,
+        Function = 3,
+        Service = 4,
+        Table = 5 // table should be defined in t_customtables
+        
+    }
 }

@@ -20,13 +20,15 @@ namespace StackErp.ViewModel.FormWidget
         DynamicObj Properties { get; }
         bool IsReadOnly { get; }
         bool IsRequired {get; }
-        bool IsEditable { get; }
         string WidgetFormatInfo { get; }
         InvariantDictionary<IValidation> Validation { get; }
         ActionInfo DataActionLink { get; }
         List<int> RuleToFire  { get; }
+        WidgetDependencyInfo Dependency { set; get; }
+        WidgetFeatures Features { set; get; }
 
         void OnCompile();
+        void OnCompileComplete(FormContext formContext);
         bool SetValue(object value);
     }
 

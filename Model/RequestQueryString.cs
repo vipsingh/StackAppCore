@@ -77,12 +77,21 @@ namespace StackErp.Model
             get { return GetInt("FieldId"); }
             set { this["FieldId"] = value.ToString(); }
         }
+        public string FieldName
+        {
+            get { return GetString("FieldName"); }
+            set { this["FieldName"] = value.ToString(); }
+        }
         public string WidgetId
         {
             get { return GetString("WidgetId"); }
             set { this["WidgetId"] = value.ToString(); }
         }
-
+        public string Name
+        {
+            get { return GetString("Name"); }
+            set { this["Name"] = value.ToString(); }
+        }
         private int GetInt(string param)
         {
             string val = GetData(param);

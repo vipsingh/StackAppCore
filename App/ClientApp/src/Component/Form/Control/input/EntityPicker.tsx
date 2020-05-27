@@ -4,6 +4,7 @@ import _ from "lodash";
 import GridView from "../../../ListView/GridView";
 import { Button, Modal, Input, Row, Col } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
+import { prepareWidgetRequest } from "../../../../Core/Form/Utils/FormUtils";
 
 //const Option = AutoComplete.Option;
 
@@ -66,6 +67,15 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
     //       });
     // }
 
+    getFieldRequest = () => {
+        const { api,WidgetId } = this.props;
+        let req;
+        if (api) req = api.prepareFieldRequest(WidgetId);
+        else req = prepareWidgetRequest(this.props);
+
+        return req;
+    }
+
     render() {
         const { Value, DataActionLink, WidgetId, api } = this.props; 
         let text = "";
@@ -83,8 +93,8 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
             {!this.state.visible || <EntityPickerView 
                 DataActionLink={DataActionLink} 
                 WidgetId={WidgetId} 
-                api={api} 
                 SelectionConfig={this.selectionConfig} 
+                getFieldRequest={this.getFieldRequest}
                 onSelect={this.handleOk} />}
             </div>);        
     }
@@ -95,7 +105,7 @@ class EntityPickerView extends React.PureComponent<{
     onSelect: Function,
     DataActionLink: any, 
     WidgetId: string,
-    api: FormApi
+    getFieldRequest: Function
 }, any> {
     gridRef: any
     loadedSource: boolean
@@ -118,16 +128,16 @@ class EntityPickerView extends React.PureComponent<{
         // if (!(tdata.isReloadRequired || !this.loadedSource))
         //     return;
 
-        const {DataActionLink, WidgetId, api} = this.props;
+        const {DataActionLink, WidgetId, getFieldRequest} = this.props;
         const { Url } = DataActionLink;
-        const req = api.prepareFieldRequest(WidgetId);        
+        const req = getFieldRequest(WidgetId);        
 
         this.setState({ IsFetching: true });
 
         window._App.Request.getData({
             url: Url,
             type: "POST",
-            body: req
+            body: {RequestType: 0, RequestInfo: req}
         }).then((res: any) => {
             if (res.Data) {
                 // if dropdown type

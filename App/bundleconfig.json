@@ -4,5 +4,12 @@
       "inputFiles": [
         "wwwroot/static/css/*.css"
       ]
-    }    
+    },
+    {
+      "outputFileName": "wwwroot/js/sitex.js",
+      "inputFiles": [
+        "wwwroot/static/js/*.js"
+      ],
+      "sourceMap": true
+    }     
 ]

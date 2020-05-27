@@ -84,7 +84,7 @@ namespace StackErp.UI.View.PageGenerator
                 q = new RequestQueryString();
                 foreach(var p in definition.QueryParam)
                 {
-                    q.Add(p.Name, ValueResolver.ResolveValue(context, p).ToString());
+                    q.Add(p.Name, ValueResolver.ResolveValue(context, p.Value).ToString());
                 }
             }
 

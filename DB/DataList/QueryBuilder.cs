@@ -28,7 +28,7 @@ namespace StackErp.DB.DataList
         {
             _QueryInfo = queryInfo;
         }
-        List<(string, string, string)> _addedFields;
+        List<(string, string, string)> _selectFields;
         List<(string, string, string)> _toJoinTables;
         string _entTable;
         short idx = 0;
@@ -36,10 +36,10 @@ namespace StackErp.DB.DataList
         {
             _entTable = _QueryInfo.Entity.DBName;
 
-            _addedFields = new List<(string, string, string)>();
+            _selectFields = new List<(string, string, string)>();
             _toJoinTables = new List<(string, string, string)>();
 
-            _addedFields.Add(("ID", _entTable + ".id", "id"));
+            AddSelectField("ID", _entTable + ".id", "id");
 
             var fields = _QueryInfo.Fields;
             
@@ -48,19 +48,23 @@ namespace StackErp.DB.DataList
             foreach (var field in fields)
             {
                 var fieldSchema = field.Field;
-                _addedFields.Add((field.FieldName, _entTable + "." + fieldSchema.DBName, field.FieldName));
-                if (fieldSchema.RefObject.Code > 0)
+                if (field.IsSelect)
                 {
-                    var rel = relations.Find(x => x.ParentRefField.Name == fieldSchema.Name);
-                    if(rel != null)
+                    AddSelectField(field.FieldName, _entTable + "." + fieldSchema.DBName, field.FieldName);
+
+                    if (fieldSchema.RefObject.Code > 0)
                     {
-                        AddRefTable(rel);
+                        var rel = relations.Find(x => x.ParentRefField.Name == fieldSchema.Name);
+                        if(rel != null)
+                        {
+                            AddRefTable(rel);
+                        }
                     }
                 }
             }
 
             var selectSql = PrepareSelectQuery();
-            var where = PrepareFilterSql(_QueryInfo, _QueryInfo.Filters);
+            var where = PrepareWhereExp(_QueryInfo, _QueryInfo.FixedFilter, _QueryInfo.Filters);
 
             var q = selectSql + (String.IsNullOrEmpty(where)? "" : " WHERE " + where);
 
@@ -74,7 +78,7 @@ namespace StackErp.DB.DataList
             var shouldJoin = false;
                 if (rel.Type == EntityRelationType.LINK)
                 {
-                    _addedFields.Add((rel.ParentRefField.Name, $"{idf}.{rel.ChildRefField.DBName}", $"{rel.ParentRefField.Name}__name"));
+                    AddSelectField(rel.ParentRefField.Name, $"{idf}.{rel.ChildDisplayField.DBName}", $"{rel.ParentRefField.Name}__name");                    
                     //_addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
                     shouldJoin = true;
                 }
@@ -87,10 +91,16 @@ namespace StackErp.DB.DataList
             idx++;
         }
 
+        private void AddSelectField(string fieldName, string queryName, string queryAlias)
+        {
+            if (_selectFields.Where(x => x.Item2.ToLower() == queryName.ToLower()).Count() == 0)
+                _selectFields.Add((fieldName, queryName, queryAlias));
+        }
+
         string PrepareSelectQuery()
         {
             List<string> selectExp = new List<string>();
-            _addedFields.ForEach(x =>
+            _selectFields.ForEach(x =>
             {
                 selectExp.Add($"{x.Item2} as {x.Item3}");
             });
@@ -121,12 +131,24 @@ namespace StackErp.DB.DataList
 
             return param;
         }
-        public static string PrepareFilterSql(DbQuery qInfo, FilterExpression filters)
+
+        public static string PrepareWhereExp(DbQuery qInfo, FilterExpression fixedFilter, FilterExpression filters)
+        {
+            var whereFix = PrepareFilterSql(qInfo, fixedFilter);
+
+            var whereQ = PrepareFilterSql(qInfo, filters);
+
+            if (string.IsNullOrEmpty(whereFix))
+                return whereQ;
+
+            return whereFix + (String.IsNullOrEmpty(whereQ) ? "": $" AND ({whereQ})"); 
+        }
+        public static string PrepareFilterSql(DbQuery qInfo, FilterExpression filterExp)
         {
             var sql = new List<string>();
-            if (filters != null)
+            if (filterExp != null)
             {
-                foreach(var filter in filters.GetAll())
+                foreach(var filter in filterExp.GetAll())
                 {
                     var dbField = qInfo.Fields.Find(x=>x.FieldName == filter.FieldName);                   
                     sql.Add(getFieldFilterString(dbField, filter));
@@ -137,7 +159,7 @@ namespace StackErp.DB.DataList
 
         private static string getFieldFilterString(DbQueryField dbField, FilterExpField filter)
         {
-            var op = GetSqlOpOp(filter.Op, filter.Value);
+            var op = GetSqlOpOp(filter.Op, filter.Value.ToString());
             Func<DbQueryField, string, string> getSqlVal =  (DbQueryField DbQueryField, string v) => { 
                 return IsNumericVal(dbField.Field) ? v: "'" + v + "'"; 
             };

@@ -4,6 +4,7 @@ using StackErp.Model.Entity;
 using StackErp.Model.Form;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
+using StackErp.ViewModel.ValueProvider;
 using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel
@@ -14,10 +15,12 @@ namespace StackErp.ViewModel
         public AnyStatus Status;
 
         public EntityModelBase RecordModel {private set; get;}
+        private FormValueProvider ValueProvider;
         public EntityModelGenerator(EditFormContext context)
         {
             _formContext = context;
             Status = AnyStatus.NotInitialized;
+            ValueProvider = new FormValueProvider(context);
         }
         public EntityModelBase Generate(UIFormModel model)
         {
@@ -37,48 +40,13 @@ namespace StackErp.ViewModel
         {
             foreach(var modelField in model.Widgets)
             {
-                ResolveFieldValue(modelField.Value);
+                ValueProvider.ResolveFieldValue(modelField.Value, SetModelValue);
             }
-        }
+        }        
 
-        public object ResolveFieldValue(UIFormField formField) 
+        private void SetModelValue(object value, BaseField fieldSchema)
         {
-                var fieldSchema = this._formContext.GetField(formField.WidgetId);
-                var widget = BuildWidget(fieldSchema, formField);
-                if (widget != null)
-                {
-                    this._formContext.AddControl(widget);
-
-                    return SetValue(widget, formField, fieldSchema);
-                }
-
-                return null;
-        }
-
-        public BaseWidget BuildWidget(BaseField field, UIFormField fieldValue)
-        {   
-            var widgetContext = new WidgetContext(this._formContext);
-            widgetContext.Build(field, null);
-            widgetContext.WidgetType = (FormControlType)fieldValue.WidgetType;
-            widgetContext.PostValue = fieldValue.Value;
-
-            var widget = WidgetFactory.Create(widgetContext);
-            return widget;
-        }
-
-        protected object SetValue(BaseWidget widget, UIFormField fieldValue, BaseField fieldSchema)
-        {
-            //if CustomValueBinder exists then call it else
-            var value = widget.GetValue();
-
-            SetModelValue(fieldSchema, value);
-
-            return value;
-        }   
-
-        private void SetModelValue(BaseField fieldSchema, object value)
-        {
-            if (RecordModel != null) {
+            if (fieldSchema != null && RecordModel != null) {
                 RecordModel.SetValue(fieldSchema.Name, value);
             }
         }     

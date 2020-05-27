@@ -6,7 +6,7 @@ using System.Linq;
 namespace StackErp.Model.Entity
 {
     public class SelectField: BaseField {
-        public int LookupId {set;get;}
+        public int CollectionId {set;get;}
         public bool IsPickList {set;get;}
         public List<SelectOption> PickList {set;get;}
         public SelectField(): base() {
@@ -17,7 +17,7 @@ namespace StackErp.Model.Entity
         public override void OnInit()
         {
             base.OnInit();
-            ControlInfo.LookupId = this.LookupId;
+            ControlInfo.CollectionId = this.CollectionId;
             ControlInfo.IsMultiSelect = this.IsMultiSelect;
         }
 
@@ -36,7 +36,7 @@ namespace StackErp.Model.Entity
             }
             else
             {
-                if (value is IEnumerable) {
+                if (value is IEnumerable<int> || value is IEnumerable<string>) {
                     List<int> data = new List<int>();
                     foreach(var o in (IEnumerable)value) {
                         int number;
@@ -108,13 +108,11 @@ namespace StackErp.Model.Entity
         private void BuildPickerDataSource()
         {
             var refEntity = this.Entity.GetEntity(this.RefObject);
-            this.ControlInfo.DataSource = new PickerDataSource {
-                Type = "ENTITY",
+            var filterDomain = this._TempSchemaData.Get("linkentity_domain", "");
+            this.ControlInfo.DataSource = new FieldDataSource {
+                Type = DataSourceType.Entity,
                 Entity = this.RefObject,
-                Fields = new List<string>(){refEntity.TextField},
-                IdField = refEntity.IDField,
-                SortOnField = "",
-                Domain = this.Domain
+                Domain = FilterExpression.BuildFromJson(this.RefObject, filterDomain)
             };
         }
     }    

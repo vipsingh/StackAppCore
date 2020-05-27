@@ -27,7 +27,7 @@ public enum FormControlType {
     Label = 10,
     Image = 11,
     File =12,
-    Entity = 99,
+    ListForm = 99,
     EntityListView = 100,
     EntityFilter=101
 }
@@ -103,9 +103,13 @@ public enum ActionType {
     Export= 15,
     Update = 16,
 
+    Report = 20,
     Url = 21,
     Client = 22,
     Function = 23,
+    Script=25,
+
+
 
     Custom = 50
 }
@@ -140,6 +144,7 @@ public enum EvalSourceType {
     Constant = 2,
     RequestQuery = 3,
     User = 4,
-    Env = 5
+    Env = 5,
+    Parameters = 6
 }
 }

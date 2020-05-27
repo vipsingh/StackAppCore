@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using StackErp.Core.Form;
 using StackErp.Core.Layout;
 using StackErp.Model;
@@ -28,18 +30,18 @@ namespace StackErp.UI.View.PageGenerator
         {
             this.LayoutContext = layoutContext;
             View = new ViewPage(this.FormContext);
+
             this.Compile(layoutContext);
+            this.OnCompileComplete(layoutContext);
 
             this.OnRenderComplete();
         }
 
         protected virtual void Compile(LayoutContext layoutContext)
         {            
-            this.BuildFormRules(layoutContext.View);
+            this.BuildLayoutRules(layoutContext.View);
             this.CompileWidgets(layoutContext.View);
-            this.CompileActions(layoutContext.View);
-
-            this.OnCompileComplete(layoutContext);                        
+            this.CompileActions(layoutContext.View); 
         }
 
         protected virtual void CompileWidgets(TView view)
@@ -48,27 +50,41 @@ namespace StackErp.UI.View.PageGenerator
             {
                 CompileWidget(field);   
             }
-
-            foreach(var field in FormContext.MissingFields)
-            {
-                CompileWidget(new TField(){ FieldId = field }); 
-            }
         }
 
         private void CompileWidget(TField field)
         {
-            BaseField fieldSchema;
-            fieldSchema = this.FormContext.GetField(field.FieldId);
-
-            if(fieldSchema != null)
+            if (!this.FormContext.Widgets.ContainsKey(field.FieldId))
             {
-                this.FieldCompiler.Compile(fieldSchema, field);
+                BaseField fieldSchema;
+                fieldSchema = this.FormContext.GetField(field.FieldId);
+
+                if(fieldSchema != null)
+                {
+                    this.FieldCompiler.Compile(fieldSchema, field);
+                }
             }
         }
 
-        protected virtual void BuildFormRules(TView view)
+        protected virtual void BuilDependency()
         {
-            View.FormRules = ViewModel.Helper.FormRuleBuilder.BuildRules(FormContext, view);
+            var controls = this.FormContext.Widgets;
+            if (controls != null)
+            {
+                foreach (var control in controls)
+                {
+                    var fieldSchema = this.FormContext.GetField(control.Value.WidgetId);
+                    if (fieldSchema != null)
+                    {
+                        ViewModel.Services.FilterDependencyBuilder.Build(this.FormContext, fieldSchema, ((BaseWidget)control.Value));
+                    }
+                }
+            }
+        }
+
+        protected virtual void BuildLayoutRules(TView view)
+        {
+            View.FormRules = ViewModel.Services.FormRuleBuilder.BuildRules(FormContext, view);
         }
 
         protected virtual void CompileActions(TView view)
@@ -99,7 +115,10 @@ namespace StackErp.UI.View.PageGenerator
 
         protected virtual void OnCompileComplete(LayoutContext layoutContext)
         {
-            this.AddPageTitle();
+            foreach(var field in FormContext.MissingFields)
+            {
+                CompileWidget(new TField(){ FieldId = field }); 
+            }
 
             foreach(var formrule in View.FormRules)
             {
@@ -111,12 +130,23 @@ namespace StackErp.UI.View.PageGenerator
                         ((BaseWidget)w).SetRule(formrule.Id);
                 }
             }
+
+            //Add Form parameters. 
+
+            FieldOnCompileComplete();
         }
 
-        protected void AddPageTitle() 
+        protected void FieldOnCompileComplete()
         {
-
-        }      
+            var controls = this.FormContext.Widgets;
+            if (controls != null)
+            {
+                foreach (var control in controls)
+                {                    
+                    control.Value.OnCompileComplete(FormContext);
+                }
+            }
+        }
 
         public virtual ViewPage GetViewPage()
         {

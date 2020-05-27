@@ -16,7 +16,7 @@ namespace StackErp.ViewModel.Model
             {
                 var schema = formContext.Entity.GetFieldSchema(filed.FieldName);
                 if (schema != null)
-                    exp.Add(x++, new string[] { schema.ViewName, ((int)filed.Op).ToString(), filed.Value });
+                    exp.Add(x++, new string[] { schema.ViewName, ((int)filed.Op).ToString(), filed.Value.ToString() });
             }
 
             return exp;

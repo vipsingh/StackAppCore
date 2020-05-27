@@ -30,7 +30,7 @@ namespace StackErp.UI.View.PageAction
             if(generator.Status == AnyStatus.Success)
             {
                 var recordModel = generator.RecordModel;
-                var saveStatus = context.Entity.Save(recordModel);
+                var saveStatus = context.Entity.Save(_AppContext, recordModel);
                 if (saveStatus == AnyStatus.Success)
                 {
                     response.Status = SubmitStatus.Success;

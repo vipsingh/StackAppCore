@@ -3,26 +3,23 @@ common formatter of data
 Custom Actions
 FilterForm
 Layout Rules: invisible
-custom function invoke, fixed and entity related
+Data Linking
+		1.OnChange method(server) on field :: find deps of other fields in function
+			scene:: A. set other field value. if field is not in layout set on widget dics on client.
+					B. custom message
 ----Action button on page
 	OnAfterCompile -> AddButtons, AddPageTitle, AddResources
 		AddButtons -> 1. Fetch Layout Buttons, 2.Add fix button on renderer(ex close), fetch link definition (entityid specific and globals, these contains all)
 
 todo-------------------------------------------
-FilterForm
 Layout Rules: invisible, also change the visibility logic on client. should based on field
-Data Linking
 
---today
-	Data Linking
-		1.OnChange method(server) on field :: find deps of other fields in function
-			scene:: A. set other field value. if field is not in layout set on widget dics on client.
-					B. custom message
-		2.set DataSource filter based on another fields
-	Computed field 
-		1.Set expression on field. can have [iftrue, ifnull] 
-		Check if computed fields not in form. Calculation should also be on server side. 
-		And if dependent field are not on layout thean include it. Can have system fields. 
+--today	
+	custom function invoke, fixed and entity related	
+	related field
+	list definition (default:: should not include complex field)
+
+	return action test(submit action)
 
 
 --Next

@@ -22,7 +22,7 @@ namespace StackErp.ViewModel.FormWidget
             {
                 IsMultiSelect = this.Context.ControlDefinition.IsMultiSelect;
             }
-            BuildLookupData();
+            BuildCollectionData();
         }
 
         List<SelectOption> _options = null;
@@ -41,10 +41,10 @@ namespace StackErp.ViewModel.FormWidget
                 // }
             }}
 
-        protected virtual void BuildLookupData()
+        protected virtual void BuildCollectionData()
         {
             if (!this.IsViewMode && this.Options == null) {
-                var data = LookupDataHelper.GetLookupData(this.Context);
+                var data = CollectionDataHelper.GetCollectionData(this.Context);
                 this.Options = data;
             }
         }
@@ -72,7 +72,7 @@ namespace StackErp.ViewModel.FormWidget
                     data = this.Options.Where(o => values.Contains(o.Value)).ToList();
                 }
                 else
-                    data = LookupDataHelper.GetLookupData(this.Context, values);
+                    data = CollectionDataHelper.GetCollectionData(this.Context, values);
 
                 if (data.Count > 0) {
                     val = data;

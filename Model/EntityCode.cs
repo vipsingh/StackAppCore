@@ -41,10 +41,12 @@ namespace StackErp.Model
         public static Dictionary<string, int> AllEntities;
 
         public const int None = 0;
-        public const int User = 101;
-        public const int UserRole = 102;
-
         public const int EntityMaster = 1;
         public const int EntitySchema = 2;
+        public const int User = 101;
+        public const int UserRole = 102;  
+
+        public const int Customer = 111;
+        public const int Product = 112;  
     }
 }

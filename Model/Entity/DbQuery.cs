@@ -11,6 +11,7 @@ namespace StackErp.Model.Entity
         public IDBEntity Entity {get;}
         public QueryType QueryType {private set;get;}
         public DbQueryFieldCollection Fields {get;}
+        public FilterExpression FixedFilter {private set;get;}
         public FilterExpression Filters {private set;get;}
 
         public List<(string, string)> OrderBy {private set;get;}
@@ -30,13 +31,33 @@ namespace StackErp.Model.Entity
             Relations  = Entity.Relations;
         }
 
-        public void BuildWithLayout(TList view)
+        public void BuildListDefn(DataListDefinition defn)
         {
-            foreach(var f in view.Fields)
+            ItemIdField = defn.ItemIdField;
+            
+            var view  = defn.Layout;
+            foreach(var f in view.GetLayoutFields())
             {
                 AddField(f.FieldId, true);
             }
+            if (defn.FixedFilter != null)
+                FixedFilter = defn.FixedFilter.DeepClone();
         }
+
+        // public void BuildWithListInfo(TListInfo view)
+        // {
+        //     ItemIdField = view.IdField;
+
+        //     foreach(var f in view.Select)
+        //     {
+        //         AddField(f.FieldName, true);
+        //     }
+        //     var filterJson = view.Where;
+        //     if (filterJson != null)
+        //     {
+        //         FixedFilter = FilterExpression.BuildFromJson(view.Entity, filterJson.ToString());
+        //     }
+        // }
 
         public void AddField(string fieldName, bool isSelect = true)
         {
@@ -46,6 +67,15 @@ namespace StackErp.Model.Entity
 
         public void ResolveFields()
         {
+            if(FixedFilter != null)
+            {
+                foreach(var fl in FixedFilter.GetAll())
+                {
+                    var f =  new DbQueryField(fl.FieldName, false);
+                    Fields.AddField(f);
+                }
+            }
+
             if(Filters != null)
             {
                 foreach(var fl in Filters.GetAll())
@@ -69,9 +99,9 @@ namespace StackErp.Model.Entity
             Filters = filter;
         }
 
-        public void AddFixedFilter()
+        public void SetFixedFilter(FilterExpression filter)
         {
-
+            FixedFilter = filter;
         }
 
         public void WithPage(int pageIndex, int pageSize)
@@ -117,23 +147,21 @@ namespace StackErp.Model.Entity
 
 /*
 {
-  "entity": "usermaster",
-  "idfield": "id",
-  "select": ["name", "status", "role.name"],
-  "additional": [],
-  "where": {
+  "Entity": 111,
+  "IdField": "id",
+  "LinkField": "name",
+  "Select": [
+    {"FieldName": "name", "Format": "", "Link": false}
+    {"FieldName": "role.name"}
+    ],
+  "Additional": [],
+  "Where": {
     "$or": [
       {
-        "status": [0, "A"]
-      },
-      {
-        "qty": [2, 30]
-      },
-      {
-        "role.name": [0, "admin"]
+        "status": [0, 1]
       }
     ]
   },
-  "orderby": ["name"]
+  "OrderBy": ["name"]
 }
 */

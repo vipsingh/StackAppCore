@@ -16,13 +16,9 @@ namespace StackErp.UI.View.PageGenerator
         protected override void Compile(LayoutContext layoutContext)
         {
             base.Compile(layoutContext);
-            BuildActions();
-            this.BuildDependencies();
+            BuildActions();            
         }
-        protected void BuildDependencies()
-        {
 
-        }
         protected override void OnRenderComplete()
         {
             this.FillWidgetsData();            

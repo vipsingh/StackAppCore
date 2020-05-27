@@ -23,11 +23,11 @@ export default class FieldProps extends Component<{
                 FieldType: { WidgetId: "FieldType", WidgetType: 6, Caption: "Type", Options: fieldTypes, RuleToFire: [1] },
                 Length: { WidgetId: "Length", WidgetType: 1, Caption: "Length" },
                 IsRequired: { WidgetId: "IsRequired", WidgetType: 4, Caption: "IsRequired" },
-                LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity" },
+                LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity", Hidden_Exp: { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] } },
                 OtherSetting: { WidgetId: "OtherSetting", WidgetType: 1, Caption: "OtherSetting" }
             },
             FormRules: [
-                { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] },                
+                { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] },
             ],
             Actions: {
                 SAVE: {

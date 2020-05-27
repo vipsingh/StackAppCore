@@ -33,7 +33,7 @@ namespace StackErp.DB
                 var shouldJoin = false;
                 if (rel.Type == EntityRelationType.LINK)
                 {
-                    addedFields.Add((rel.ParentRefField.Name, $"{idf}.{rel.ChildRefField.DBName}", $"{rel.ParentRefField.Name}__name"));
+                    addedFields.Add((rel.ParentRefField.Name, $"{idf}.{rel.ChildDisplayField.DBName}", $"{rel.ParentRefField.Name}__name"));
                     addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
                     shouldJoin = true;
                 }
@@ -49,7 +49,10 @@ namespace StackErp.DB
             {
                 var field = fields[fk];
                 if (addedFields.FindAll(x => x.Item1.ToUpper() == field.Name.ToUpper()).Count == 0)
-                    addedFields.Add((field.Name, entTable + "." + field.DBName, field.Name));
+                {
+                    if (field.IsDbStore)
+                        addedFields.Add((field.Name, entTable + "." + field.DBName, field.Name));
+                }
             }
 
             return PrepareSelectQuery(entTable, addedFields, toJoinTables, $" {entTable}.id = @ItemId");
