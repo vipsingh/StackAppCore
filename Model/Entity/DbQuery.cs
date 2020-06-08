@@ -22,12 +22,10 @@ namespace StackErp.Model.Entity
         public string QrySql {private set;get;}
         public List<IEntityRelation> Relations {get;}
 
-        public DbQuery(EntityCode entityId) {
-            EntityId = entityId;
-            Fields =  new DbQueryFieldCollection();            
-        }
-        public DbQuery(IDBEntity entity): this(entity.EntityId) {
+        public DbQuery(IDBEntity entity) {
             Entity = entity;
+            EntityId = entity.EntityId;
+            Fields =  new DbQueryFieldCollection();            
             Relations  = Entity.Relations;
         }
 
@@ -40,6 +38,9 @@ namespace StackErp.Model.Entity
             {
                 AddField(f.FieldId, true);
             }
+
+            AddField(ItemIdField, false);
+
             if (defn.FixedFilter != null)
                 FixedFilter = defn.FixedFilter.DeepClone();
         }
@@ -65,8 +66,11 @@ namespace StackErp.Model.Entity
             Fields.AddField(f);
         }
 
+        private bool _isresolved = false;
         public void ResolveFields()
         {
+            if (_isresolved) return;
+            
             if(FixedFilter != null)
             {
                 foreach(var fl in FixedFilter.GetAll())
@@ -92,6 +96,8 @@ namespace StackErp.Model.Entity
                 f.DbName = fSchema.DBName;
                 f.Alias = Entity.DBName;
             }
+            
+            _isresolved =true;
         }
 
         public void SetFilter(FilterExpression filter)

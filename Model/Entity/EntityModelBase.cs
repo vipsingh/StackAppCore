@@ -15,6 +15,7 @@ namespace StackErp.Model
         public EntityCode EntityId { get; }
         public int _id { private set; get; }
         public bool IsNew { get => !(this._id > 0); }
+        public bool IsDeleted {set;get;}
 
         public DBModelBase(EntityCode entityId)
         {

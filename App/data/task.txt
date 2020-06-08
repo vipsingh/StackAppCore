@@ -17,7 +17,6 @@ Layout Rules: invisible, also change the visibility logic on client. should base
 --today	
 	custom function invoke, fixed and entity related	
 	related field
-	list definition (default:: should not include complex field)
 
 	return action test(submit action)
 

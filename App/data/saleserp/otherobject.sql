@@ -238,7 +238,7 @@ CREATE TABLE t_product_uom
     id integer,	
 	name character varying(100)  NOT NULL,
     code character varying(20),
-    group integer not null,
+    groupid integer not null,
     createdby integer NOT NULL,
     updatedby integer,
     createdon timestamp without time zone NOT NULL,	
@@ -263,8 +263,8 @@ values(0,10020,113,'code','Code',1,20,false
 insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
 ,dbname,tablename,viewtype,defaultvalue,collectionid
 ,linkentity,linkentity_domain,createdon,updatedon)
-values(0,10021,113,'group','Group',9,0,true
-,'group','t_product_uom',0,null,20
+values(0,10021,113,'groupid','Group',9,0,true
+,'groupid','t_product_uom',0,null,20
 ,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
 
 insert into t_entitymaster(masterid,id,name,text,tablename,primaryfield,namefield)
@@ -282,7 +282,7 @@ insert into t_entitylist(masterid,id,entityid,categoryid,name,idfield,viewfield,
 	layoutxml, 
 	filterpolicy,fixedfilter,createdon,createdby) 
 values(0,10004,113,0,'Default','id','name',
-'<tlist type="GRID"><template><row><field id="name"/><field id="group" /></row></template></tlist>',
+'<tlist type="GRID"><template><row><field id="name"/><field id="groupid" /></row></template></tlist>',
 '','', '2020-01-01',1);
 
 --------------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ values(0,10029,115,'description','Description',13,1000,false
 insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
 ,dbname,tablename,viewtype,defaultvalue
 ,linkentity,linkentity_domain,createdon,updatedon)
-values(0,10030,115,'subdescription','Sub Description',13,1000,false
+values(0,10030,115,'subdescription','Sub Description',17,2000,false
 ,'subdescription','t_product',0,null
 ,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
 

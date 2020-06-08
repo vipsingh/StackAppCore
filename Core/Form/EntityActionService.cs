@@ -43,9 +43,9 @@ namespace StackErp.Core.Form
 
             // _Links.Add(d);
         }
-        public static ActionLinkDefinition GetViewAction(StackAppContext appContext, EntityCode entity, EntityLayoutType layoutType, string actionId)
+        public static ActionLinkDefinition GetViewAction(StackAppContext appContext, EntityCode entity, EntityLayoutType layoutType, int actionId)
         {
-            return _Links.Find(x => x.ActionId == actionId && x.Viewtype == layoutType);
+            return _Links.Find(x => x.Id == actionId && x.Viewtype == layoutType);
         }
     }
 }

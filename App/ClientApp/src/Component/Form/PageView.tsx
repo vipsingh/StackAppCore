@@ -6,7 +6,6 @@ import { PageHeader } from "antd";
 export default class PageView extends React.Component<{
     getControl: Function,
     entityModel: any,
-    renderActions: Function,
     getFormActions: Function
 }> {
  

@@ -24,6 +24,8 @@ namespace StackErp.Model.Entity
         public override object ResolveSetValue(object value, out bool isValid)
         {
             isValid = true;
+            if (value == null) return null;
+            
             if (value is Int32 || value is List<Int32>)
                 return value;
             else if (value is SelectOption)

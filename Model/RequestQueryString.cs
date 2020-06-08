@@ -8,9 +8,9 @@ using Newtonsoft.Json.Linq;
 
 namespace StackErp.Model
 {
-    public class RequestQueryString : Dictionary<string, string>
+    public class RequestQueryString : InvariantDictionary<string>
     {
-        private string _UrlReferer;
+        //private string _UrlReferer;
 
         public int ItemId
         {
@@ -64,6 +64,11 @@ namespace StackErp.Model
         {
             get { return GetInt("ListingId"); }
             set { this["ListingId"] = value.ToString(); }
+        }
+        public int RowId
+        {
+            get { return GetInt("RowId"); }
+            set { this["RowId"] = value.ToString(); }
         }
 
         public bool IsAjax

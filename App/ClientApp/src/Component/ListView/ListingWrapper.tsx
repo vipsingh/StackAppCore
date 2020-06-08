@@ -6,7 +6,7 @@ export default function(ListComp: React.ComponentClass<any,any>) {
     
     return class ListingWrapper extends React.Component<ListingProps, {
                 IsFetching: boolean,            
-                Rows: Array<any>,
+                ListInfo: any,
                 Pager: {
                     Count: number,
                     Page: number,
@@ -20,7 +20,7 @@ export default function(ListComp: React.ComponentClass<any,any>) {
 
             this.state = {
                 IsFetching: false,
-                Rows: [],
+                ListInfo: null,
                 Pager: {
                     Count: 0,
                     Page: 1,
@@ -33,7 +33,7 @@ export default function(ListComp: React.ComponentClass<any,any>) {
         }
 
         loadData = (index: number = 1) => {
-            const { WidgetId, DataActionLink, ListData, api } = this.props; 
+            const { WidgetId, DataActionLink, ListData, api, IsLocalStore } = this.props; 
             if (!DataActionLink) return;
             
             const { Url } = DataActionLink;      
@@ -46,7 +46,9 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                 body: {RequestType: 0}
             }).then((res: any) => {
                 const info = res;
-                if (api && api.updateField) {
+                if (IsLocalStore) {
+                    this.setState({ListInfo: Object.assign({}, this.state.ListInfo || {}, info)});
+                } else if (api && api.updateField) {
                     api.updateField(WidgetId,  { ListData: Object.assign({}, ListData, info) });
                 }
             }).finally(() => {
@@ -66,11 +68,18 @@ export default function(ListComp: React.ComponentClass<any,any>) {
 
         getSelectedRows() {
             const { selectedRowKeys } =this.state;
-            const { ListData: { Data } } = this.props;
+            const { Data } = this.getListInfo();
 
             return _.filter(Data, k => {
                 return  selectedRowKeys.indexOf(k.RowId) >= 0;
             });
+        }
+
+        getListInfo() {
+            const { ListData, IsLocalStore } = this.props;
+            if (IsLocalStore) return this.state.ListInfo;
+
+            return ListData;
         }
 
         getRowSelection(): any {
@@ -99,7 +108,7 @@ export default function(ListComp: React.ComponentClass<any,any>) {
         }
 
         render() {
-            const { ListData } = this.props;
+            const ListData = this.getListInfo();
             const { Pager } = this.state;
             
             if(this.state.IsFetching){

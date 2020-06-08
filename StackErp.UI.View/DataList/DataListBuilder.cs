@@ -5,7 +5,7 @@ using StackErp.Model.DataList;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
-namespace StackErp.ViewModel.DataList
+namespace StackErp.UI.View.DataList
 {
     public class DataListBuilder
     {
@@ -62,6 +62,11 @@ namespace StackErp.ViewModel.DataList
         protected virtual void ExecutePrepareData(DataListContext context, DataListDefinition defn)
         {
 
+        }
+
+        protected virtual void PrepareLinkDefinition(DataListContext context, DataListDefinition defn)
+        {
+            
         }
     }
 }

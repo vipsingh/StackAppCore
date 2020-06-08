@@ -13,8 +13,8 @@ namespace StackErp.ViewModel.Model
     {
         public AppPageType PageType {set;get;}
         public Dictionary<string, IWidget> Widgets {get;set;}   
-        public List<FormRule> FormRules {get;set;}   
         public string PostUrl {get;}
+        public string CurrentQuery {set;get;}
         public InvariantDictionary<ActionInfo> Actions {get;set;}
         public ObjectModelInfo EntityInfo {set;get;}
         public DynamicObj PageTitle {set;get;}
@@ -25,6 +25,7 @@ namespace StackErp.ViewModel.Model
         {
             PageType = AppPageType.Detail;
             EntityInfo = formContext.EntityModelInfo;
+            CurrentQuery = formContext.RequestQuery.ToQueryString();
                         
             this.Widgets = formContext.Widgets; 
 
@@ -35,6 +36,18 @@ namespace StackErp.ViewModel.Model
         {
             PageType = AppPageType.Detail;
             this.Widgets = new Dictionary<string, IWidget>();
+        }
+    }
+
+    public class ViewPageDataOnly
+    {
+        public Dictionary<string, IWidgetData> Widgets {get;set;}
+        public ObjectModelInfo EntityInfo {set;get;}
+        public DynamicObj PageTitle {set;get;}
+        public string ErrorMessage {set;get;}
+        public ViewPageDataOnly(ObjectModelInfo entityInfo)
+        {
+            this.EntityInfo = entityInfo;
         }
     }
 }

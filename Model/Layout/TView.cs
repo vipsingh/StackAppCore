@@ -13,10 +13,7 @@ namespace StackErp.Model.Layout
     {
         public TPage Header { set; get; }
         public int RenderingStyle { set; get; }
-        public List<TPage> Pages { set; get; }
-        
-        [JsonIgnore]
-        public List<TFormRule> FormRules { set; get; }
+        public List<TPage> Pages { set; get; }        
         public List<TCommand> Commands { set; get; }
         public TView()
         {
@@ -68,11 +65,16 @@ namespace StackErp.Model.Layout
         public string FieldId { set; get; }
         public string Text { set; get; }
         public bool FullRow { set; get; }
-        public string InVisible { set; get; }
+        [JsonIgnore]
+        public string Invisible { set; get; }
+        [JsonIgnore]
+        public string ReadOnly { set; get; }
         [JsonIgnore]
         public string Domain { set; get; }
         [JsonIgnore]
         public FormControlType Widget { set; get; }
+        [JsonIgnore]
+        public int CaptionPosition { set; get; }
         public string Format { set; get; }
         public string Width { set; get; }
         public DynamicObj Style { set; get; }
@@ -83,6 +85,15 @@ namespace StackErp.Model.Layout
 
             Guard.Against.Null(attrs["id"], "FieldId");
             f.FieldId = attrs["id"].Value;
+
+            if (attrs["invisible"] != null) 
+            {
+                f.Invisible = attrs["invisible"].Value.Trim();                
+            }
+            if (attrs["readonly"] != null) 
+            {
+                f.ReadOnly = attrs["readonly"].Value.Trim();                
+            }
 
             return f;
         }
@@ -119,7 +130,7 @@ namespace StackErp.Model.Layout
     public class TCommand
     {
         [XmlAttribute]
-         public string Id {set;get;}
+         public int Id {set;get;}
          [XmlAttribute]
         public string Text {set;get;}
         [XmlAttribute]

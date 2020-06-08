@@ -8,13 +8,12 @@ import update from "immutability-helper";
 import { getComponent } from "../../../WidgetFactory";
 import { EditFilled, SaveFilled, DeleteFilled } from '@ant-design/icons';
 
-export interface ListFormProps {
-    Schema: any
+export interface ListFormProps extends WidgetInfoProps {
+    FormPage: any
 }
 
 export default class ListForm extends React.Component<ListFormProps, 
     { 
-        data: Array<IDictionary<IFieldData>>,
         activeKey: string,
         activeModel: IDictionary<IFieldData>,
         IsUnCommitedData: boolean
@@ -24,24 +23,54 @@ export default class ListForm extends React.Component<ListFormProps,
     constructor(props: any, cntx: any) {
         super(props, cntx);
 
-        this.schema = this.mergeFields(this.props.Schema, null);
+        this.schema = this.mergeFields(this.props.FormPage, null);
         
         this.state = {
-            data: [],
             activeKey: "",
             IsUnCommitedData: false,
-            activeModel: this.schema.getDataModel() 
+            activeModel: {} 
         };
     }
 
+    componentDidMount() {
+        const { DataLink, onChange } = this.props as any;
+
+        window._App.Request.getData({
+            url: DataLink.Url,
+            type: "GET"
+        }).then((res: any) => {
+            var data: Array<IDictionary<IFieldData>> = [];
+            
+            _.each(res, (r: any) => {
+                var m = this.schema.getDataModel();                
+                m._EntityInfo = r.EntityInfo;
+                _.forIn(r.Widgets, (w, k) => {
+                    m[k] = w;
+                });
+                data.push(m);
+            });
+
+            onChange(data);
+
+        }).finally(() => {
+            //this.setState({IsFetching: false});
+        });
+    }
+
     mergeFields(schema: any, formData: any) {        
-        const entityModel: ViewPageInfo = new ViewPageInfo(this.props.Schema, formData);
+        const entityModel: ViewPageInfo = new ViewPageInfo(this.props.FormPage, formData);
         return entityModel;
     }  
     
     addItem = () => {
+        const { onChange, Value } = this.props;
         const d = this.schema.getDataModel();
-        this.setState({ data: update(this.state.data, {$push: [d] }), activeModel: d, activeKey: d._UniqueId.Value, IsUnCommitedData: true});
+        
+        let vals = Value;
+        if (!vals) vals = [];
+        onChange(update(vals, {$push: [d] }));
+
+        this.setState({ activeModel: d, activeKey: d._UniqueId.Value, IsUnCommitedData: true});
     }
     
     editItem = (formId: string) => {
@@ -50,8 +79,11 @@ export default class ListForm extends React.Component<ListFormProps,
     }
 
     deleteRowItem = (formId: string) => {
-        const ix = _.findIndex(this.state.data, o => o._UniqueId.Value === formId);
-        this.setState({ data: update(this.state.data, { $splice: [[ix, 1]] }), activeKey: "", IsUnCommitedData: false});
+        const { onChange, Value } = this.props;
+        const ix = _.findIndex(Value, (o: any) => o._UniqueId.Value === formId);
+        onChange(update(Value, { $splice: [[ix, 1]] }));
+
+        this.setState({ activeKey: "", IsUnCommitedData: false});
     }
 
     cancelEdit = () => {
@@ -64,13 +96,17 @@ export default class ListForm extends React.Component<ListFormProps,
     }
 
     onModelChange = (model: IDictionary<IFieldData>, params: { updateBy: string, param?: string }) => {  
-        const ix = _.findIndex(this.state.data, o => o._UniqueId.Value === model._UniqueId.Value);
-        this.setState({ data: update(this.state.data, {[ix]: { $set: model }}), IsUnCommitedData: true});        
-        this.setState({ activeModel: model });
+        const { onChange, Value } = this.props;
+
+        const ix = _.findIndex(Value, (o: any) => o._UniqueId.Value === model._UniqueId.Value);
+        onChange(update(Value, {[ix]: { $set: model }}));
+        this.setState({ IsUnCommitedData: true, activeModel: model});
     }
 
     saveItem = (toSaveModel: any) => {
-        const ix = _.findIndex(this.state.data, o => o.UniqueId === this.state.activeKey);        
+        // const { onChange, Value } = this.props;
+
+        // const ix = _.findIndex(Value, (o: any) => o.UniqueId === this.state.activeKey);        
         this.setState({ activeKey: "", IsUnCommitedData: false });
     }
 
@@ -80,18 +116,20 @@ export default class ListForm extends React.Component<ListFormProps,
     }
 
     getModel(key: string): IDictionary<IFieldData> {
-        const v = _.filter(this.state.data, x => x._UniqueId.Value === key);
+        const { Value } = this.props;
+        const v = _.filter(Value, x => x._UniqueId.Value === key);
 
         return v[0] as IDictionary<IFieldData>;
     }
     
     render() {
-        const { activeKey, data, activeModel } = this.state;        
+        const { Value, IsViewMode } = this.props;
+        const { activeKey, activeModel } = this.state;        
 
         return(
             <div>
                 <div>
-                    <Button disabled={ !!activeKey } onClick={this.addItem}>Add</Button>
+                    {IsViewMode || <Button disabled={ !!activeKey } onClick={this.addItem}>Add</Button>}
                 </div>
                 <Form
                     entityModel={this.schema}
@@ -103,10 +141,11 @@ export default class ListForm extends React.Component<ListFormProps,
                             return <ListFormGrid 
                                 {...prop}  
                                 activeFormId={activeKey}
-                                listData={data}
+                                listData={Value}
                                 editRowItem={this.editItem}
                                 deleteRowItem={this.deleteRowItem}
                                 cancelRowEdit={this.cancelEdit}
+                                isViewMode={IsViewMode}
                                 />;
                         }
                     }
@@ -146,10 +185,12 @@ class ListFormGrid extends React.Component<any, any> {
     }
 
     prepareColumns() {
-        const { entityModel: { Widgets } } = this.props;
+        const { entityModel: { Widgets }, isViewMode } = this.props;
+
         const cols: Array<any> = [];
+
         _.forIn(Widgets, (v: WidgetInfo) => {
-            if (v.WidgetId === "_UniqueId") return;
+            if (v.WidgetType === 0) return;
 
             cols.push({
                 title: v.Caption,
@@ -159,13 +200,15 @@ class ListFormGrid extends React.Component<any, any> {
             })
         });
 
-        cols.push({
-            title: 'Action',
-            dataIndex: '',
-            key: '_action_',
-            render: this.renderRowAction,
-            width: 60
-        });
+        if (!isViewMode) {
+            cols.push({
+                title: 'Action',
+                dataIndex: '',
+                key: '_action_',
+                render: this.renderRowAction,
+                width: 60
+            });
+        }
 
         return cols;
     }
@@ -209,13 +252,13 @@ class ListFormGrid extends React.Component<any, any> {
         const { listData } = this.props;
  
         return (<div>
-            <Table 
-                columns={columns}
-                dataSource={listData}
-                rowKey={"UniqueId"}
-                bordered
-                size="small"
-            />            
+                <Table 
+                    columns={columns}
+                    dataSource={listData}
+                    rowKey={"UniqueId"}
+                    bordered
+                    size="small"
+                />            
             </div>
         );
     }

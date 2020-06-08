@@ -16,7 +16,7 @@ function defer() {
   };
 }
 
-class DialogBox extends React.Component<{options: any, title: string, children: any}> {  
+class DialogBox extends React.Component<{options: any, title: string, render: Function, id: string}> {  
   displayName: string
   promise: any
 
@@ -38,7 +38,7 @@ class DialogBox extends React.Component<{options: any, title: string, children: 
   }
 
   render() {
-    const { options } = this.props;
+    const { options, id } = this.props;
     let btn_op = {
       confirmLabel: "OK",
       abortLabel: "Cancel"
@@ -86,21 +86,20 @@ class DialogBox extends React.Component<{options: any, title: string, children: 
         width={width}
         style={{ top: options.size === "lg"? 20: undefined }}
       >
-        {this.props.children}
+        {this.props.render({ dialogId: id  })}
       </Modal>
     );
   }
 }
 
-export const openDialog = function(title: string, children: any, options: any = {}): { promise: Promise<any>, cleanup: Function } {
+export const openDialog = function(title: string, renderFunction: Function, options: any = {}): { promise: Promise<any>, cleanup: Function, id: string } {
   var cleanup, component: any, props, wrapper: HTMLDivElement;
 
   title = title || "Message";
-  props = { title: title, options: options, children };
+  props = { title: title, options: options, render: renderFunction };
   wrapper = document.body.appendChild(document.createElement("div"));
   wrapper.id = _.uniqueId("dialog");
   openedDialogs.push(wrapper.id);
-  component = render(<DialogBox {...props} />, wrapper);
   cleanup = function() {
     ReactDOM.unmountComponentAtNode(wrapper);
     return setTimeout(function() {
@@ -108,7 +107,10 @@ export const openDialog = function(title: string, children: any, options: any = 
       return wrapper.remove();
     });
   };
-  return { promise: component.promise.promise.finally(cleanup), cleanup };
+  
+  component = render(<DialogBox {...props} id={wrapper.id} />, wrapper);
+  
+  return { promise: component.promise.promise.finally(cleanup), cleanup, id: wrapper.id };
 };
 let openedDialogs: Array<any> = [];
 
@@ -124,4 +126,15 @@ export function closeAll() {
   });
 
   openedDialogs = [];
+}
+
+export function close(id: string) {
+  const wrapper = document.getElementById(id);
+      if (wrapper) {
+        ReactDOM.unmountComponentAtNode(wrapper);
+        setTimeout(function() {
+          return wrapper.remove();
+        });
+        openedDialogs = _.remove(openedDialogs, a => a === id); 
+  }  
 }

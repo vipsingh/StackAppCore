@@ -192,6 +192,26 @@ namespace StackErp.Model
                         objectValue = number;
                     }
                     break;
+                case TypeCode.Int16:
+                    if (value is Int16 )
+                        objectValue = value;
+                    else if (value is Int32 || value is decimal)
+                    {
+                        objectValue = Convert.ToInt16(value);
+                    }
+                    else
+                    {
+                        var valType = value.GetType();
+                        Int16 number = 0;
+
+                        if (valType.IsEnum)
+                            number = Convert.ToInt16(value);
+                        else
+                            Int16.TryParse(value.ToString(), out number);
+
+                        objectValue = number;
+                    }
+                    break;
                 case TypeCode.String:
                     objectValue = value.ToString();
                     break;

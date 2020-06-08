@@ -1,35 +1,48 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
 using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel.Model
 {
-    public class FormFilterExpression: Dictionary<int, string[]>
+    [JsonConverter(typeof(FilterExpressionJsonConverter))]
+    public class FormFilterExpression
     {
-        public static FormFilterExpression Build(FormContext formContext, FilterExpression expression) 
+        private FilterExpression FilterExp;
+        public FormFilterExpression(FormContext formContext, FilterExpression expression)
         {
-            var exp = new FormFilterExpression();
-            int x = 0;
-            foreach(var filed in expression.GetAll())
-            {
-                var schema = formContext.Entity.GetFieldSchema(filed.FieldName);
-                if (schema != null)
-                    exp.Add(x++, new string[] { schema.ViewName, ((int)filed.Op).ToString(), filed.Value.ToString() });
-            }
-
-            return exp;
+            FilterExp = expression;
         }
 
-        public List<string> GetCriteriaFields()
+        public IList<string> GetCriteriaFields()
         {
-            var s = new List<string>();
-            foreach(var f in this.Values){
-                s.Add(f[0]);
-            }
+            return this.FilterExp.GetFieldNames();
+        }
 
-            return s;
+        public JObject ToJObject()
+        {
+            return JObject.Parse(this.FilterExp.ToJSONFormat());
+        }
+    }
+
+    public class FilterExpressionJsonConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(FormFilterExpression);
+        }
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            var jo = ((FormFilterExpression)value).ToJObject();
+            jo.WriteTo(writer);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            return null;
         }
     }
 }

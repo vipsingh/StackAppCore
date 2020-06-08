@@ -1,6 +1,7 @@
 import React from "react";
 import { Form } from "antd";
 import cs from "classnames";
+import { FormLabelAlign } from "antd/lib/form/interface";
 
 const FormItem = Form.Item;
 
@@ -11,11 +12,15 @@ export default class FormField extends React.Component<WidgetInfoProps> {
         return true;
       }
       
-      return nextProps.Value !== this.props.Value || nextProps.HasError !== this.props.HasError || nextProps.Invisible !== this.props.Invisible || nextProps.VisibleOptions !== this.props.VisibleOptions;
+      return nextProps.Value !== this.props.Value 
+        || nextProps.HasError !== this.props.HasError 
+        || nextProps.Invisible !== this.props.Invisible 
+        || nextProps.IsReadOnly !== this.props.IsReadOnly 
+        || nextProps.VisibleOptions !== this.props.VisibleOptions;
     }
 
     render() {        
-        const { WidgetId, Caption, HasError, api, Invisible, IsHidden } = this.props;
+        const { WidgetId, Caption, HasError, api, Invisible, IsHidden, CaptionPosition } = this.props;
         
         const formItemLayout = {
             labelCol: {
@@ -25,11 +30,16 @@ export default class FormField extends React.Component<WidgetInfoProps> {
             wrapperCol: {
               xs: { span: 24 },
               sm: { span: 16 },
-            },
+            }
           };
 
-        if(!Caption) {
+        if(!Caption || CaptionPosition === 1) {
           formItemLayout.wrapperCol.sm.span = 24;
+        }
+
+        let labelAlign: FormLabelAlign = "right";
+        if (CaptionPosition === 1) {
+          labelAlign = "left";
         }
 
         let validResult: any;
@@ -42,13 +52,14 @@ export default class FormField extends React.Component<WidgetInfoProps> {
 
         return (
             <FormItem
-            {...formItemLayout}            
-            label={(IsHidden || Invisible) ? "" : Caption}        
+            {...formItemLayout}  
+            labelAlign={labelAlign}          
+            label={Caption}        
             >
-            <div className={cs("form-field-control", {"ant-form-item-has-error": HasError})}>
-              {this.props.children}
-              { !HasError || <div className="ant-form-item-explain"><div>{validResult.Message}</div></div>}
-            </div>
+              <div className={cs("form-field-control", {"ant-form-item-has-error": HasError})}>
+                {this.props.children}
+                { !HasError || <div className="ant-form-item-explain"><div>{validResult.Message}</div></div>}
+              </div>
         </FormItem>
         );
     }    

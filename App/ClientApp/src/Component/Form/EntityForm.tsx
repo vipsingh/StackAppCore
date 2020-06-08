@@ -74,8 +74,8 @@ export default class EntityForm extends React.Component<EntityFormProps, {
         LinkProcesser.handeleResponse(result, this.context.navigator);
     }
 
-    updateForm = (model: IDictionary<IFieldData>) => {
-        this.setState({dataModel: model});
+    updateForm = (model: IDictionary<IFieldData>, updateBy: { updateBy: string, param?: string }, afterChange: () => void = () => {}) => {
+        this.setState({dataModel: model}, afterChange);
     }
 
     render() {

@@ -30,6 +30,7 @@ public enum FieldType {
     ObjectKey = 25,
     FilterField = 26,
     File = 27,
+    Phone=28    
 }
     
     public enum EntityRelationType 
@@ -91,5 +92,13 @@ public enum QueryType
         Service = 4,
         Table = 5 // table should be defined in t_customtables
         
+    }
+
+    public enum EntityDeletePolicyType
+    {
+        None = 0,
+        AllowDelete = 1,
+        
+        OnlyUnlink = 2
     }
 }

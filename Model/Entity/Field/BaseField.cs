@@ -30,6 +30,7 @@ namespace StackErp.Model.Entity
         public string TableName { set; get; }
         public bool IsMultiSelect { set; get; }
         public bool IsArrayData { private set; get; }
+        public int ViewOrder { set; get; }
         
         public FormControlType ControlType { set; get; }
         private string _viewName;

@@ -71,6 +71,10 @@ namespace StackErp.UI.View.PageGenerator
             {
                 url = "";
             }
+            else if (definition.ActionType == ActionType.Page)
+            {
+                url = string.Format("{0}{1}", context.Context.AppRoot, url);
+            }
 
             if(string.IsNullOrEmpty(url))
             {

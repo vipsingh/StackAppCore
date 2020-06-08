@@ -76,6 +76,7 @@ CREATE TABLE t_entityschema
 	tablename character varying(100),
 	computeexpression character varying(1024),
 	uisetting character varying(500),
+	vieworder int,
 	createdby integer NOT NULL,
     updatedby integer,
 	createdon timestamp without time zone,	
@@ -194,6 +195,20 @@ insert into t_entity_itemtype(masterid,id,entityid,name,code)
 values(0,2,2,'Default','0');
 insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
 values(0,2,2,2,'','0', null);
+
+insert into t_entitylist(masterid,id,entityid,categoryid,name,idfield,viewfield,
+	layoutxml, 
+	filterpolicy,fixedfilter,createdon,createdby) 
+values(0,1,1,0,'Default','id','name',
+'<tlist type="GRID"><template><row><field id="name"/><field id="text"/><field id="tablename"/><field id="primaryfield"/><field id="namefield"/></row></template></tlist>',
+'','', '2020-01-01',1);
+
+insert into t_entitylist(masterid,id,entityid,categoryid,name,idfield,viewfield,
+	layoutxml, 
+	filterpolicy,fixedfilter,createdon,createdby) 
+values(0,2,2,0,'Default','id','fieldname',
+'<tlist type="GRID"><template><row><field id="fieldname"/><field id="entityid"/><field id="fieldtype"/><field id="collectionid"/><field id="linkentity"/></row></template></tlist>',
+'','', '2020-01-01',1);
 -----------------------------------------------------------------------------------------------
 
 CREATE TABLE t_company_master

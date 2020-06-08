@@ -6,13 +6,13 @@ const PageContext = React.createContext({ popup: false, navigator: {
     history: null
 } });
 
-function createPageContext(windowId: number, history: any, popup: boolean = false) {
+function createPageContext(windowId: number, history: any, popup: any = null) {
     //const { WindowManager } = window;
     
     return {
         popup,
         navigator: {
-            windowType: windowId === 0 ? 2 : 1,
+            windowType: "", // "","POPUP","TAB"
             windowId,
             openerWindowId: 0,
             navigate: (url: string, replace: boolean = false) => {
@@ -21,10 +21,17 @@ function createPageContext(windowId: number, history: any, popup: boolean = fals
                 else
                     history.push(url);
             },
-            history
+            history,
+            opener: null,
             // navigateInCurrent: WindowManager.navigateInCurrent,
-            // reload: (isFullReload) => { return WindowManager.reload(this.windowId, isFullReload); },
-            // close: () => { return WindowManager.closeWindow(this.windowId); },
+            reload: () => {
+                const path =  `${history.location.pathname}${history.location.search}`;
+                history.push("/reload");//temp path
+                history.replace(path);
+            },
+            close: () => { 
+
+            },
             // reloadParent: WindowManager.reloadParent,
             // navigateOpener: WindowManager.navigateOpener
         }

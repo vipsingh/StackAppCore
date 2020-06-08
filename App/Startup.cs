@@ -11,6 +11,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StackErp.Model.Utils;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using StackErp.UI;
+using StackErp.Model;
 
 namespace StackErp.App
 {
@@ -45,7 +50,32 @@ namespace StackErp.App
              services.Configure<Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions>(options =>
             {
                 options.AllowSynchronousIO = true;
-            });        
+            });
+
+            var appSettingsSection = Configuration.GetSection("AppKeySettings");
+            services.Configure<AppKeySetting>(appSettingsSection);
+
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppKeySetting>();
+            var key = Encoding.ASCII.GetBytes(appSettings.JWTSecret);
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+        
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,10 +96,13 @@ namespace StackErp.App
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
-            {                
+            {  
+                endpoints.MapControllers();
+                              
                 // endpoints.MapControllerRoute(
                 //     name: "web",
                 //     pattern: "web/{c?}/{a?}",

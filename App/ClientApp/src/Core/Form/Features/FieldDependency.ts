@@ -19,7 +19,7 @@ function execute(field: string, model: IDictionary<IFieldData>, formApi: FormApi
     return model;
 }
 
-function processDeps(childField: { WidgetId: string, Clear: boolean }, parentWidget: WidgetInfoProps, model: IDictionary<IFieldData>, formApi: FormApi, fieldDataUpdateColl: Array<string>): IDictionary<IFieldData> {
+function processDeps(childField: { WidgetId: string, Clear: boolean }, parentWidget: WidgetInfo, model: IDictionary<IFieldData>, formApi: FormApi, fieldDataUpdateColl: Array<string>): IDictionary<IFieldData> {
     const child = formApi.getField(childField.WidgetId);
     if (!child) {
         _Debug.error(`FieldDependency: Child Widget ${childField.WidgetId} not found.`);

@@ -50,6 +50,6 @@ namespace StackErp.UI.View.PageGenerator
             var page = base.GetViewPage();
             page.PageType = AppPageType.Edit;
             return page;
-        }
+        }        
     }
 }

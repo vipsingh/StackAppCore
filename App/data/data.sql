@@ -44,6 +44,24 @@ insert into t_entitylist(masterid,id,entityid,categoryid,name,idfield,viewfield,
 values(0,999,99,0,'Default','id','name',
 '<tlist type="GRID"><template><row><field id="name"/><field id="image" widget="11" format="" width="" style="" /><field id="category" link="true" /></row></template><rules><rule type="conditionalformat" criteria="[{&quot;category&quot;:[0, 1]}]" style="{&quot;color&quot; : &quot;red&quot;}" /></rules></tlist>',
 '[{"category": [0,0]}]','', '2020-01-01',1);
+
+--------------OneToMany Field
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,linkentity_field, createdon,updatedon)
+values(0,993,99,'categories','Categories',20,0,false
+,null,null,0,null
+,112,null,'testobjid','2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10035,112,'testobjid','testobjid',2,4,false
+,'testobjid','"t_product_category"',-1,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+alter table t_product_category add testobjid integer
+
 ---------------------------------------------
 
 

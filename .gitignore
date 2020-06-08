@@ -12,5 +12,9 @@ Bin/
 obj/
 Obj/
 
+App/wwwroot/dms/
+App/wwwroot/css/
+App/wwwroot/js/
+
 # dotenv environment variables file
 .env

@@ -3,6 +3,7 @@ import { Button } from "antd";
 //import { Link } from "react-router-dom";
 import { ButtonType } from "antd/lib/button";
 import { openDialog } from "./UI/Dialog";
+import { openDrawer } from "./UI/Drawer";
 import PageComponent from "./PageComponent";
 import PageContext from "../Core/PageContext";
 
@@ -19,11 +20,15 @@ export default class ActionLink extends React.Component<ActionInfo> {
     }
 
     openInTarget = () => {
-        const { Url, Target } = this.props;
+        const { Url, LinkTarget } = this.props;
         
-        if (Target === "POPUP") {
-           openDialog("<>", <PageComponent url={Url} history={this.context.navigator.history} popup />, { hideCommands: true, size: "lg" });
-        }
+        if (LinkTarget === "POPUP") {
+            openDialog("<>", (dlgProps: any) => {
+                return <PageComponent url={Url} openerNavigator={this.context.navigator} popup={dlgProps} /> 
+            }, { hideCommands: true, size: "lg" });
+        } else if (LinkTarget === "DRAWER") {
+            openDrawer("<>", <PageComponent url={Url} openerNavigator={this.context.navigator} popup />, { hideCommands: true });
+         }
     }
 
     navigate = (event: any) => {
@@ -32,15 +37,15 @@ export default class ActionLink extends React.Component<ActionInfo> {
     }
     
     renderLink() {
-        const { Title, ActionId, ExecutionType, Url, OnlyIcon, Target } = this.props;
+        const { Title, ActionId, ExecutionType, Url, Attributes, LinkTarget } = this.props;
         const title = Title || ActionId;
-        let caption = OnlyIcon ? "" : title;
+        let caption = Attributes && Attributes.OnlyIcon ? "" : title;
 
         if ((!ExecutionType || ExecutionType === 4) && Url) {
             let u = `/${Url}`;
             u = u.replace("//", "/");
 
-            if (Target) {
+            if (LinkTarget) {
                 return <Button type="link" onClick={this.openInTarget} style={{ height:0, padding:0 }}>{caption}</Button>;
             }
 
@@ -51,13 +56,13 @@ export default class ActionLink extends React.Component<ActionInfo> {
     }
 
     getButtonType(): { type: ButtonType, isDanger: boolean } {
-        const { ButtonStyle, ActionType } = this.props;
+        const { Attributes, ActionType } = this.props;
         const acTyp = ActionType || 0;
         let res: { type: ButtonType, isDanger: boolean } = {type: "default", isDanger: false};
         
-        if (ButtonStyle) {
+        if (Attributes && Attributes.ButtonStyle) {
 
-            res.type = ButtonStyle as ButtonType;
+            res.type = Attributes.ButtonStyle as ButtonType;
         } else if([2,10,11,12].indexOf(acTyp) >= 0) {
             res.type = "primary";
         } else if([5,9,13].indexOf(acTyp) >= 0) {

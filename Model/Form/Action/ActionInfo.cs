@@ -16,6 +16,7 @@ namespace StackErp.Model.Form
         public ActionButtonPosition ActionPosition { set; get; }
         public ActionDisplayType DisplayType { set; get; }
         public string Icon { set; get; }
+        public string LinkTarget { set; get; }
         public ActionExecutionType ExecutionType { set; get; }
         private DynamicObj _attr;
         public DynamicObj Attributes { get => _attr; }
@@ -27,7 +28,6 @@ namespace StackErp.Model.Form
         }
         public ActionInfo(string rawUrl, RequestQueryString qs)
         {
-            _attr = new DynamicObj();
             this.RawUrl = rawUrl;
             this.Query = (qs == null) ? null : qs.Clone();
             ExecutionType = ActionExecutionType.Redirect;
@@ -35,6 +35,9 @@ namespace StackErp.Model.Form
 
         public void AddAttribute(string key, object value)
         {
+            if (this._attr == null)
+                this._attr = new DynamicObj();
+                
             this._attr.Add(key, value);
         }
         public string ToURL()
@@ -54,6 +57,15 @@ namespace StackErp.Model.Form
             }
 
             return str;
+        }
+
+        public void AddButtonStyle(string style)
+        {
+            this.AddAttribute("ButtonStyle", style); //danger, primary, dashed
+        }
+        public void ShowOnlyIcon()
+        {
+            this.AddAttribute("OnlyIcon", true);
         }
     }
 }

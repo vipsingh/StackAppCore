@@ -11,7 +11,7 @@ namespace StackErp.Model.Entity
         string Name {get;}
         string DBName {get;}
         string Text { get; }
-        Dictionary<string, BaseField> Fields {get;}
+        InvariantDictionary<BaseField> Fields {get;}
         
         string TextField {get; set;}
          string IDField {get;}
@@ -19,6 +19,9 @@ namespace StackErp.Model.Entity
         List<IEntityRelation> Relations {get;}
 
         List<string> ComputeOrderSeq { get; }
+
+        bool IsChildEntity {get;}
+        bool IsTransiant {get;}
 
         Dictionary<string, BaseField> GetFields();
         BaseField GetFieldSchema(string fieldName);
@@ -29,11 +32,14 @@ namespace StackErp.Model.Entity
         List<EntityModelBase> GetAll(FilterExpression filter);
         List<EntityModelBase> GetAll(int[] ids);
         AnyStatus Save(StackAppContext appContext, EntityModelBase model);
+        AnyStatus Save(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
         AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
         AnyStatus OnBeforeDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
-        bool Write(int id, DynamicObj model);
+        
+        AnyStatus DeleteRecord(int id);
         DBModelBase Read(int id, List<string> fields);
         List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter);
+        List<int> ReadIds(FilterExpression filter);
 
         IDBEntity GetEntity(EntityCode id);
         
@@ -53,6 +59,5 @@ namespace StackErp.Model.Entity
         /*Item1: FIeldName, Item2: Child RefFieldName*/
         List<(string, string)> OtherChildFields {get;}
     }
-
 
 }

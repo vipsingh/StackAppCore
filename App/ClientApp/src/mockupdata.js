@@ -329,6 +329,7 @@ export const entity_detail = {
 
 export const entity_edit = {
         "PageType": 1,
+        "PageTitle": {"PageTitle":"xyz"},
         "Widgets": {
             "Name": {
                 "WidgetType": 1,
@@ -408,7 +409,7 @@ export const entity_edit = {
                 "Validation": null,
                 "IsReadOnly": false,
                 "IsRequired": false,
-                "IsMultiSelect": true,
+                "IsMultiSelect": false,
                 "DataActionLink": {
                     "ActionId": null,
                     "Title": null,
@@ -472,7 +473,7 @@ export const entity_edit = {
                 "IsRequired": false,
                 "DataActionLink": null,
                 "ActionLink": null,
-                "RuleToFire": [
+                "RuleToFire_x": [
                     0,
                     1
                 ],
@@ -484,6 +485,17 @@ export const entity_edit = {
                             "Clear": true
                         }
                     ]
+                },
+                "Features": {
+                    "OPTIONS": {
+                        "Criteria": {
+                            "$and": [
+                                {"Role": [0, 1]}
+                            ]
+                        },
+                        "Depends": ["Role"],
+                        "Options": [3,4]
+                    }
                 }
             },
             "SubmitAmount": {
@@ -504,9 +516,19 @@ export const entity_edit = {
                 "DataActionLink": null,
                 "ActionLink": null,
                 "IsEditable": false,
-                "RuleToFire": [
+                "RuleToFire_x": [
                     2
                 ],
+                "Features": {
+                    "INVISIBLE": {
+                        "Criteria": {
+                            "$and": [
+                                {"Type": [0, 2]}
+                            ]
+                        },
+                        "Depends": ["Type"]
+                    }
+                }
             },
             "ComputedAmount": {
                 "WidgetType": 3,
@@ -525,10 +547,16 @@ export const entity_edit = {
                 "DataActionLink": null,
                 "ActionLink": null,
                 "RuleToFire": null,
-                "IsEditable": false                
+                "IsEditable": false,
+                "Features": {
+                    "EVAL": {
+                        "Expression": "SubmitAmount + 100",
+                        "Depends": ["SubmitAmount"]
+                    }
+                }
             }
         },
-        "FormRules": [
+        "FormRules_x": [
             {
                 "Id": 0,
                 "Type": "hidden",

@@ -50,9 +50,10 @@ export default class Form extends React.Component<FormProps, {
             if (ix === keys.length) {
                 this.setDataModel(m, { updateBy: "FORM" });
             } else
-                this.execAllFormFeature(keys[ix++], m, this.getEntitySchema(), [], next); 
+                this.execAllFormFeature(keys[ix++], m, this.getEntitySchema(), null, next); 
         };
-        next(model);
+
+        if (!_.isEmpty(model)) next(model);
     }
 
     renderField(ControlId: string, customProps: any) {
@@ -131,44 +132,48 @@ export default class Form extends React.Component<FormProps, {
         const cErrors = this.setValidationResult(controlId, vRes);
         this.setState({errors: cErrors});
 
-        this.execAllFormFeature(controlId, model, entitySchema, ["HIDDEN", "OPTIONS"], (m: IDictionary<IFieldData>) => {
-            this.setDataModel(m, { updateBy: "WIDGET", param: controlId }, afterChange);
-        });
-        
-        if (fieldInfo.Dependency) {
-            this.executeDependecy(controlId, model, (m: IDictionary<IFieldData>) => {
-                this.setDataModel(m, { updateBy: "WIDGET", param: controlId });
+        this.execAllFormFeature(controlId, model, entitySchema, ["INVISIBLE", "OPTIONS"], (m: IDictionary<IFieldData>) => {
+            this.setDataModel(m, { updateBy: "WIDGET", param: controlId }, () => {
+                if (fieldInfo.Dependency) {
+                    this.executeDependecy(controlId, this.getDataModel(), (m1: IDictionary<IFieldData>) => {
+                        this.setDataModel(m1, { updateBy: "WIDGET", param: controlId }, afterChange);
+                    });
+                }
+
+                if (afterChange) afterChange();
             });
-        }
+        });        
     }
 
-    execAllFormFeature(controlId: string, dataModel: IDictionary<IFieldData>, entitySchema: IPageInfo, onlyFire: Array<string>, cb: Function) {
+    execAllFormFeature(controlId: string, dataModel: IDictionary<IFieldData>, entitySchema: IPageInfo, onlyFire: Array<string> | null, cb: Function) {
         const field = entitySchema.getField(controlId);
+        if (!field) return;
         
-        if (field.RuleToFire && field.RuleToFire.length > 0) {
-            _.each(field.RuleToFire, (rule) => {                
-                const rFire = _.find(entitySchema.FormRules, { Index: rule });
-                if (rFire) {
-                    if (onlyFire.length > 0 && onlyFire.indexOf(rFire.Type.toUpperCase()) >= 0) {
-                        dataModel = this.execFeature(rFire, field, dataModel);
-                    } else if (onlyFire.length === 0) {
-                        dataModel = this.execFeature(rFire, field, dataModel);
-                    }
-                }
-            });
+        const dependents = entitySchema.Dependencies[controlId];
+        
+        if (dependents && dependents.length > 0) {
+            _.each(dependents, (fieldId) => {
+                const depField = entitySchema.getField(fieldId);
+                dataModel = this.execWidgetFeature(field, depField, dataModel, entitySchema, onlyFire)
+            })
         }
         cb(dataModel);
     }
 
-    execFeature(rFire: any, field: WidgetInfo, dataModel: IDictionary<IFieldData>): IDictionary<IFieldData> {
-        const typ = rFire.Type.toUpperCase();
-        if(typ === "HIDDEN") {
-            dataModel = formFeatures.FieldVisibility.execute(rFire, field.WidgetId, dataModel, this.getFormAPI());
-        } else if(typ === "OPTIONS") {
-            dataModel = formFeatures.OptionsVisibility.execute(rFire, field.WidgetId, dataModel, this.getFormAPI());
-        } else if(typ === "EVAL") {
-            dataModel = formFeatures.ExpressionEval.execute(rFire, dataModel, this.getFormAPI());
-        }
+    execWidgetFeature(parentField: WidgetInfo, depField: WidgetInfo, dataModel: IDictionary<IFieldData>, entitySchema: IPageInfo, onlyFire: Array<string> | null) {
+        _.forIn(depField.Features, (f, fType) => {
+            if (onlyFire && onlyFire.indexOf(fType) < 0) return;
+            
+            if(fType === "Invisible") {
+                dataModel = formFeatures.FieldVisibility.execute(depField, parentField.WidgetId, dataModel, this.getFormAPI());
+            } else if(fType === "Eval") {
+                dataModel = formFeatures.ExpressionEval.execute(depField, dataModel, this.getFormAPI());
+            } else if(fType === "Options") {
+                dataModel = formFeatures.OptionsVisibility.execute(depField, parentField.WidgetId, dataModel, this.getFormAPI());
+            } else if(fType === "ReadOnly") {
+                dataModel = formFeatures.FieldReadOnly.execute(depField, parentField.WidgetId, dataModel, this.getFormAPI());
+            }
+        });
 
         return dataModel;
     }

@@ -1,12 +1,13 @@
 import React from "react";
 import PageContext, { createPageContext } from "../Core/PageContext";
 import PageFactory from "../Core/PageFactory";
+import { close } from "../Component/UI/Dialog";
 
 export default class PageComponent extends React.Component<
 {
   url: any;
-  history?: any,
-  popup?: boolean
+  openerNavigator?: any,
+  popup?: any
 },
 {
   loaded: boolean;
@@ -25,7 +26,16 @@ constructor(props: any) {
     data: null,
   };
 
-  this.pageContext = createPageContext(0, this.props.history, this.props.popup);
+  this.pageContext = createPageContext(0, this.props.openerNavigator.history, this.props.popup);
+  if (this.props.popup) {
+    this.pageContext.navigator.windowType = "POPUP" 
+    this.pageContext.navigator.close = () => {
+        const dlg = this.props.popup as any
+        close(dlg.dialogId);
+    }
+
+    this.pageContext.navigator.opener = this.props.openerNavigator;
+  }
 }
 
 componentDidMount() {

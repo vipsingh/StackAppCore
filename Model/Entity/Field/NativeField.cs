@@ -34,6 +34,12 @@ namespace StackErp.Model.Entity
         }
     }
 
+    public class PhoneField: StringField
+    {
+        public PhoneField(): base() {
+            Type = FieldType.Phone;
+        }
+    }
     public class JsonField: StringField
     {
         public JsonField(): base() {

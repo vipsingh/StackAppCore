@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackErp.Model;
 using StackErp.Model.Utils;
@@ -13,6 +14,8 @@ namespace StackErp.ViewModel.FormWidget
         public override FormControlType WidgetType { get => FormControlType.ListForm; }
         public ListFormDisplayMode ListDisplayMode {set;get;} 
         public ViewPage FormPage  {set;get;} 
+        [JsonIgnore]
+        public string RelatedField  {set;get;} 
         public ListFormWidget(WidgetContext cntxt): base(cntxt)
         {
             ListDisplayMode = ListFormDisplayMode.Form;
@@ -20,9 +23,23 @@ namespace StackErp.ViewModel.FormWidget
 
         public override void OnCompile()
         {
-                //build form metadata for link object
-                //set fetch data url(For edit mode)
-            
+            this.CaptionPosition = 1;            
+        }
+
+        protected override bool OnSetData(object value)
+        {
+            var entityModel = this.Context.FormContext.EntityModelInfo;
+            DataLink = new StackErp.Model.Form.ActionInfo("widget/GetListFormData", new RequestQueryString() { EntityId = entityModel.EntityId, ItemId = entityModel.ObjectId, FieldName = this.RelatedField });
+
+            return base.OnSetData(value);
+        }
+
+        protected override bool OnFormatSetData(object value)
+        {
+            var entityModel = this.Context.FormContext.EntityModelInfo;
+            DataLink = new StackErp.Model.Form.ActionInfo("widget/GetListFormData", new RequestQueryString() { EntityId = entityModel.EntityId, ItemId = entityModel.ObjectId, FieldName = this.RelatedField });
+
+            return base.OnFormatSetData(value);
         }
 
         public override object GetValue()
@@ -33,6 +50,7 @@ namespace StackErp.ViewModel.FormWidget
                 foreach(JObject obj in (JArray)PostValue) 
                 {
                     var uiModel = JSONUtil.DeserializeObject<UIFormModel>(obj.ToString());
+                    if (uiModel.Widgets.Count == 0) continue;
                     
                     var qs = new RequestQueryString();
                     qs.EntityId = uiModel.EntityInfo.EntityId; 

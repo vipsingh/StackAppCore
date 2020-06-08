@@ -1,31 +1,37 @@
 import update from "immutability-helper";
 import FilterCriteria from "./FilterCriteria";
 
-function execute(rule: any, field: string, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {
-  const fieldsToHide = rule.Fields;
+function execute(
+  toField: WidgetInfo,
+  field: string,
+  model: IDictionary<IFieldData>,
+  formApi: FormApi
+): IDictionary<IFieldData> {
+  //const fieldsToHide = toField.WidgetId;
+  const feature = toField.Features ? toField.Features["Invisible"] : {};
 
   let isCriteriaMetch = true;
-  if (rule.Criteria) {
-    isCriteriaMetch = FilterCriteria.execute(rule.Criteria, model);
+  if (feature.Criteria) {
+    isCriteriaMetch = FilterCriteria.execute(feature.Criteria, model);
   }
 
   let isHidden = false;
   if (isCriteriaMetch) {
     isHidden = true;
   }
-  fieldsToHide.forEach((fId: string) => {    
-    let fHide = formApi.getField(fId);
-    let fTempdata = formApi.getWidgetTempdata(fId);
-    let fdata = model[fId];
-    if (fHide.IsHidden) return;
 
-    if (!isHidden && fdata.Invisible && fTempdata.hiddenBy !== field) {
-    } else {       
-      model = update(model, {[fId]: { $merge: {Invisible: isHidden}}});      
-    }
+  let fTempdata = formApi.getWidgetTempdata(toField.WidgetId);
+  let fdata = model[toField.WidgetId];
+  if (toField.IsHidden) return model;
 
-    formApi.setWidgetTempdata(fId, { hiddenBy: field });
-  });
+  if (!isHidden && fdata.Invisible && fTempdata.hiddenBy !== field) {
+  } else {
+    model = update(model, {
+      [toField.WidgetId]: { $merge: { Invisible: isHidden } },
+    });
+  }
+
+  formApi.setWidgetTempdata(toField.WidgetId, { hiddenBy: field });
 
   return model;
 }

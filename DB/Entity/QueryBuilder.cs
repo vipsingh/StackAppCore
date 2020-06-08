@@ -55,7 +55,7 @@ namespace StackErp.DB
                 }
             }
 
-            return PrepareSelectQuery(entTable, addedFields, toJoinTables, $" {entTable}.id = @ItemId");
+            return PrepareSelectQuery(entTable, addedFields, toJoinTables, $" {entTable}.id = ANY(@ItemId)");
         }
 
         string PrepareSelectQuery(string table, List<(string, string, string)> select, List<(string, string, string)> joinTables, string where)

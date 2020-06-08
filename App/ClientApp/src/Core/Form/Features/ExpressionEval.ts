@@ -1,7 +1,9 @@
 import update from "immutability-helper";
 
-function execute(rule: any, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {
-    const { Field, Exp, ExpFields } = rule;
+function execute(toField: WidgetInfo, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {    
+    const feature = toField.Features ? toField.Features["Eval"] : {};
+    const { Expression: Exp, Depends: ExpFields } = feature;
+
     try {
         const arrVar: any[] = [];
         ExpFields.forEach((ef: string) => {
@@ -22,9 +24,9 @@ function execute(rule: any, model: IDictionary<IFieldData>, formApi: FormApi): I
         const str = `function(){ ${arrVar.join(';')} return ${Exp} }`;
         const res = Function(`return (${str})()`)();   
         
-        model = update(model, {[Field]: { Value: { $set: res}, IsDirty: { $set: true}}});              
+        model = update(model, {[toField.WidgetId]: { Value: { $set: res}, IsDirty: { $set: true}}});              
     } catch(ex) {
-        _Debug.error(`ExpressionEval: error in evaluating expression on ${Field}. ${ex}`);
+        _Debug.error(`ExpressionEval: error in evaluating expression on ${toField.WidgetId}. ${ex}`);
     }
     return model;
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using StackErp.Model;
 
 namespace StackErp.App.Models
@@ -17,6 +18,15 @@ namespace StackErp.App.Models
         }
 
 
+    }
+
+    public class AuthenticateModel
+    {
+        [Required]
+        public string Username { get; set; }
+
+        [Required]
+        public string Password { get; set; }
     }
 
 }

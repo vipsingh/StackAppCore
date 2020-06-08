@@ -20,10 +20,12 @@ namespace StackErp.ViewModel.FormWidget
             Add(FormControlType.Dropdown, GetDropdown);
             Add(FormControlType.EntityPicker, GetObjectPicker);
             Add(FormControlType.NumberBox, GetNumber);
-            Add(FormControlType.CheckBox, GetCheckBox);
-            Add(FormControlType.LongText, GetText);     
-            Add(FormControlType.Image, GetImage);     
+            Add(FormControlType.CheckBox, GetCheckBox);                 
+            Add(FormControlType.Image, GetImage);
+            Add(FormControlType.LongText, (cntxt) => { return new LongTextWidget(cntxt); });      
+            Add(FormControlType.HtmlText, (cntxt) => { return new HtmlTextWidget(cntxt); });      
 
+            Add(FormControlType.ListForm, GetListForm);
             Add(FormControlType.EntityListView, GetEntityList);
             Add(FormControlType.EntityFilter, GetFilterWidget);
         }
@@ -95,6 +97,10 @@ namespace StackErp.ViewModel.FormWidget
             return new ImageField(cntxt);
         }
         //**********************
+        private static BaseWidget GetListForm(WidgetContext cntxt)
+        {
+            return new ListFormWidget(cntxt);
+        }
         private static BaseWidget GetEntityList(WidgetContext cntxt)
         {
             return new EntityListWidget(cntxt);

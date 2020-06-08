@@ -82,10 +82,11 @@ export default class Studio extends Component<
   onFieldSelect = (f: any) => {
     //this.setState({ selectedField: f.Id });
     const selectedF = f;//_.find(this.state.form.Fields, { Id: f.Id });
-    this.fieldPropDlg = openDialog("Field", (<FieldProps
-      selectedField={selectedF}
-      setFieldProp={this.setFieldProp}
-    />), { hideCommands: true, size: "lg" });
+    this.fieldPropDlg = openDialog("Field", () => { return <FieldProps
+        selectedField={selectedF}
+        setFieldProp={this.setFieldProp}
+      />; 
+    }, { hideCommands: true, size: "lg" });
   };
 
   setFieldProp = (toSaveModel: any) => {
@@ -120,25 +121,38 @@ export default class Studio extends Component<
     );
   }
 
+  moveField(id: number, fieldBoxId: number) {
+    const fboxix = _.findIndex(this.state.FieldBox, { Id: fieldBoxId });
+    let fieldBox = update(this.state.FieldBox, {[fboxix]: { $set: Object.assign({}, this.state.FieldBox[fboxix], { FieldId: id })} });
+    const fboxix1 = _.findIndex(this.state.FieldBox, { FieldId: id });
+    fieldBox = update(fieldBox, {[fboxix1]: { $set: Object.assign({}, fieldBox[fboxix1], { FieldId: -1 })} });
+    
+    this.setState({ FieldBox: fieldBox });    
+  }
+
   renderFieldBox = (fieldId: number) => {
     let fieldItem = _.find(this.state.form.Fields, { Id: fieldId });
     return (
+      <MoveBox item={{ id: fieldId }} moveField={(id: number, fieldBoxId: string) => { 
+        this.moveField(id, parseInt(fieldBoxId));
+      }}>
       <Form.Item label={fieldItem.FieldName} labelCol={{span: 6}} wrapperCol={{span: 18}}>
-      <Input
-        addonAfter={
-          <Button
-            type="link"
-            onClick={() => {
-              this.onFieldSelect(fieldItem);
-            }}
-          >
-            {"###"}
-          </Button>
-        }
-        placeholder={fieldItem.FieldName}
-        disabled
-      />
+        <Input
+          addonAfter={
+            <Button
+              type="link"
+              onClick={() => {
+                this.onFieldSelect(fieldItem);
+              }}
+            >
+              {"###"}
+            </Button>
+          }
+          placeholder={fieldItem.FieldName}
+          disabled
+        />
     </Form.Item>
+    </MoveBox>
     );
   }
 
@@ -162,7 +176,7 @@ export default class Studio extends Component<
             </Col>
             <Col span={20}>
               <div style={panelStyle}>
-                <Form>
+                <div>
                 {
                   _.map(this.state.FieldBox, (b) => {
                     return <FieldPanel 
@@ -171,7 +185,7 @@ export default class Studio extends Component<
                   })
                 }
                 <Button type="primary">{"Save"}</Button>
-                </Form>
+                </div>
               </div>
             </Col>
           </Row>
@@ -202,12 +216,14 @@ const Box: React.FC<{
 }> = ({ item, addField }) => {
   const [{ isDragging }, drag] = useDrag({
     item: { name: item.Value.toString(), type: "FIELDBOX" },
+
     end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
       const dropResult = monitor.getDropResult()
       if (item && dropResult && dropResult.fieldId <= 0) {
         addField(item.name, dropResult.name);
       }
     },
+    
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),
@@ -222,7 +238,7 @@ const Box: React.FC<{
 }
 
 const style: React.CSSProperties = {
-  height: '2.5rem',
+  minHeight: '2.5rem',
   width: '15rem',
   margin: '0.5rem',
   float: 'left',
@@ -255,4 +271,34 @@ const FieldPanel: React.FC<any> = ({Id, FieldId, render}) => {
         </Col>
     </Row>
   );
+}
+
+const MoveBox: React.FC<{
+  item: any,
+  moveField: Function,
+  children: any
+}> = ({ item, moveField, children }) => {
+  
+  const [{ isDragging }, drag] = useDrag({
+    item: { name: item.id.toString(), type: "FIELDBOX" },
+    
+    end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
+      const dropResult = monitor.getDropResult();
+      console.log(item);
+      if (item && dropResult && dropResult.fieldId <= 0) {
+        moveField(parseInt(item.name), dropResult.name);
+      }
+    },
+    
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  })
+  const opacity = isDragging ? 0.4 : 1
+
+  return (
+    <div ref={drag} style={{ border: '1px dashed gray', opacity }}>
+      {children}
+    </div>
+  )
 }

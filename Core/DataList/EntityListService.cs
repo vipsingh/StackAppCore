@@ -6,6 +6,7 @@ using StackErp.DB.DataList;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
+using StackErp.Model.Layout;
 
 namespace StackErp.Core.DataList
 {
@@ -14,32 +15,54 @@ namespace StackErp.Core.DataList
         public DataListDefinition GetEntityListDefn(EntityCode entityId, int queryId = 0)
         {
             var deff = ListDbService.GetEntityList(entityId);
-            deff.Id = entityId.Code.ToString() + "_" + queryId.ToString();
-            deff.PageSize = 50;
-            //var layout = new EntityLayoutService(null, entityId);
             var _Entity = Core.EntityMetaData.Get(entityId);
-
-            //var defn = new DataListDefinition();
-            // defn.DataSource = new FieldDataSource() {
-            //     Type = DataSourceType.Entity,
-            //     Entity = entityId
-            // };
-
-            //defn.Id = entityId.Code.ToString() + "_" + queryId.ToString();
-            //defn.Layout = layout.PrepareListLayout(queryId);
-            //defn.ItemViewField = _Entity.GetFieldSchema(_Entity.TextField).ViewName;
-            //defn.PageSize = 50; 
+            if (deff == null) 
+            {
+                deff = CreateDefaultListDefn(_Entity, entityId);
+            }
+            deff.Id = entityId.Code.ToString() + "_" + queryId.ToString();
+            if (deff.PageSize <= 0)
+                deff.PageSize = 50;
 
             return deff;
         }
 
-        public List<DynamicObj> ExecuteData(DbQuery query, Func<string, object, DynamicObj, object> onFormattedFieldValue)
+        private EntityListDefinition CreateDefaultListDefn(DBEntity entity, EntityCode entityId)
         {
-            var data = QueryDbService.ExecuteEntityQuery(query);
-            return PrepareEntityData(data, query, onFormattedFieldValue);
+            var defn = new EntityListDefinition()
+            {
+                EntityId = entityId.Code,
+                Name = "Default",
+                ItemIdField = entity.IDField,
+                ItemViewField = entity.TextField,
+                OrderByField  = new List<string>() { entity.TextField },
+            };
+
+            defn.DataSource = new FieldDataSource() 
+            {
+                Type = DataSourceType.Entity,
+                Entity = entityId
+            };
+
+            List<TField> col_r = new List<TField>();
+            var layoutF = entity.GetLayoutFields(EntityLayoutType.View);
+            var tlist = new TList();
+            foreach (var f in layoutF)
+            {
+                tlist.Fields.Add(new TField() { FieldId = f.Name });
+            }
+            defn.Layout = tlist;
+
+            return defn;
         }
 
-        public List<DynamicObj> PrepareEntityData(IEnumerable<DbObject> data, DbQuery query, Func<string, object, DynamicObj, object> onFormattedFieldValue)
+        public List<DynamicObj> ExecuteData(DbQuery query, Action<DynamicObj> onPrepareRow, Func<string, object, DynamicObj, object> onFormattedFieldValue)
+        {
+            var data = QueryDbService.ExecuteEntityQuery(query);
+            return PrepareEntityData(data, query, onPrepareRow, onFormattedFieldValue);
+        }
+
+        public List<DynamicObj> PrepareEntityData(IEnumerable<DbObject> data, DbQuery query, Action<DynamicObj> onPrepareRow, Func<string, object, DynamicObj, object> onFormattedFieldValue)
         {
             var res = new List<DynamicObj>();
             var idField = query.Entity.GetFieldSchema(query.ItemIdField);
@@ -53,8 +76,14 @@ namespace StackErp.Core.DataList
                     if (field.IsSelect)
                     {
                         row.Add(field.Field.Name, onFormattedFieldValue(field.Field.Name, field.Field.ResolveDbValue(dataRow), row), true);
+                    } 
+                    else 
+                    {
+                        row.Add(field.Field.Name, field.Field.ResolveDbValue(dataRow));
                     }
-                }                                
+                }
+
+                onPrepareRow(row);
 
                 res.Add(row);
             }

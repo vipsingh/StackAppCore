@@ -1,6 +1,7 @@
 import React from "react";
 import _ from "lodash";
 import { Row, Col } from "antd";
+import { DesignerContext } from "../../Core/Studio";
 
 export default class UIView extends React.Component<{
     template: any,
@@ -42,7 +43,7 @@ export class UIField extends React.Component<{
 }
 
 export const PageSheet: React.FC<any> = (props) => {
-    const { sheet, key, getControl } =props;
+    const { sheet, key, getControl } = props;
     const { Groups } = sheet;
     let i = 0;
 
@@ -50,7 +51,7 @@ export const PageSheet: React.FC<any> = (props) => {
         <div className="form-ui-sheet">
                 {
                     _.map(Groups, (p) => {
-                        return <PageGroup getControl={getControl} group={p} key={`${key}_group_${i++}`} /> //this.renderGroup(p, `${key}_group_${i++}`);
+                        return <PageGroup sheetId={sheet.Id} getControl={getControl} group={p} key={`${key}_group_${i++}`} /> //this.renderGroup(p, `${key}_group_${i++}`);
                     })
                 }
         </div>
@@ -58,13 +59,21 @@ export const PageSheet: React.FC<any> = (props) => {
   }
 
 export const PageGroup: React.FC<any> = (props) => {
-    const { group, getControl } = props;
+    const { group, getControl, sheetId } = props;
     const { Rows, Label } = group;
     //let i = 0;
+    const renderDesigner = (api: any) => {
+        if (!api) return;
+        
+        return api.renderGroupSetting(sheetId, group);
+    }
 
     return (
         <div className="form-ui-group paper-group">
             {!Label || <h3>{Label}</h3>}
+            <DesignerContext.Consumer>
+                {(api) => renderDesigner(api)}
+            </DesignerContext.Consumer>
         {
             _.map(Rows, (row) => {
                 const { Fields } = row;

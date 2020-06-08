@@ -9,6 +9,7 @@ export default class ViewPageInfo implements IPageInfo {
     PostUrl: string|undefined
     FormRules!: any
     Errors!: IDictionary<{ IsValid: boolean, Message?: string }>
+    Dependencies: IDictionary<Array<any>>
 
     constructor(schema: any, data: any = null) {
         this.Widgets = {};
@@ -27,8 +28,26 @@ export default class ViewPageInfo implements IPageInfo {
             } else
                 this.Widgets = _.cloneDeep(schema.Widgets);
         }
+        
+        this.Dependencies = { };
+        _.forIn(this.Widgets, (w, wk) => {
+            if (w.Features) {
+                _.forIn(w.Features, (f, fk) => {
+
+                    if (f.Depends) {
+                        _.each(f.Depends, (d) => {
+                            if (!this.Dependencies[d]) this.Dependencies[d] = [];
+
+                            this.Dependencies[d] = _.union(this.Dependencies[d], [wk]);
+                        });
+                    }
+                });
+            }
+        });
+
         const wd: any = this.Widgets;
         wd["_UniqueId"] = { WidgetId: "_UniqueId", WidgetType: 0 };
+        wd["_EntityInfo"] = { WidgetId: "_EntityInfo", WidgetType: 0 };
     }
 
     getField(widgetId: string) {
@@ -42,6 +61,7 @@ export default class ViewPageInfo implements IPageInfo {
         });
 
         dataModel._UniqueId = { Value: _.uniqueId("v_form") };
+        dataModel._EntityInfo = { Value: this.EntityInfo };
 
         return dataModel;
     }

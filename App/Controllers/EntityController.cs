@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackErp.Model;
 using StackErp.UI.View.PageAction;
 using StackErp.UI.View.PageBuilder;
-using StackErp.ViewModel.DataList;
+using StackErp.UI.View.DataList;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -18,9 +20,9 @@ namespace StackErp.App.Controllers
     [SPA]
     public class EntityController : StackErp.UI.Controllers.BaseController
     {
-        public EntityController(ILogger<EntityController> logger): base(logger)
+        public EntityController(ILogger<EntityController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
-
+            logger.LogDebug(1, "NLog injected into EntityController");
         }
 
         public IActionResult Index()
@@ -80,7 +82,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult List([FromBody] ListRequestinfo request)
         {
-            var context = new DataListContext(this.StackAppContext, request);
+            var context = new DataListContext(this.StackAppContext, RequestQuery, request);
             var builder = new EntityListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);

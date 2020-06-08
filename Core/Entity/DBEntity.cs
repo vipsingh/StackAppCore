@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using StackErp.Core.Form;
 using StackErp.DB;
+using StackErp.DB.DataList;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
@@ -14,10 +15,11 @@ namespace StackErp.Core
     public class DBEntity : IDBEntity
     {
         public EntityCode EntityId { get; }
+        public AppModuleCode AppModule { get; }
         public string Name { get; }
         public string DBName { private set; get; }
         public string Text { private set; get; }
-        public Dictionary<string, BaseField> Fields { get; private set; }
+        public InvariantDictionary<BaseField> Fields { get; private set; }
 
         private string _fieldText;
         public string TextField { set { _fieldText = value; } get { return String.IsNullOrWhiteSpace(_fieldText) ? "Name" : _fieldText; } }
@@ -26,6 +28,11 @@ namespace StackErp.Core
         public List<IEntityRelation> Relations { private set; get; }
 
         public List<string> ComputeOrderSeq { private set; get; }
+
+        //If true than it can not be used directly
+        public bool IsChildEntity {private set;get;}        
+        public bool IsTransiant {protected set;get;}
+        public EntityDeletePolicyType DeletePolicyType {protected set;get;}
 
         private string _detailQry;
         public DBEntity(int id, string name, Dictionary<string, BaseField> fields, string dbName = "")
@@ -36,7 +43,7 @@ namespace StackErp.Core
             this.IDField = "ID";
             this.Text = name;
 
-            this.Fields = new Dictionary<string, BaseField>();
+            this.Fields = new InvariantDictionary<BaseField>();
             if (fields.Where(f => f.Key.ToUpper() == "ID").Count() == 0)
             {
                 this.Fields.Add("ID", new ObjectKeyField()
@@ -57,7 +64,8 @@ namespace StackErp.Core
                 DBName = "CreatedOn",
                 IsReadOnly = true,
                 Copy = false,
-                IsDbStore = true
+                IsDbStore = true,
+                ViewId = -1
             });
             fields.Add("UPDATEDON", new DateTimeField()
             {
@@ -67,7 +75,8 @@ namespace StackErp.Core
                 DBName = "UpdatedOn",
                 IsReadOnly = true,
                 Copy = false,
-                IsDbStore = true
+                IsDbStore = true,
+                ViewId = -1
             });
             fields.Add("CREATEDBY", new IntegerField()
             {
@@ -76,7 +85,8 @@ namespace StackErp.Core
                 DBName = "CreatedBy",
                 IsReadOnly = true,
                 Copy = false,
-                IsDbStore = true
+                IsDbStore = true,
+                ViewId = -1
             });
             fields.Add("UPDATEDBY", new IntegerField()
             {
@@ -85,15 +95,18 @@ namespace StackErp.Core
                 DBName = "UpdatedBy",
                 IsReadOnly = true,
                 Copy = false,
-                IsDbStore = true
+                IsDbStore = true,
+                ViewId = -1
             });
 
-            foreach (var f in fields)
+            var orderedFields = fields.Select(x => x.Value).OrderBy(x => x.ViewOrder);
+
+            foreach (var f in orderedFields)
             {
-                if (!this.Fields.Keys.Contains(f.Key))
+                if (!this.Fields.Keys.Contains(f.Name.ToUpper()))
                 {
-                    f.Value.Entity = this;
-                    this.Fields.Add(f.Key, f.Value);
+                    f.Entity = this;
+                    this.Fields.Add(f.Name.ToUpper(), f);
                 }
             }
 
@@ -109,6 +122,7 @@ namespace StackErp.Core
             InitRelations();
 
             var qBuilder = new EntityQueryBuilder(this);
+            
             _detailQry = qBuilder.BuildDetailQry();
 
             PrepareComputeOrderSeq();
@@ -157,10 +171,10 @@ namespace StackErp.Core
         }
 
         #region Data Fetch
-        public EntityModelBase GetSingle(int id)
+        public virtual EntityModelBase GetSingle(int id)
         {
             var sql = _detailQry;
-            var arr = DBService.Query(sql, new { ItemId = id });
+            var arr = DBService.Query(sql, new { ItemId = new int[] {id} });
             if (arr.Count() > 0)
             {
                 var d = arr.First();
@@ -179,7 +193,20 @@ namespace StackErp.Core
 
         public List<EntityModelBase> GetAll(int[] ids)
         {
-            throw new NotImplementedException();
+            var sql = _detailQry;
+            var arr = DBService.Query(sql, new { ItemId = ids });
+            var list = new List<EntityModelBase>();
+            if (arr.Count() > 0)
+            {
+                foreach(var a in arr)
+                {
+                    var model = new EntityRecordModel(this);
+                    model.BuiltWithDB(a);
+                    list.Add(model);
+                }
+            }
+
+            return list;
         }
 
         public DBModelBase Read(int id, List<string> fields)
@@ -189,7 +216,34 @@ namespace StackErp.Core
 
         public List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter)
         {
-            throw new NotImplementedException();
+            var q = new DbQuery(this);
+            foreach(var f in fields)
+            {
+                q.AddField(f, true);
+            }
+            q.SetFixedFilter(filter);
+
+            var data = QueryDbService.ExecuteEntityQuery(q);            
+
+            return null;
+        }
+
+        public List<int> ReadIds(FilterExpression filter)
+        {
+            var q = new DbQuery(this);
+            q.AddField(this.IDField, true);
+            q.SetFixedFilter(filter);
+            var data = QueryDbService.ExecuteEntityQuery(q);            
+            var list = new List<int>();
+            if (data.Count() > 0)
+            {
+                foreach(var d in data)
+                {
+                    list.Add(d.Get(this.IDField, 0));
+                }
+            }
+
+            return list;
         }
         #endregion
 
@@ -203,9 +257,7 @@ namespace StackErp.Core
         {
             var fs = new List<BaseField>();
             foreach (var f in this.Fields)
-            {                
-                if (new List<string>(){ "CREATEDON","UPDATEDON","CREATEDBY","UPDATEDBY" }.Contains(f.Key))
-                    continue;
+            {                                
                 if (f.Value.ViewId == 0 || f.Value.ViewId == Convert.ToInt16(type))
                 {
                     fs.Add(f.Value);
@@ -251,7 +303,12 @@ namespace StackErp.Core
             return Core.EntityMetaData.Get(id);
         }
 
-        public AnyStatus Save(StackAppContext appContext, EntityModelBase model)
+        public virtual AnyStatus Save(StackAppContext appContext, EntityModelBase model)
+        {
+            return Save(appContext, model, null, null);
+        }
+
+        public AnyStatus Save(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
         {
             AnyStatus status = AnyStatus.NotInitialized;
             try
@@ -259,11 +316,11 @@ namespace StackErp.Core
                 if (model.IsNew)
                 {
                     model.SetValue("CREATEDON", DateTime.Now.ToUniversalTime());
-                    model.SetValue("CREATEDBY", 1);
+                    model.SetValue("CREATEDBY", appContext.UserInfo.UserId);
                     model.SetMasterId(appContext.MasterId);
                 }
                 model.SetValue("UPDATEDON", DateTime.Now.ToUniversalTime());
-                model.SetValue("UPDATEDBY", 1);
+                model.SetValue("UPDATEDBY", appContext.UserInfo.UserId);
             
                 if (this.Validate(model))
                 {
@@ -271,7 +328,7 @@ namespace StackErp.Core
                     {
                         ((EntityRecordModel)model).ResolveComputedFields();
                     }
-                    status = EntityDBService.SaveEntity(appContext, this, model);
+                    status = EntityDBService.SaveEntity(appContext, this, model, connection, transaction);
                 }
                 else 
                 {
@@ -284,7 +341,7 @@ namespace StackErp.Core
                 status.Message = ex.Message;
             }
             return status;
-        }        
+        }
         
         private bool Validate(EntityModelBase model)
         {
@@ -311,9 +368,43 @@ namespace StackErp.Core
 
         public virtual AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
         {
-            var sts = AnyStatus.Success;
-           
+            AnyStatus sts = AnyStatus.Success;
+            
+            SaveRelatedData(appContext, model, connection, transaction);
+            
             return sts;
+        }
+        
+        private AnyStatus SaveRelatedData(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
+        {
+            AnyStatus sts = AnyStatus.Success;
+            //save child entities
+            foreach (var f in model.Attributes)
+            {               
+                var val = f.Value;
+                if (val.Field.Type == FieldType.OneToMany && val.IsChanged && val.Value != null && (val.Value as IList).Count > 0)
+                {
+                    var itemColl = (List<EntityModelBase>)val.Value;
+                    var field = val.Field;
+                    var entity = GetEntity(field.RefObject);
+                    foreach (var localModel in itemColl)
+                    {
+                        SetRelationshipValue(model.ID, field.Name, localModel);
+                        sts = entity.Save(appContext, localModel, connection, transaction);
+                        if (sts != AnyStatus.Success)
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return sts;
+        }
+        private void SetRelationshipValue(int parentId, string parentFieldName, EntityModelBase childModel)
+        {
+            var rel = this.Relations.Find(x => x.ParentRefField.Name == parentFieldName);
+            childModel.SetValue(rel.ChildRefField.Name, parentId);
         }
 
         public virtual AnyStatus OnBeforeDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
@@ -323,10 +414,13 @@ namespace StackErp.Core
                 ((EntityRecordModel)model).PrepareSaveImageField(appContext);
             return sts;
         }
-        public bool Write(int id, DynamicObj model)
+
+        public AnyStatus DeleteRecord(int id)
         {
+            //check related data also
+
             throw new NotImplementedException();
-        }        
+        }
 
         //private Hooks
         /*

@@ -66,7 +66,7 @@ export default class FieldProps extends Component<{
     render() {
 
         //return (<FilterBox />);
-        //return (<ListForm Schema={this.schema}  />);
+        //return (<ListForm FormPage={this.schema}  />);
 
         return (
             <Form

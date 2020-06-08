@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Options;
+using StackErp.Model;
 
 namespace StackErp.App.Controllers
 {
     public class AppController : StackErp.UI.Controllers.BaseController
     {
-        public AppController(ILogger<AppController> logger): base(logger)
+        public AppController(ILogger<AppController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
             
         }

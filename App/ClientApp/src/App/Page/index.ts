@@ -2,6 +2,7 @@ import { PageType } from "../../Constant";
 import NewEdit from "./Edit";
 import Detail from "./Detail";
 import Desk from "./Desk";
+import EntityStudio from "./Studio/EntityPage";
 import ErrorPage from "./Error";
 import PageFactory from "../../Core/PageFactory";
 
@@ -13,6 +14,7 @@ export default function() {
     PageFactory.addPage(PageType.Desk, Desk);
     PageFactory.addPage(PageType.Edit, NewEdit);
     PageFactory.addPage(PageType.Detail, Detail);
+    PageFactory.addPage(PageType.AppStudio, EntityStudio);
     PageFactory.addPage(PageType.Error, ErrorPage);
 }
 

@@ -12,11 +12,11 @@ namespace StackErp.ViewModel.ViewContext
         public EntityCode EntityId {get;}
         public int LayoutId {get;}
         public TView View {protected set; get;}
-        public LayoutContext(StackAppContext context, RequestQueryString query)
+        public LayoutContext(StackAppContext context, int layoutId, EntityCode entityId)
         {
             this.Context = context;
-            this.LayoutId = query.LayoutId;
-            EntityId= query.EntityId;
+            this.LayoutId = layoutId;
+            EntityId= entityId;
         }
 
         public virtual TView Build()
@@ -28,8 +28,8 @@ namespace StackErp.ViewModel.ViewContext
 
     public class DeskPageLayoutContext: LayoutContext
     {
-        public DeskPageLayoutContext(StackAppContext context, RequestQueryString query)
-            :base(context, query)
+        public DeskPageLayoutContext(StackAppContext context, int layoutId, EntityCode entityId)
+            :base(context, layoutId, entityId)
         {
         }
         public override TView Build()

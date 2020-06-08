@@ -23,13 +23,16 @@ namespace StackErp.Core
             field.FieldId = fieldId;
             field.Name = fname;
             field.Type = (FieldType)typ;
-            field.DBName = dbname;            
+            field.DBName = dbname;
+            field.ViewId = sch.Get<short>("viewtype", 0);
             field.IsDbStore = !String.IsNullOrEmpty(dbname);
             field.TableName = table;
             field._TempSchemaData = new DynamicObj();
             field.DefaultValue = sch.Get("defaultvalue", String.Empty);
+            field.ViewOrder = sch.Get("vieworder", 10000);
 
             field.IsRequired = sch.Get("isrequired", false);
+            
 
             var computeexpression = sch.Get("computeexpression", "");
             if (!string.IsNullOrEmpty(computeexpression))
@@ -117,6 +120,15 @@ namespace StackErp.Core
                 case FieldType.MonataryAmount:
                     field = new DecimalField();
                     break;
+                case FieldType.Html:
+                    field = new HtmlField();
+                    break;
+                case FieldType.Email:
+                    field = new EmailField();
+                    break;
+                case FieldType.Phone:
+                    field = new PhoneField();
+                    break;
                 case FieldType.ObjectLink:
                     field = new LinkField();
                     break;
@@ -173,6 +185,15 @@ namespace StackErp.Core
                     break;
                 case FieldType.Image:
                     t = FormControlType.Image;
+                    break;
+                case FieldType.Html:
+                    t = FormControlType.HtmlText;
+                    break;
+                case FieldType.Email:
+                    t = FormControlType.Email;
+                    break;
+                case FieldType.Phone:
+                    t = FormControlType.Phone;
                     break;
                 case FieldType.FilterField:
                     t = FormControlType.EntityFilter;

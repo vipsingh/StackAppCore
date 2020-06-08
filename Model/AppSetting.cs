@@ -2,8 +2,8 @@ using System;
 
 namespace StackErp.Model
 {
-    public class AppSetting
+    public class AppKeySetting
     {
-        
+        public string JWTSecret {set;get;}
     }
 }

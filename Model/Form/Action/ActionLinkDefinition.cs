@@ -6,6 +6,7 @@ namespace StackErp.Model.Form
 {
     public class ActionLinkDefinition
     {
+        public int Id { set; get; }
         public ActionType ActionType { set; get; }
         public string ActionId { set; get; }
         public FilterExpression Visibility { set; get; }

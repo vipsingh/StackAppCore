@@ -14,8 +14,8 @@ namespace StackErp.ViewModel.ViewContext
         public BaseField Field {private set; get;}
         public FieldDataSource DataSource {private set; get;}
         public EntityCode RelatedEntityId {private set; get;}
-        public PickerListContext(StackAppContext context, ListRequestinfo requestInfo)
-            : base(context, requestInfo)
+        public PickerListContext(StackAppContext context , RequestQueryString query, ListRequestinfo requestInfo)
+            : base(context, query, requestInfo)
         {
 
         }

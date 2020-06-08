@@ -1,8 +1,10 @@
 import React from "react";
-import { Table } from 'antd';
+import { Table, Dropdown, Menu } from 'antd';
 import _, { Dictionary } from "lodash";
 import ListingWrapper from "./ListingWrapper";
 import { cellRenderer } from "./Helper";
+import { DashOutlined } from '@ant-design/icons';
+import ActionLink from "../ActionLink";
 
 class GridView extends React.Component<{
     listData: any, 
@@ -26,12 +28,12 @@ class GridView extends React.Component<{
     }
 
     prepareAntTableSchema(columns: Dictionary<any>) {
-        return  _.reduce(Object.keys(columns), (result: Array<any>, value: any) => {
+        const cols =  _.reduce(Object.keys(columns), (result: Array<any>, value: any) => {
             const c =  columns[value];
             if (c.IsHidden) return result;
 
             result.push({
-                title: c.WidgetId,
+                title: c.Caption,
                 dataIndex: c.WidgetId, 
                 key: c.WidgetId,
                 render: this.formatCell.bind(this, c)
@@ -39,6 +41,33 @@ class GridView extends React.Component<{
 
             return result;
         }, []);
+
+        cols.push({key: "RowActions", 
+            dataIndex: "RowActions",
+            fixed: "right",
+            width: 30,
+            render: (col: any) => { 
+                if (!col || col.length === 0) return;
+
+                var menu = (
+                    <Menu>
+                        {_.map(col, (a) => {
+                            return (<Menu.Item>
+                                <ActionLink {...a} Target="POPUP" />
+                            </Menu.Item>)
+                        })}
+                    </Menu>
+                );
+                
+                return (<Dropdown overlay={menu}>
+                        <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                            <DashOutlined />
+                    </a>
+                </Dropdown>);
+            }
+        });
+
+        return cols;
     }    
 
     render() {

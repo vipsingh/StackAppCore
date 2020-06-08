@@ -2,23 +2,32 @@ import update from "immutability-helper";
 import FilterCriteria from "./FilterCriteria";
 import _ from "lodash";
 
-function execute(rule: any, field: string, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {  
+function execute(toField: WidgetInfo, field: string, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {  
+  const feature = toField.Features ? toField.Features["Options"] : {};
+
   let isCriteriaMetch = true;
-  if (rule.Criteria) {
-    isCriteriaMetch = FilterCriteria.execute(rule.Criteria, model);
+  if (feature.Criteria) {
+    isCriteriaMetch = FilterCriteria.execute(feature.Criteria, model);
   }
   
-  let fdata = model[rule.Field];
+  let fdata = model[toField.WidgetId];
   const { VisibleOptions } = fdata;
 
   let visOptions: Array<number> = [];
   if (isCriteriaMetch) {
-    visOptions = _.union(visOptions, VisibleOptions, rule.Options)
+    visOptions = _.union(visOptions, VisibleOptions, feature.Options)
   } else {
-    visOptions = _.filter(VisibleOptions, x => rule.Options.indexOf(x) < 0);
+    visOptions = _.filter(VisibleOptions, x => feature.Options.indexOf(x) < 0);
   }
 
-  model = update(model, {[rule.Field]: { $merge: {VisibleOptions: visOptions}}});      
+  let fieldVal = fdata.Value && _.isObjectLike(fdata.Value) ? fdata.Value.Value : fdata.Value;
+  if (visOptions && visOptions.indexOf(fieldVal) < 0)
+    fieldVal = null;
+
+  model = update(model, {[toField.WidgetId]: { $merge: {VisibleOptions: visOptions}}});
+  if (!fieldVal) {
+    model = update(model, {[toField.WidgetId]: { $merge: {Value: null}}});
+  }
 
   return model;
 }

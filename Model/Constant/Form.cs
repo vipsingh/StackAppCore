@@ -11,7 +11,8 @@ public enum AppPageType
     Desk = 3,
     Report = 4,
     Dashboard = 5,
-    Error = 6
+    Error = 10,
+    AppStudio = 7
 }
 public enum FormControlType {
     None = 0,
@@ -27,14 +28,19 @@ public enum FormControlType {
     Label = 10,
     Image = 11,
     File =12,
+    HtmlText=13,
+    Email=14,  
+    Phone=15,
+    Url=16,  
+    FormattedText = 21,
+    Avatar = 22,
     ListForm = 99,
     EntityListView = 100,
     EntityFilter=101
 }
 
 public enum EntityLayoutType {
-    None = -1,
-    All = 0,
+    None = 0,
     Edit = 1,
     View = 2,
     QuickView = 3,
@@ -102,14 +108,13 @@ public enum ActionType {
     Import = 14,
     Export= 15,
     Update = 16,
+    Page=17,
 
     Report = 20,
     Url = 21,
     Client = 22,
     Function = 23,
     Script=25,
-
-
 
     Custom = 50
 }
@@ -126,7 +131,7 @@ public enum ActionButtonPosition {
 
 public enum ActionDisplayType {
     None=0,
-    Label=1,
+    Link=1,
     Button=2
 }
 
@@ -134,7 +139,7 @@ public enum ActionExecutionType {
     None=0,
     Submit=1,
     Close=2,
-    Popup=3,
+    Function =3,
     Redirect=4,
     Client =5,
     Custom=6

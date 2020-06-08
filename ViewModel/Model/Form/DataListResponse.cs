@@ -8,7 +8,7 @@ namespace StackErp.ViewModel.Model
 {
     public class DataListResponse
     {
-        public Dictionary<string, BaseWidget> Fields  {set; get;} 
+        public Dictionary<string, IDisplayWidget> Fields  {set; get;} 
         public DynamicObj Properties { get; }
         public List<DynamicObj> Data {set; get;} 
         public string RenderMode{set;get;}

@@ -27,21 +27,24 @@ namespace StackErp.ViewModel.FormWidget
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
+        private DynamicObj _attrs;
+        public DynamicObj Attributes { get => _attrs; }
         private InvariantDictionary<IValidation> _validations;
         public InvariantDictionary<IValidation> Validation { get => _validations; }
-        public bool IsReadOnly { private set; get; }
+        public bool IsReadOnly { set; get; }
         public bool IsRequired { private set; get; }
         public ActionInfo DataActionLink { protected set; get; }
+        public ActionInfo DataLink { protected set; get; }
         public List<int> RuleToFire  { protected set; get; }
         public WidgetDependencyInfo Dependency { set; get; }
         public WidgetFeatures Features { set; get; }
         // FieldChangeSource: { SourceUrl: LinkInfo, DependUpon: Array<{Id: string}> }        
         protected object PostValue { private set; get; }
+        public int CaptionPosition { set; get; }
 
         public BaseWidget(WidgetContext context)
         {
-            Context = context;
-            _props = new DynamicObj();            
+            Context = context;                        
             this.Init(context);
         }
 
@@ -124,10 +127,38 @@ namespace StackErp.ViewModel.FormWidget
             this.AdditionalValue = null;
         }
 
+        public IWidgetData ToOnlyData()
+        {
+            var d = new WidgetData(this.Value);
+            d.AdditionalValue = this.AdditionalValue;
+            d.FormatedValue = this.FormatedValue;
+            d.DataLink = this.DataLink;
+
+            return d;
+        }
+
+        public void AddProperty(string key, object value)
+        {
+            if (_props == null)
+                _props = new DynamicObj();
+            
+            this._props.Add(key, value, true);
+        }
+
+        public void AddAttribute(string key, object value)
+        {
+            if (_attrs == null)
+                _attrs = new DynamicObj();
+            
+            this._attrs.Add(key, value, true);
+        }
+
         #region Build Validation
 
         public virtual void BuildValidation()
         {
+            if (this.IsViewMode) return;
+            
             if (this.IsRequired) 
             {
                 AddValidation(ValidationConstant.Required, ValidationHelper.GetRequiredValidation(Caption));
@@ -200,6 +231,7 @@ namespace StackErp.ViewModel.FormWidget
     {
         public WidgetFeature Eval {set;get;}
         public WidgetFeature Invisible {set;get;}
+        public WidgetFeature ReadOnly {set;get;}
         public WidgetFeature Mandatory {set;get;}
         public List<WidgetFeature> Options {set;get;}
     }
@@ -226,5 +258,21 @@ namespace StackErp.ViewModel.FormWidget
             }
         }
         
+    }
+
+    public class WidgetData : IWidgetData
+    {
+        public string FormatedValue {set;get;}
+
+        public DynamicObj AdditionalValue  {set;get;}
+
+        public object Value  {get;}
+
+        public ActionInfo DataLink {set;get;}
+
+        public WidgetData(object Value)
+        {
+            this.Value = Value;
+        }
     }
 }

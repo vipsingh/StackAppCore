@@ -57,6 +57,8 @@ namespace StackErp.Model.Form
                     param.Source = EvalSourceType.User;
                 else if (field.StartsWith("$app."))
                     param.Source = EvalSourceType.Env;
+                
+                field = field.Split('.')[1];
             } 
             else 
             {

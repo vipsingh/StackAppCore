@@ -36,7 +36,12 @@ namespace StackErp.Core
                 var val = f.Value;
                 if (val.Field.Type == FieldType.Image && val.IsChanged)
                 {
-                    var value ="";
+                    var value = val.Value;
+                    if (value == null || (value is string && String.IsNullOrEmpty(value.ToString())))
+                    {
+                        f.Value.SetValue(value);
+                        return;
+                    }
                     var obj =  (DynamicObj)val.Value;
                     if (obj.Get("IsTemp", false))
                     {

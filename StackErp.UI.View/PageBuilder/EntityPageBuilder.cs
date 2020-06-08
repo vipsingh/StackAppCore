@@ -10,7 +10,7 @@ namespace StackErp.UI.View.PageBuilder
         public ViewPage CreateNewPage(EditFormContext context)
         {
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery);
+            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -22,7 +22,7 @@ namespace StackErp.UI.View.PageBuilder
         public ViewPage CreateEditPage(EditFormContext context)
         {
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery);
+            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -34,7 +34,7 @@ namespace StackErp.UI.View.PageBuilder
         public ViewPage CreateDetailPage(DetailFormContext context)
         {
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery);
+            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -45,7 +45,7 @@ namespace StackErp.UI.View.PageBuilder
         }
         public ViewPage CreateDeskPage(DeskPageContext context)
         {
-            var lConext = new DeskPageLayoutContext(context.Context, context.RequestQuery);
+            var lConext = new DeskPageLayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 

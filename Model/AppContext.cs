@@ -18,7 +18,7 @@ namespace StackErp.Model
         public string NotSpecifiedText { set; get; }
         public string ImageStorePath { set; get; }
 
-        public void Init()
+        public void Init(AppKeySetting appSetting)
         {
             MasterId = 10;
             AppType = ApplicationType.Web;            
@@ -35,7 +35,11 @@ namespace StackErp.Model
             NotSpecifiedText = "";
 
             ImageStorePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "dms");
+
+           AppSetting = appSetting;
         }
+
+        public AppKeySetting AppSetting {private set;get;}
 
         // public bool IsAllow(ItemType itemType, OperationType operationType)
         // {
@@ -54,14 +58,17 @@ namespace StackErp.Model
         public int CompanyId { set; get; }
         public int RoleId { set; get; }
         public int UserId { set; get; }
-        public int UserName { set; get; }
+        public string UserName { set; get; }
         public int LoginId { set; get; }
         public int LanguageId { set; get; }
         public int TimeZoneId { set; get; }
         public int TimeZoneOffset { set; get; }
+        public bool IsMobile { set; get; }
 
         public UserContext()
         {
+            UserId = 1;
+            UserName = "Default User";
             CompanyId = 1;
             RoleId = 1;
             LanguageId = 1;

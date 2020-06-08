@@ -4,6 +4,7 @@ using System.Linq;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
+using StackErp.Model.Form;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 
@@ -17,24 +18,27 @@ namespace StackErp.ViewModel.ViewContext
         public DynamicObj Parameters { get => _parms; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
-        protected RequestQueryString RequestQuery {get => Context.RequestQuery;}
+        protected RequestQueryString RequestQuery {get;}
         protected DataListRequestType _RequestMode;
         public EntityCode SourceEntityId {protected set; get;}
         public IDBEntity SourceEntity {protected set; get;}
         public DbQuery DbQuery {protected set; get;}
-        public InvariantDictionary<BaseWidget> Fields  {set; get;} 
+        public InvariantDictionary<IDisplayWidget> Fields  {set; get;} 
+        public List<ActionLinkDefinition> RowLinks {set; get;}
         protected int _DefaultPageSize;
         public List<DynamicObj> Data {set; get;} 
         public  string IdColumn {set; get;} 
         public string ItemViewField {set; get;} 
 
-        public DataListContext(StackAppContext context, ListRequestinfo requestInfo)
+        public DataListContext(StackAppContext context, RequestQueryString query, ListRequestinfo requestInfo)
         {
             Context = context;
+            RequestQuery = query;
             ListRequest = requestInfo;
             _parms = new DynamicObj();
             _props = new DynamicObj();
-            Fields = new InvariantDictionary<BaseWidget>();
+            Fields = new InvariantDictionary<IDisplayWidget>();
+            RowLinks = new List<ActionLinkDefinition>();
              _RequestMode = ListRequest.RequestType;
              SourceEntityId = RequestQuery.EntityId;
             Init();
@@ -73,6 +77,7 @@ namespace StackErp.ViewModel.ViewContext
             // this.ItemViewField = defn.ItemViewField;
             
             PrepareFilter(this.DbQuery, defn);
+            PrepareRequestFilter(this.DbQuery, ListRequest.GridRequest);
 
             this.DbQuery.ResolveFields();
 
@@ -87,6 +92,15 @@ namespace StackErp.ViewModel.ViewContext
 
         protected virtual void PrepareFilter(DbQuery query, DataListDefinition defn) 
         {           
+        }
+
+        protected virtual void PrepareRequestFilter(DbQuery query, QueryRequest gridReq)
+        {
+            if (gridReq == null || gridReq.DataFilter == null) return;
+
+            var filter = FilterExpression.BuildFromJson(SourceEntityId, gridReq.DataFilter.ToString());
+
+            query.SetFilter(filter);
         }
     }
 }

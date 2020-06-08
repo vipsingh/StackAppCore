@@ -39,7 +39,7 @@ namespace StackErp.UI.View.PageGenerator
 
         protected virtual void Compile(LayoutContext layoutContext)
         {            
-            this.BuildLayoutRules(layoutContext.View);
+            //this.BuildLayoutRules(layoutContext.View);
             this.CompileWidgets(layoutContext.View);
             this.CompileActions(layoutContext.View); 
         }
@@ -82,11 +82,6 @@ namespace StackErp.UI.View.PageGenerator
             }
         }
 
-        protected virtual void BuildLayoutRules(TView view)
-        {
-            View.FormRules = ViewModel.Services.FormRuleBuilder.BuildRules(FormContext, view);
-        }
-
         protected virtual void CompileActions(TView view)
         {
             if(view.Commands != null) 
@@ -120,17 +115,6 @@ namespace StackErp.UI.View.PageGenerator
                 CompileWidget(new TField(){ FieldId = field }); 
             }
 
-            foreach(var formrule in View.FormRules)
-            {
-                var cFields = formrule.Criteria.GetCriteriaFields();
-                foreach(var f in cFields)
-                {
-                    var w = this.FormContext.GetWidget(f);
-                    if(w!= null)
-                        ((BaseWidget)w).SetRule(formrule.Id);
-                }
-            }
-
             //Add Form parameters. 
 
             FieldOnCompileComplete();
@@ -154,6 +138,19 @@ namespace StackErp.UI.View.PageGenerator
             View.Actions = FormContext.Actions.ActionButtons;
             View.Layout = FormContext.GetLayoutView();
             return View;
+        }
+
+        public virtual ViewPageDataOnly GetViewPageOnlyData()
+        {
+            var page = this.GetViewPage();
+            var p = new ViewPageDataOnly(page.EntityInfo);
+            p.Widgets = new System.Collections.Generic.Dictionary<string, IWidgetData>();
+            foreach(var w in page.Widgets)
+            {
+                 p.Widgets.Add(w.Key, w.Value.ToOnlyData());
+            }
+            
+            return p;
         }
     }
 }

@@ -8,18 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackErp.Model;
-using StackErp.UI.View.PageAction;
-using StackErp.UI.View.PageBuilder;
-using StackErp.ViewModel.DataList;
-using StackErp.ViewModel.Model;
-using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
     public class FileController : StackErp.UI.Controllers.BaseController
     {
-        public FileController(ILogger<EntityController> logger): base(logger)
+        public FileController(ILogger<EntityController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
 
         }
@@ -45,8 +41,13 @@ namespace StackErp.App.Controllers
             var fileName = RequestQuery.Name;
             var path = Path.Combine(this.StackAppContext.ImageStorePath, "store_" + StackAppContext.MasterId, fileName);
 
-            var imageFileStream = System.IO.File.OpenRead(path);
-            return File(imageFileStream, "image/png");
+            if (System.IO.File.Exists(path))
+            {
+                var imageFileStream = System.IO.File.OpenRead(path);
+                return File(imageFileStream, "image/png");
+            }
+            else
+                return File(new Byte[0], "image/png");
         }        
         
     }

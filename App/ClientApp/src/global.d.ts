@@ -35,6 +35,7 @@ interface IPageInfo {
     PostUrl: string|undefined,
     FormRules?: any,
     Errors?: IDictionary<{ IsValid: boolean, Message?: string }>,
+    Dependencies: IDictionary<Array<any>>
     getField: (widgetId: string) => WidgetInfoProps
 }
 
@@ -43,6 +44,7 @@ interface WidgetInfo {
     WidgetType: number,
     Value?: any,
     Caption?: string,
+    CaptionPosition?: number,
     IsRequired?: boolean,
     IsReadOnly?: boolean,
     Options?: Array<any>,
@@ -51,6 +53,7 @@ interface WidgetInfo {
     IsHidden?: boolean,
     RuleToFire?: Array<any>,
     Properties?: IDictionary<any>,
+    Attributes?: IDictionary<any>,
     Dependency?: {Parents?: Array<any>, Children?: Array<{WidgetId: string, Clear: boolean}>},
     Validation?: IDictionary<any>,
     AdditionalValue?: any, 
@@ -59,7 +62,8 @@ interface WidgetInfo {
     IsMultiSelect?: boolean,
     DisplayType?: string,
     IsInLayout?: boolean,
-    DecimalPlaces?: number
+    DecimalPlaces?: number,
+    Features?: IDictionary<any>
 }
 
 interface WidgetInfoProps extends WidgetInfo{
@@ -80,14 +84,20 @@ interface IFieldData {
     IsDirty?: boolean,
     HasError?: boolean,
     Invisible?: boolean,
+    IsReadOnly?: boolean,
     VisibleOptions?: Array<number>
 }
+
+// interface IFormData extends IDictionary<IFieldData> {
+//     _UniqueId: string,
+//     _EntityInfo: ObjectModelInfo
+// }
 
 interface FormApi {
     getEntitySchema: () => IPageInfo,
     setValue: Function,
     updateField: (widgetId: string, data: any, afterUpdate?: Function) => any,
-    getField: (widgetId: string) => WidgetInfoProps,
+    getField: (widgetId: string) => WidgetInfo,
     getErrorResult: Function,
     validateField: Function,
     prepareFieldRequest: Function,
@@ -100,11 +110,11 @@ interface ObjectModelInfo extends IDictionary<any> {
 }
 
 interface ListingProps extends WidgetInfoProps {
-    listingSchema: any,
-    ListData: any,
+    ListData?: any,
     api?: FormApi,
     SelectionConfig?: any,
-    FilterBox?: any
+    FilterBox?: any,
+    IsLocalStore?: boolean
 }
 
 interface ActionInfo {
@@ -116,9 +126,8 @@ interface ActionInfo {
     Icon?: string,
     ExecutionType?: number,
     onClick?: Function,
-    ButtonStyle?: string,
-    OnlyIcon?: bool,
-    Target?: string
+    LinkTarget?: string,
+    Attributes?: IDictionary<any>
 }
 
 interface RequestResultInfo {

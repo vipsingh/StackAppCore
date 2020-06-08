@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackErp.Model;
 using StackErp.ViewModel.Model;
 
@@ -15,12 +16,11 @@ namespace StackErp.UI.Controllers
         private readonly ILogger<BaseController> _logger;    
         public StackAppContext StackAppContext {get;}
         public RequestQueryString RequestQuery {protected set; get;}
-        public BaseController(ILogger<BaseController> logger)
+        public BaseController(ILogger<BaseController> logger, IOptions<AppKeySetting> appSettings)
         {
             _logger = logger;    
             StackAppContext = new StackAppContext();
-            StackAppContext.Init();
-                        
+            StackAppContext.Init(appSettings.Value);    
         }
 
         public override void OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context)
@@ -77,6 +77,12 @@ namespace StackErp.UI.Controllers
             ViewBag.Host = Request.Scheme + "://" + Request.Host.ToUriComponent();
 
             return View("_App", m);
-        }   
+        }  
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new App.Models.ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        } 
     }
 }

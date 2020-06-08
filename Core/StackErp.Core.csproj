@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
     <ProjectReference Include="..\DB\StackErp.DB.csproj" />
     <ProjectReference Include="..\Model\StackErp.Model.csproj" />

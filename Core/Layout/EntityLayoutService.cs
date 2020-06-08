@@ -52,13 +52,24 @@ namespace StackErp.Core.Layout
             {
                 var field = new TField();
                 field.FieldId = f.Name;
-                //field.FieldName = f.Name;
 
                 if (col_r.Count == 1)
                     start_new_r = true;
                 else
                     start_new_r = false;
-                col_r.Add(field);
+
+                if (IsWidgetOnFullRow(f.Type))
+                {
+                    start_new_r = true;
+                    var row = new TRow();
+                    field.FullRow = true;
+                    row.Fields = new List<TField>() { field };
+                    group.Rows.Add(row);
+                }
+                else {
+                    col_r.Add(field);
+                } 
+                
 
                 if (start_new_r)
                 {
@@ -77,6 +88,14 @@ namespace StackErp.Core.Layout
             }
 
             return view;
+        }
+
+        private bool IsWidgetOnFullRow(FieldType fieldType)
+        {
+            if (fieldType == FieldType.OneToMany || fieldType == FieldType.OneToOne)
+                return true;
+
+            return false;
         }
     }
 }

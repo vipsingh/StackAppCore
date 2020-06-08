@@ -6,7 +6,7 @@ using StackErp.Model.Entity;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.ViewContext;
 
-namespace StackErp.ViewModel.DataList
+namespace StackErp.UI.View.DataList
 {
     public class PickerListBuilder: EntityListBuilder
     {

@@ -15,6 +15,8 @@ namespace StackErp.DB.DataList
     {
         public static IEnumerable<DbObject> ExecuteEntityQuery(DbQuery query)
         {
+            query.ResolveFields();
+            
             var builder = new QueryBuilder(query);
             var data = DBService.Query(builder.BuildSql(), new {});
             return data;
@@ -159,23 +161,55 @@ namespace StackErp.DB.DataList
 
         private static string getFieldFilterString(DbQueryField dbField, FilterExpField filter)
         {
-            var op = GetSqlOpOp(filter.Op, filter.Value.ToString());
-            Func<DbQueryField, string, string> getSqlVal =  (DbQueryField DbQueryField, string v) => { 
-                return IsNumericVal(dbField.Field) ? v: "'" + v + "'"; 
-            };
+            var op = GetSqlOpOp(filter.Op, filter.Value == null ? "" : filter.Value.ToString());
+
             string val;
-            if (op.Item1 == "IN" || op.Item1 == "NOTIN")
+            if (filter.Op == FilterOperationType.In || filter.Op == FilterOperationType.NotIn)
             {
-                val = "(" + getSqlVal(dbField, op.Item2) + ")";
-            } else {
-                val = getSqlVal(dbField, op.Item2);
+                List<string> v1 = new List<string>();
+                if (filter.Value != null)
+                {
+                    String[] vals = filter.Value.ToString().Split(',');
+                    foreach(var d in vals)
+                    {
+                        v1.Add(GetSqlVal(dbField, d));
+                    }
+                    val = "(" + string.Join(",", v1) + ")";
+                }
+                else
+                {
+                    val = "(" + GetSqlVal(dbField, op.Item2) + ")";    
+                }
+                
+            } 
+            else 
+            {
+                val = GetSqlVal(dbField, op.Item2);
             }
+
             var s = String.Format("{0}.{1} {2} {3}", dbField.Alias, dbField.DbName, op.Item1, val);
+            
             return s;
+        }
+
+        private static string GetSqlVal(DbQueryField dbQueryField, string v)
+        {
+                string v1 = v;
+                if (IsNumericVal(dbQueryField.Field))
+                {
+                    if (string.IsNullOrEmpty(v)) {
+                        v1 = "-1";
+                    }
+                }
+                else {
+                    v1 = "'" + v + "'";
+                }
+
+                return v1;
         }
         private static bool IsNumericVal(BaseField f)
         {
-            if(f is NumericField || f is LinkField)
+            if(f.BaseType == TypeCode.Int32 || f.BaseType == TypeCode.Int16 || f.BaseType == TypeCode.Int64 || f.BaseType == TypeCode.Decimal)
             {
                 return true;
             }
@@ -217,7 +251,7 @@ namespace StackErp.DB.DataList
             }
             else if (filterOp == FilterOperationType.NotIn)
             {
-                op = "NOTIN";
+                op = "NOT IN";
             }
             //between
             return (op, val);

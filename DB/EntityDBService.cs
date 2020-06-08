@@ -45,12 +45,14 @@ namespace StackErp.DB
             foreach(var dbO in entitiesActions)
             {
                 var action = new ActionLinkDefinition(){
+                    Id = dbO.Get("id", 0),
                     ActionId = "ACT_ENTITY_" + dbO.Get("id", 0).ToString(),
                     ActionType = (ActionType)dbO.Get("actiontype", 0),
                     EntityId = dbO.Get("entityid", 0),
                     Viewtype = (EntityLayoutType)dbO.Get("viewtype", 0),
                     Text = dbO.Get("text", ""),
                     Action = dbO.Get("action", ""),
+                    ExecType = ActionExecutionType.Redirect
                 };
 
                 action.QueryParam = EvalParam.FromJson(dbO.Get("queryparam", String.Empty));
@@ -60,6 +62,13 @@ namespace StackErp.DB
                 {
                     action.Visibility = FilterExpression.BuildFromJson(action.EntityId, dbO.Get("visibility", String.Empty));
                 }
+
+                if (action.ActionType == ActionType.Client)
+                    action.ExecType = ActionExecutionType.Client;
+                else if (action.ActionType == ActionType.Function || action.ActionType == ActionType.Script || action.ActionType == ActionType.Print || action.ActionType == ActionType.Import)
+                    action.ExecType = ActionExecutionType.Function;
+                else if (action.ActionType == ActionType.Save || action.ActionType == ActionType.SaveClose || action.ActionType == ActionType.SaveContinue || action.ActionType == ActionType.Update)
+                    action.ExecType = ActionExecutionType.Function;
 
                 l.Add(action);
             }

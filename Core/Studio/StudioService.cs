@@ -8,17 +8,22 @@ namespace StackErp.Core.Studio
 {
     public class StudioService
     {        
-        public List<DynamicObj> GetAllEntities() 
+        public List<DynamicObj> GetEntityListData()
         {
             var ents = new List<DynamicObj>();
 
             foreach(var entK in EntityMetaData.entities)
             {
                 var ent = entK.Value;
+                if (ent.IsChildEntity) continue;
+                if (ent.IsTransiant) continue;
+
                 var o =  new DynamicObj();
+                o.Add("Module", ent.AppModule);
                 o.Add("Name", ent.Name);
                 o.Add("Text", ent.Name);
                 o.Add("ID", ent.EntityId.Code);
+
                 ents.Add(o);
             }
 

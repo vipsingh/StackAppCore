@@ -4,6 +4,8 @@ import ListView from "./ListView";
 import { Dictionary } from "lodash";
 import { FormControlType } from "../Constant";
 import FilterBox from "./Form/Control/FilterBox";
+import ListForm from "./Form/Control/ListForm";
+import HtmlTextBox from "./Form/Control/HtmlTextBox";
 
 
 export function getComponent(controlType: number, isViewMode?: boolean) {
@@ -40,6 +42,9 @@ export function getComponent(controlType: number, isViewMode?: boolean) {
         case FormControlType.Image:
             editComponent = viewComponent =  CTRL.ImageField;
             break;
+        case FormControlType.HtmlText:
+            editComponent = viewComponent = HtmlTextBox;
+            break;
         default:
             const w = widgets[controlType];
             if (w) {
@@ -67,6 +72,8 @@ export function registerWidget(type: number, editComponent: any, viewComponent: 
         view: viewComponent? viewComponent : editComponent
     };
 }
+
+registerWidget(99, ListForm);
 
 registerWidget(100, ListView);
 registerWidget(101, FilterBox);

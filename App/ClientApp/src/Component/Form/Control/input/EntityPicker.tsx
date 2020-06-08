@@ -61,11 +61,11 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
         console.log("s");
     }
 
-    // handleCancel = () => {
-    //     this.setState({
-    //         visible: false,
-    //       });
-    // }
+    handleCancel = () => {
+        this.setState({
+            visible: false,
+          });
+    }
 
     getFieldRequest = () => {
         const { api,WidgetId } = this.props;
@@ -95,7 +95,8 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
                 WidgetId={WidgetId} 
                 SelectionConfig={this.selectionConfig} 
                 getFieldRequest={this.getFieldRequest}
-                onSelect={this.handleOk} />}
+                onSelect={this.handleOk}
+                onCancel={this.handleCancel} />}
             </div>);        
     }
 }
@@ -103,6 +104,7 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
 class EntityPickerView extends React.PureComponent<{
     SelectionConfig: any, 
     onSelect: Function,
+    onCancel: Function,
     DataActionLink: any, 
     WidgetId: string,
     getFieldRequest: Function
@@ -172,7 +174,7 @@ class EntityPickerView extends React.PureComponent<{
     }
 
     handleCancel = () => {
-        this.props.onSelect();
+        this.props.onCancel();
     }
 
     render() {
@@ -191,8 +193,7 @@ class EntityPickerView extends React.PureComponent<{
                                 ref={(node) => { this.gridRef = node; }}
                                 ListData={DataSource}
                                 WidgetId="sddd" 
-                                WidgetType={100} 
-                                listingSchema={null} 
+                                WidgetType={100}
                                 onChange={() => { }}
                                 SelectionConfig={SelectionConfig}
                             />
