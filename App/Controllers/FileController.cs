@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackErp.Model;
+using StackErp.UI.Controllers;
 
 namespace StackErp.App.Controllers
 {
+    [SPA(Ignore = true)]
     public class FileController : StackErp.UI.Controllers.BaseController
     {
         public FileController(ILogger<EntityController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)

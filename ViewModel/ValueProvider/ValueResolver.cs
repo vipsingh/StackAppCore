@@ -37,6 +37,10 @@ namespace StackErp.ViewModel
             {
                 return GetRequestQueryValue(formContext.RequestQuery, param.Value.ToString());
             }
+            else if (param.Source == EvalSourceType.Parameters)
+            {
+                return GetParametersValue(formContext, param.Value.ToString());
+            }
 
             return param.Value;
         }
@@ -65,6 +69,18 @@ namespace StackErp.ViewModel
         private static object GetRequestQueryValue(RequestQueryString requestQuery, string key)
         {
             return requestQuery.GetData(key);
+        }
+        
+        private static object GetParametersValue(FormContext formContext, string key)
+        {
+            if(formContext.EntityModelInfo != null)
+            {
+               var param = formContext.EntityModelInfo.Get<DynamicObj>("Parameters", null);
+
+                return param.Get<object>(key, null);
+            }
+
+            return null;
         }
     }
 }

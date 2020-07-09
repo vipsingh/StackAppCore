@@ -1,15 +1,25 @@
 import React from "react";
 import _ from "lodash";
-import { Row, Col } from "antd";
+import { Row, Col, Tabs } from "antd";
 import { DesignerContext } from "../../Core/Studio";
+
+const { TabPane } = Tabs;
 
 export default class UIView extends React.Component<{
     template: any,
     getControl: Function
   }> {
 
+    renderSheet(sheet: any, ix: number) {
+        const { getControl } = this.props;
+
+        return (
+            <PageSheet getControl={getControl} sheet={sheet} key={`page_${ix++}`} />
+        );
+    }
+
   render() {
-    const { template, getControl } = this.props;
+    const { template } = this.props;
     const { Pages } = template;
     let i = 0;
 
@@ -18,7 +28,14 @@ export default class UIView extends React.Component<{
             <div>
                 {
                     _.map(Pages, (s) => {
-                        return <div className=" paper"><PageSheet getControl={getControl} sheet={s} key={`page_${i++}`} /></div>;
+                        return (<div className=" paper">
+                                <Tabs style={{ marginBottom: 32 }}>
+                                    <TabPane tab="Default" key={`page_${i++}`}>
+                                        {this.renderSheet(s, i)}
+                                    </TabPane>
+                                </Tabs>
+                                </div>
+                            );
                     })
                 }
             </div>

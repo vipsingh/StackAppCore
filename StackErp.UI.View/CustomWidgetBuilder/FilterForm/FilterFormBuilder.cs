@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using StackErp.Core.Form;
 using StackErp.Core.Layout;
 using StackErp.Model;
@@ -29,12 +30,13 @@ namespace StackErp.UI.View.CustomWidgetBuilder
 
         public FilterWidgetResponse Generate(CustomRequestInfo request, RequestQueryString requestQuery)
         {
-            var formContext = new EditFormContext(Context, EntityCode.User, requestQuery);
+            var formContext = new EditFormContext(Context, requestQuery.EntityId, requestQuery);
             formContext.Build();   
             if (request != null && request.Value != null) 
             {
-                var fieldId = request.Value;
-                var fieldInfo = formContext.Entity.GetFieldSchema(Convert.ToInt32(fieldId));
+                JObject fieldId = (JObject)request.Value;
+                var fid = fieldId["Value"];
+                var fieldInfo = formContext.Entity.GetFieldSchema(Convert.ToInt32(fid));
                 if (fieldInfo == null) {
                     throw new EntityException("Invalid field!");
                 }

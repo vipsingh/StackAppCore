@@ -15,6 +15,7 @@ namespace StackErp.ViewModel.ViewContext
         public IDBEntity Entity { protected set; get;}
         public EntityLayoutType EntityLayoutType { protected set; get;}
         public int ObjectId { private set; get;}
+        public int ItemTypeId { private set; get;}
         public RequestQueryString RequestQuery { private set; get;}
         public LayoutContext LayoutContext { set; get;}
         private DynamicObj _parms;
@@ -55,12 +56,17 @@ namespace StackErp.ViewModel.ViewContext
             Actions = new PageActions();
             MissingFields = new List<string>();
 
-            ObjectId = RequestQuery.ItemId;            
+            ObjectId = RequestQuery.ItemId;     
+            ItemTypeId = RequestQuery.ItemTypeId;                  
         }
 
         public virtual void Build(UIFormModel model = null)
         {
             this.SubmitModel = model;
+            
+            if (ItemTypeId == 0)
+                ItemTypeId = Entity.DefaultItemTypeId; 
+
             this.PrepareEntityContext();
         }
 
@@ -78,7 +84,9 @@ namespace StackErp.ViewModel.ViewContext
         }
 
         protected virtual void PrepareEntityContext() {
-            var entityCntxt = new ObjectModelInfo(this.ObjectId, this._entity);     
+            var entityCntxt = new ObjectModelInfo(this.ObjectId, this._entity);
+            entityCntxt.ItemType = ItemTypeId;            
+
             this.EntityModelInfo = entityCntxt;
             // if (this.SubmitModel != null)
             // {

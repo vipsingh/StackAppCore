@@ -3,21 +3,38 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackErp.App.Models;
+using StackErp.Core;
 using StackErp.Model;
+using StackErp.StackScript;
 
 namespace StackErp.App.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        
+        StackAppContext appContext;
+        public HomeController(ILogger<HomeController> logger, IOptions<AppKeySetting> appSettings)
         {
             _logger = logger;
+            ScriptFunctions.RegisterFunction("GetEntity", GetEntity);
+
+            appContext = new StackAppContext();
+            appContext.Init(appSettings.Value); 
         }
+
+        public static Function GetEntity => new Function((arguments) =>
+        {
+            var arg1 = arguments.Get(0);
+            
+            return EntityMetaData.Get((int)arg1);
+        });
 
         public IActionResult Index()
         {
@@ -29,6 +46,19 @@ namespace StackErp.App.Controllers
         public IActionResult StackScript([FromBody] string scr)
         {
             new StackErp.StackScript.StackScriptExecuter().ExecuteScript(scr);
+
+            return Content("executed");
+        }
+
+        [HttpPost]
+        public IActionResult StackScriptFunction([FromQuery]int id, [FromBody] string scr)
+        {
+            var d = StackErp.Core.EntityMetaData.Get(99).GetSingle(id);
+            
+            var args = new Dictionary<string, object>();
+            args.Add("model", d);
+
+            new StackErp.StackScript.StackScriptExecuter().ExecuteFunction(appContext, scr, args);
 
             return Content("executed");
         }

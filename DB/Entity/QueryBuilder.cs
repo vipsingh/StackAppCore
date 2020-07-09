@@ -17,67 +17,46 @@ namespace StackErp.DB
 
         public string BuildDetailQry()
         {
-            string entTable = _Entity.DBName;
+            var q = new DbQuery(_Entity);            
 
-            var addedFields = new List<(string, string, string)>();
-            var toJoinTables = new List<(string, string, string)>();
-            addedFields.Add(("ID", entTable + ".id", "id"));
+            bool hasItemTypeFiled = _Entity.DefaultItemTypeId > 0;
+            List<string> ignoreFields = new List<string>();
+            if (!hasItemTypeFiled) ignoreFields.Add("itemtype");
 
             var fields = _Entity.GetFields();
-            short idx = 0;
-            foreach (var rel in _Entity.Relations)
-            {
-                var idf = "_" + idx;
-                var refEnt = _Entity.GetEntity(rel.ChildName);
-
-                var shouldJoin = false;
-                if (rel.Type == EntityRelationType.LINK)
-                {
-                    addedFields.Add((rel.ParentRefField.Name, $"{idf}.{rel.ChildDisplayField.DBName}", $"{rel.ParentRefField.Name}__name"));
-                    addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
-                    shouldJoin = true;
-                }
-
-                if (shouldJoin)
-                {
-                    toJoinTables.Add(($"{refEnt.DBName} as {idf}", $"{entTable}.{rel.ParentRefField.DBName}", $"{idf}.id"));
-                }
-                idx++;
-            }
-
             foreach (var fk in fields.Keys)
             {
                 var field = fields[fk];
-                if (addedFields.FindAll(x => x.Item1.ToUpper() == field.Name.ToUpper()).Count == 0)
-                {
-                    if (field.IsDbStore)
-                        addedFields.Add((field.Name, entTable + "." + field.DBName, field.Name));
-                }
+                if (ignoreFields.Contains(field.Name.ToLower())) continue;
+
+                if (field is OneToManyField) continue;
+
+                q.AddField(field.Name, true);
             }
 
-            return PrepareSelectQuery(entTable, addedFields, toJoinTables, $" {entTable}.id = ANY(@ItemId)");
+            q.ResolveFields();
+            q.WhereInjectKeyword = "${WHERE}";
+
+            var qBuilder = new DataList.QueryBuilder(q);
+            var sql = qBuilder.BuildSql();
+
+            return sql.Replace("${WHERE}", $" {_Entity.DBName}.id = ANY(@ItemId)");
         }
-
-        string PrepareSelectQuery(string table, List<(string, string, string)> select, List<(string, string, string)> joinTables, string where)
+        
+        public string PrepareRelatedFieldDataQueries(IEntityRelation relation, IDBEntity childEntity)
         {
-            List<string> selectExp = new List<string>();
-            select.ForEach(x =>
+            if (relation.Type == EntityRelationType.ManyToMany)
             {
-                selectExp.Add($"{x.Item2} as {x.Item3}");
-            });
+                var relField = relation.ParentRefField.DBName;
 
-            string qry = String.Format("SELECT {0} FROM {1}", String.Join(",", selectExp), table);
-
-            if (joinTables != null)
-            {
-                joinTables.ForEach(x =>
-                {
-                    qry += $" LEFT JOIN {x.Item1} ON {x.Item2} = {x.Item3}";
-                });
+                return $@"select {childEntity.IDField} as id, {childEntity.TextField} as name, pId from {childEntity.DBName} as c1 
+                    join (
+                        SELECT pField[s] as x, pId FROM (SELECT {relField} as pField, {_Entity.IDField} as pId, generate_subscripts({relField}, 1) AS s FROM {_Entity.DBName} where id = ANY(@ItemId) ) AS foo
+                    ) as z 
+                    on c1.{childEntity.IDField} = z.x;";  
             }
-            qry += " WHERE " + where;
 
-            return qry;
+            return "";
         }
         
     }

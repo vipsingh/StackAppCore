@@ -61,18 +61,31 @@ namespace StackErp.ViewModel.FormWidget
             if (value != null)
             {
                 List<int> values;
-                if (value is int) {
-                    values = new List<int>(){ (int) value };
-                } else {
-                    values = (List<int>)value;
-                }
-
                 List<SelectOption> data;
-                if (this.Options != null) {
-                    data = this.Options.Where(o => values.Contains(o.Value)).ToList();
+
+                if (value is SelectOption)
+                {
+                    data = new List<SelectOption>() { value as SelectOption };
+                }
+                else if (value is List<SelectOption>)
+                {
+                    data = (List<SelectOption>)value;
                 }
                 else
-                    data = CollectionDataHelper.GetCollectionData(this.Context, values);
+                {    
+                    if (value is int) {
+                        values = new List<int>(){ (int) value };
+                    } else {
+                        values = (List<int>)value;
+                    }
+                    
+
+                    if (this.Options != null) {
+                        data = this.Options.Where(o => values.Contains(o.Value)).ToList();
+                    }
+                    else
+                        data = CollectionDataHelper.GetCollectionData(this.Context, values);
+                }
 
                 if (data.Count > 0) {
                     val = data;

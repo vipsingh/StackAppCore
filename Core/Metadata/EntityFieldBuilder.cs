@@ -48,7 +48,7 @@ namespace StackErp.Core
             }
             var linkEnt = sch.Get("linkentity", 0);
 
-            if (field.Type == FieldType.ObjectLink)
+            if (field.Type == FieldType.ObjectLink || field.Type == FieldType.MultiObjectLink)
             {                
                 var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
                 if (linkDbEnt.Count() > 0)
@@ -65,7 +65,6 @@ namespace StackErp.Core
                 ((SelectField)field).CollectionId = collectionid;
             }
 
-            field.IsMultiSelect = sch.Get("ismultiselect", false);
 
             field.ControlType = GetDefaultControl(field.Type);
 
@@ -117,6 +116,9 @@ namespace StackErp.Core
                 case FieldType.LongText:
                     field = new LongTextField();
                     break;
+                case FieldType.Password:
+                    field = new PasswordField();
+                    break;
                 case FieldType.MonataryAmount:
                     field = new DecimalField();
                     break;
@@ -130,10 +132,16 @@ namespace StackErp.Core
                     field = new PhoneField();
                     break;
                 case FieldType.ObjectLink:
-                    field = new LinkField();
+                    field = new ObjectLinkField();
+                    break;
+                case FieldType.MultiObjectLink:
+                    field = new MultiObjectLinkField();
                     break;
                 case FieldType.Select:
                     field = new SelectField();
+                    break;
+                case FieldType.MultiSelect:
+                    field = new MultiSelectField();
                     break;
                 case FieldType.FilterField:
                     field = new FilterField();
@@ -174,13 +182,18 @@ namespace StackErp.Core
                 case FieldType.LongText:
                     t = FormControlType.LongText;
                     break;
+                case FieldType.Password:
+                    t = FormControlType.Password;
+                    break;
                 case FieldType.ObjectLink:
+                case FieldType.MultiObjectLink:
                     t = FormControlType.EntityPicker;
                     break;
                 case FieldType.MonataryAmount:
                     t = FormControlType.DecimalBox;
                     break;
                 case FieldType.Select:
+                case FieldType.MultiSelect:
                     t = FormControlType.Dropdown;
                     break;
                 case FieldType.Image:

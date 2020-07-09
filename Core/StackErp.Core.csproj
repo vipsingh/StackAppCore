@@ -5,6 +5,9 @@
     <ProjectReference Include="..\StackErp.Utils\StackErp.Utils.csproj" />
     <ProjectReference Include="..\StackErp.StackScript\StackErp.StackScript.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Humanizer.Core" Version="2.8.26" />
+  </ItemGroup>
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>

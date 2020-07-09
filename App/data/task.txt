@@ -1,18 +1,11 @@
 P1--------------------------------------------
 common formatter of data
-Custom Actions
 FilterForm
-Layout Rules: invisible
 Data Linking
 		1.OnChange method(server) on field :: find deps of other fields in function
 			scene:: A. set other field value. if field is not in layout set on widget dics on client.
 					B. custom message
-----Action button on page
-	OnAfterCompile -> AddButtons, AddPageTitle, AddResources
-		AddButtons -> 1. Fetch Layout Buttons, 2.Add fix button on renderer(ex close), fetch link definition (entityid specific and globals, these contains all)
-
 todo-------------------------------------------
-Layout Rules: invisible, also change the visibility logic on client. should based on field
 
 --today	
 	custom function invoke, fixed and entity related	

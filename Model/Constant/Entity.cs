@@ -14,7 +14,7 @@ public enum FieldType {
     Time = 8,
     Select = 9,
     ObjectLink = 10,
-    ObjectNumber = 11,
+    MultiObjectLink = 11,
     BigInt = 12,
     LongText = 13,
     Image = 14,
@@ -30,12 +30,14 @@ public enum FieldType {
     ObjectKey = 25,
     FilterField = 26,
     File = 27,
-    Phone=28    
+    Phone=28,
+    ObjectNumber=29,
+    MultiSelect = 30,
 }
     
     public enum EntityRelationType 
-    {
-        LINK = 1,
+    { 
+        ManyToOne = 1,    
         OneToMany = 2,
         OneToOne = 3,
         ManyToMany=4

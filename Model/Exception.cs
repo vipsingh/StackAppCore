@@ -28,7 +28,8 @@ namespace StackErp.Model
 
     public class AuthException: AppException 
     {
-        public AuthException(string message): base(message) {
+        public AuthException(string message): base(message) 
+        {
             
         }
     }

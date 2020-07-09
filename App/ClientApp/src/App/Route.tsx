@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import PageFactory from "../Core/PageFactory";
-import Studio from "./Page/Studio/EntityPage";
+import Studio from "./Page/Studio/Designer";
 import PageContext, { createPageContext } from "../Core/PageContext";
 import { closeAll } from "../Component/UI/Dialog";
 

@@ -13,12 +13,17 @@ namespace StackErp.DB.Studio
     {        
         public void SaveEntity(DynamicObj entity)
         {
-            var dbModel = new DBModelBase(EntityCode.None);
-            foreach(var k in entity.Keys)
-            {
-                //var fdata = new FieldData()
-                //dbModel.Attributes.Add(k)
-            }
+            // var dbModel = new DBModelBase(EntityCode.None);
+            // foreach(var k in entity.Keys)
+            // {
+            //     //var fdata = new FieldData()
+            //     //dbModel.Attributes.Add(k)
+            // }
+        }
+
+        public void CreateTableColumn(string table, BaseField field)
+        {
+            
         }
     }
 }

@@ -19,6 +19,7 @@ namespace StackErp.DB.DataList
             
             var builder = new QueryBuilder(query);
             var data = DBService.Query(builder.BuildSql(), new {});
+
             return data;
         }
     }
@@ -31,7 +32,7 @@ namespace StackErp.DB.DataList
             _QueryInfo = queryInfo;
         }
         List<(string, string, string)> _selectFields;
-        List<(string, string, string)> _toJoinTables;
+        List<(string, List<string>)> _toJoinTables;
         string _entTable;
         short idx = 0;
         public string BuildSql()
@@ -39,7 +40,7 @@ namespace StackErp.DB.DataList
             _entTable = _QueryInfo.Entity.DBName;
 
             _selectFields = new List<(string, string, string)>();
-            _toJoinTables = new List<(string, string, string)>();
+            _toJoinTables = new List<(string, List<string>)>();
 
             AddSelectField("ID", _entTable + ".id", "id");
 
@@ -62,11 +63,20 @@ namespace StackErp.DB.DataList
                             AddRefTable(rel);
                         }
                     }
+                    if (fieldSchema is SelectField)
+                    {
+                        AddCollectionTable(fieldSchema);
+                    }
                 }
             }
 
             var selectSql = PrepareSelectQuery();
             var where = PrepareWhereExp(_QueryInfo, _QueryInfo.FixedFilter, _QueryInfo.Filters);
+
+            if (!String.IsNullOrEmpty(_QueryInfo.WhereInjectKeyword))
+            {
+                where = _QueryInfo.WhereInjectKeyword + " " + where;
+            }
 
             var q = selectSql + (String.IsNullOrEmpty(where)? "" : " WHERE " + where);
 
@@ -78,24 +88,51 @@ namespace StackErp.DB.DataList
             var idf = "_" + idx;
             var refEnt = _QueryInfo.Entity.GetEntity(rel.ChildName);
             var shouldJoin = false;
-                if (rel.Type == EntityRelationType.LINK)
+                if (rel.Type == EntityRelationType.ManyToOne)
                 {
                     AddSelectField(rel.ParentRefField.Name, $"{idf}.{rel.ChildDisplayField.DBName}", $"{rel.ParentRefField.Name}__name");                    
                     //_addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
                     shouldJoin = true;
                 }
+                else if (rel.Type == EntityRelationType.ManyToMany)
+                {
+                    AddSelectField(rel.ParentRefField.Name, $"get_related_data('{refEnt.DBName}', '{rel.ChildDisplayField.DBName}', {_entTable}.{rel.ParentRefField.DBName})", $"{rel.ParentRefField.Name}__data");
+                }
 
                 if (shouldJoin)
                 {
-                    _toJoinTables.Add(($"{refEnt.DBName} as {idf}", $"{_entTable}.{rel.ParentRefField.DBName}", $"{idf}.id"));
+                    _toJoinTables.Add(($"{refEnt.DBName} as {idf}", new List<string>() { $"{_entTable}.{rel.ParentRefField.DBName} = {idf}.id"} ));
                 }
 
             idx++;
         }
 
+        private void AddCollectionTable(BaseField fieldSchema)
+        {
+            var collectionid = ((SelectField)fieldSchema).CollectionId;
+            var idf = "_" + idx;
+
+            if (fieldSchema is MultiSelectField)
+            {
+                AddSelectField(fieldSchema.Name, $"get_collection_datatext({collectionid}, {_entTable}.{fieldSchema.DBName})", $"{fieldSchema.Name}__data");
+            }
+            else
+            {
+                AddSelectField(fieldSchema.Name, $"{idf}.datatext", $"{fieldSchema.Name}__name");
+
+                _toJoinTables.Add(($"t_collection_master as {idf}", 
+                    new List<string>() { 
+                        $"{idf}.id = {collectionid}",
+                        $"{_entTable}.{fieldSchema.DBName} = {idf}.dataid"
+                    } 
+                ));
+                idx++;
+            }
+        }
+
         private void AddSelectField(string fieldName, string queryName, string queryAlias)
         {
-            if (_selectFields.Where(x => x.Item2.ToLower() == queryName.ToLower()).Count() == 0)
+            if (_selectFields.Where(x => x.Item3.ToLower() == queryAlias.ToLower()).Count() == 0)
                 _selectFields.Add((fieldName, queryName, queryAlias));
         }
 
@@ -113,7 +150,7 @@ namespace StackErp.DB.DataList
             {
                 _toJoinTables.ForEach(x =>
                 {
-                    qry += $" LEFT JOIN {x.Item1} ON {x.Item2} = {x.Item3}";
+                    qry += $" LEFT JOIN {x.Item1} ON {string.Join(" AND ", x.Item2)}";
                 });
             }            
 

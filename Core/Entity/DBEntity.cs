@@ -34,7 +34,10 @@ namespace StackErp.Core
         public bool IsTransiant {protected set;get;}
         public EntityDeletePolicyType DeletePolicyType {protected set;get;}
 
+        public int DefaultItemTypeId {private set;get;} 
+
         private string _detailQry;
+        private InvariantDictionary<string> _relatedFieldDataQryList;
         public DBEntity(int id, string name, Dictionary<string, BaseField> fields, string dbName = "")
         {
             this.EntityId = id;
@@ -80,7 +83,7 @@ namespace StackErp.Core
             });
             fields.Add("CREATEDBY", new IntegerField()
             {
-                Type = FieldType.DateTime,
+                Type = FieldType.Integer,
                 Name = "CreatedBy",
                 DBName = "CreatedBy",
                 IsReadOnly = true,
@@ -90,11 +93,21 @@ namespace StackErp.Core
             });
             fields.Add("UPDATEDBY", new IntegerField()
             {
-                Type = FieldType.DateTime,
+                Type = FieldType.Integer,
                 Name = "UpdatedBy",
                 DBName = "UpdatedBy",
                 IsReadOnly = true,
                 Copy = false,
+                IsDbStore = true,
+                ViewId = -1
+            });
+
+            fields.Add("ITEMTYPE", new IntegerField()
+            {
+                Type = FieldType.Integer,
+                Name = "ItemType",
+                DBName = "itemtype",
+                IsReadOnly = true,
                 IsDbStore = true,
                 ViewId = -1
             });
@@ -111,19 +124,31 @@ namespace StackErp.Core
             }
 
             this.Relations = new List<IEntityRelation>();
+            //this.DbConstraint
         }
 
         private bool _isInit = false;
-        public void Init()
+        public void Init(DynamicObj dataParam)
         {
             if (_isInit)
                 return;
 
             InitRelations();
+            
+            DefaultItemTypeId = dataParam.Get("DEFAULTLAYOUT", 0);
 
             var qBuilder = new EntityQueryBuilder(this);
             
             _detailQry = qBuilder.BuildDetailQry();
+            _relatedFieldDataQryList = new InvariantDictionary<string>();
+            foreach(var rel in this.Relations)
+            {
+                if (rel.Type == EntityRelationType.ManyToMany)
+                {
+                    var childE = EntityMetaData.Get(rel.ChildName);
+                    _relatedFieldDataQryList.Add(rel.ParentRefField.Name, qBuilder.PrepareRelatedFieldDataQueries(rel, childE));
+                }
+            }
 
             PrepareComputeOrderSeq();
 
@@ -134,19 +159,34 @@ namespace StackErp.Core
         {
             foreach (var field in this.Fields)
             {
-                if (field.Value.Type == FieldType.ObjectLink)
+                var fieldInfo = field.Value;
+
+                if (fieldInfo.Type == FieldType.ObjectLink)
                 {
-                    var childE = EntityMetaData.Get(field.Value.RefObject);
-                    var rel = new EntityRelation(EntityRelationType.LINK, this.EntityId, field.Value.RefObject, field.Value, null, childE.GetFieldSchema(childE.TextField));                    
+                    var childE = EntityMetaData.Get(fieldInfo.RefObject);
+                    var rel = new EntityRelation(EntityRelationType.ManyToOne, this.EntityId, fieldInfo.RefObject, fieldInfo, null, childE.GetFieldSchema(childE.TextField)); 
                     this.Relations.Add(rel);
                 }
-                else if (field.Value.Type == FieldType.OneToMany)
+                if (fieldInfo.Type == FieldType.MultiObjectLink)
                 {
-                    var relField = (OneToManyField)field.Value;
+                    var childE = EntityMetaData.Get(fieldInfo.RefObject);
+                    var rel = new EntityRelation(EntityRelationType.ManyToMany, this.EntityId, fieldInfo.RefObject, fieldInfo, null, childE.GetFieldSchema(childE.TextField));
+                    this.Relations.Add(rel);
+                }
+                else if (fieldInfo.Type == FieldType.OneToMany)
+                {
+                    var relField = (OneToManyField)fieldInfo;
                     var childE = EntityMetaData.Get(relField.RefObject);
-                    var rel = new EntityRelation(EntityRelationType.OneToMany, this.EntityId, relField.RefObject, field.Value, childE.GetFieldSchema(relField.RefFieldName), null);
+                    var rel = new EntityRelation(EntityRelationType.OneToMany, this.EntityId, relField.RefObject, fieldInfo, childE.GetFieldSchema(relField.RefFieldName), null);
                     this.Relations.Add(rel);
                 }
+                // else if (fieldInfo.Type == FieldType.OneToOne)
+                // {
+                //     var relField = (OneToManyField)fieldInfo;
+                //     var childE = EntityMetaData.Get(relField.RefObject);
+                //     var rel = new EntityRelation(EntityRelationType.OneToMany, this.EntityId, relField.RefObject, fieldInfo, childE.GetFieldSchema(relField.RefFieldName), null);
+                //     this.Relations.Add(rel);
+                // }
             }
         }
 
@@ -175,15 +215,25 @@ namespace StackErp.Core
         {
             var sql = _detailQry;
             var arr = DBService.Query(sql, new { ItemId = new int[] {id} });
+            //var relatedFieldData = DBService.Query(_relatedFieldDataQryList, new { ItemId = new int[] {id} });
             if (arr.Count() > 0)
             {
                 var d = arr.First();
-                var model = new EntityRecordModel(this);
-                model.BuiltWithDB(d);
-
-                return model;
+                return BuildModelFromDbObj(d);
             }
             throw new EntityException("Record not found.");
+        }
+
+        private EntityRecordModel BuildModelFromDbObj(DbObject dbObj) //InvariantDictionary<IEnumerable<DbObject>> relatedFieldData
+        {
+            var model = new EntityRecordModel(this);
+            // foreach(var fData in relatedFieldData)
+            // {
+            //     dbObj.Add(fData.Key + "__data", fData.Value);
+            // }
+            model.BuiltWithDB(dbObj);
+
+            return model;
         }
 
         public List<EntityModelBase> GetAll(FilterExpression filter)
@@ -221,11 +271,20 @@ namespace StackErp.Core
             {
                 q.AddField(f, true);
             }
+            q.AddField(this.IDField, true);
+            
             q.SetFixedFilter(filter);
 
-            var data = QueryDbService.ExecuteEntityQuery(q);            
+            var data = QueryDbService.ExecuteEntityQuery(q);   
+            var models = new List<DBModelBase>();
+            foreach(var d in data)
+            {
+                var m = new DBModelBase(this.EntityId);
+                m.BuiltWithDB(d);
+                models.Add(m);
+            }         
 
-            return null;
+            return models;
         }
 
         public List<int> ReadIds(FilterExpression filter)
@@ -343,7 +402,7 @@ namespace StackErp.Core
             return status;
         }
         
-        private bool Validate(EntityModelBase model)
+        protected virtual bool Validate(EntityModelBase model)
         {
             bool IsValid = true;            
             var validator = new DataValidator();
@@ -415,7 +474,7 @@ namespace StackErp.Core
             return sts;
         }
 
-        public AnyStatus DeleteRecord(int id)
+        public virtual AnyStatus DeleteRecord(int id)
         {
             //check related data also
 

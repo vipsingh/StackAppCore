@@ -1,58 +1,61 @@
-drop table if exists usermaster CASCADE;
-drop table if exists userrole CASCADE;
-drop table if exists useraddress CASCADE;
-drop table if exists usersetting CASCADE;
+--drop table if exists usermaster CASCADE;
+insert into t_entitymaster(masterid,id,name,text,tablename,primaryfield,namefield)
+values(0,101,'User','User','t_user','id', 'name');
 
-CREATE TABLE usermaster
-(
-    id integer NOT NULL,
-    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    loginid character varying(50),
-    password character varying(50),
-    role integer,
-    submitamount numeric(20, 5),
-    assigndate date,
-    type integer,
-    createdon timestamp without time zone,
-    updatedon timestamp without time zone,
-    CONSTRAINT usermaster_pkey PRIMARY KEY (id),
-    CONSTRAINT usermaster_loginid_key UNIQUE (loginid)
-)
+insert into t_entity_itemtype(masterid,id,entityid,name,code)
+values(0,10001,101,'Default','0');
 
-CREATE TABLE userrole
-(
-    id integer NOT NULL,
-    name character varying(100) COLLATE pg_catalog."default" NOT NULL,    
-    info character varying(100),
-    category integer,
-    isadmin BOOLEAN,
-    createdon timestamp without time zone,
-    updatedon timestamp without time zone,
-    CONSTRAINT userrole_pkey PRIMARY KEY (id)
-)
+insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
+values(0,10001,101,10001,'','0', null);
 
-CREATE TABLE useraddress
-(
-    id integer NOT NULL,
-    name character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    type integer,
-    city character varying(100),
-    country integer,
-    mobile character varying(15),
-    usermaster_addresses__id integer,
-    createdon timestamp without time zone,
-    updatedon timestamp without time zone,
-    CONSTRAINT useraddress_pkey PRIMARY KEY (id)
-)
+insert into autoid values(101, 0);
 
-CREATE TABLE usersetting
-(
-    id integer NOT NULL,    
-    currency integer,
-    timezone character varying(10),
-    isprimary boolean,
-    usermaster_setting__id integer,
-    createdon timestamp without time zone,
-    updatedon timestamp without time zone,
-    CONSTRAINT usersetting_pkey PRIMARY KEY (id)
-)
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10036,101,'name','Name',1,100,true
+,'name','t_user',0,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10037,101,'shortname','shortname',1,60,false
+,'shortname','t_user',0,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10042,101,'mobileno','mobileno',28,20,false
+,'mobileno','t_user',0,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10043,101,'emailid','emailid',15,60,true
+,'emailid','t_user',0,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+insert into t_entityschema(masterid,id, entityid,fieldname,label,fieldtype,length,isrequired
+,dbname,tablename,viewtype,defaultvalue
+,linkentity,linkentity_domain,createdon,updatedon)
+values(0,10045,101,'expiredon','expiredon',5,0,false
+,'expiredon','t_user',0,null
+,null,null,'2019-11-28 22:49:44','2019-11-28 22:49:44');
+
+---------------------------------------------------------------------------------------
+
+insert into t_entitymaster(masterid,id,name,text,tablename,primaryfield,namefield)
+values(0,102,'UserRole','UserRole','t_role','id', 'name');
+
+insert into t_entity_itemtype(masterid,id,entityid,name,code)
+values(0,10007,102,'Default','0');
+
+insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
+values(0,10007,102,10007,'','0', null);
+
+insert into autoid values(102, 1);
+--------------------------------------------------------------------------------------------

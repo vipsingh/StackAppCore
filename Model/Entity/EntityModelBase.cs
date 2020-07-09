@@ -13,10 +13,11 @@ namespace StackErp.Model
         public FieldDataCollection Attributes { get => _attr; }
         public Int32 ID { get; protected set; }
         public EntityCode EntityId { get; }
-        public int _id { private set; get; }
+        public int _id { protected set; get; }
         public bool IsNew { get => !(this._id > 0); }
         public bool IsDeleted {set;get;}
 
+        private DbObject dbObject;
         public DBModelBase(EntityCode entityId)
         {
             this.EntityId = entityId;
@@ -24,11 +25,12 @@ namespace StackErp.Model
         }
         public virtual object GetValue(string field)
         {
-            return null;
+            return this.dbObject.Get<object>(field, null);
         }
         
         public virtual void BuiltWithDB(DbObject dbData)
         {
+            dbObject = dbData;
             //this._attr = dbData;
             this.ID = _id = dbData.Get("id", 0);                       
         }
@@ -43,13 +45,13 @@ namespace StackErp.Model
     {        
         public IDBEntity Entity {get;}
         public short RecordStatus { get; }        
-               
+
         public DateTime CreatedOn {private set; get; }
         public DateTime UpdatedOn {private set; get; }
         public int CreatedBy {private set; get; }
         public int UpdatedBy {private set; get; }            
 
-        public int LayoutId {private set; get; }
+        public int ItemTypeId {private set; get; }
         
         public bool HasError { private set; get; }
         public string ErrorMessage { private set; get; }
@@ -71,10 +73,13 @@ namespace StackErp.Model
 
         public override void BuiltWithDB(DbObject dbData)
         {
-            base.BuiltWithDB(dbData);
+            this.ID = _id = dbData.Get("id", 0);                       
                         
             this.CreatedOn = dbData.Get("createdon", DateTime.MinValue);
             this.UpdatedOn = dbData.Get("updatedon", DateTime.MinValue);
+            this.CreatedBy = dbData.Get("CreatedBy", 0);
+            this.UpdatedBy = dbData.Get("UpdatedBy", 0);
+            this.ItemTypeId = dbData.Get("itemtype", 0);
             
             this.SetChangeTrack(true);
             foreach(var f in Entity.Fields)

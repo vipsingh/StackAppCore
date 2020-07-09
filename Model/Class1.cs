@@ -42,7 +42,7 @@ namespace StackErp.Model
             {
                 var v = _d[attrName];
 
-                return DataHelper.GetData(v, def);
+                return DataHelper.GetData(v, def);                
             }
 
             return def;
@@ -91,10 +91,8 @@ namespace StackErp.Model
             if (String.IsNullOrEmpty(json)) {
                 return null;
             }
-            
-            var d = JsonConvert.DeserializeObject<Dictionary<string, Object>>(json);
-            
-            return new DynamicObj(d);
+
+            return DynamicObj.FromJSON(json);            
         }
 
         public static DynamicObj DeserializeJObject(object jObject)

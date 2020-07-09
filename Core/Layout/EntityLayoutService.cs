@@ -21,13 +21,18 @@ namespace StackErp.Core.Layout
             _EntityId = entityId;
         }
 
-        public TView PrepareView(int layoutId)
+        public TView PrepareView(int itemTypeId, EntityLayoutType layoutType)
         {
-            var layout = LayoutDbService.GetItemType(_EntityId.Code, layoutId);
-            if (layout == null)
-                throw new EntityException("Layout is not defined.");
+            string layoutXml = "";
+            if (itemTypeId != 0)
+            {
+                var layout = LayoutDbService.GetItemTypeLayout(_EntityId.Code, itemTypeId, (int)layoutType);
+                if (layout == null)
+                    throw new EntityException("ItemType is not defined.");
 
-            var layoutXml = layout.Get("layoutxml", string.Empty);
+                layoutXml = layout.Get("layoutxml", string.Empty);
+            }
+
             if (string.IsNullOrWhiteSpace(layoutXml))
                 return CreateDefault();
 

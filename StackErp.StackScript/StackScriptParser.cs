@@ -30,13 +30,10 @@ namespace StackErp.StackScript
     }
 
     public class StackScriptExecuter {
-        private Dictionary<string, object> _Vars;
         private ObjectDataProvider _DataProvider;
-        private ObjectDataProvider _VarProvider;
+        private string currentScriptTag = "";
         public StackScriptExecuter()
         {
-            _Vars = new Dictionary<string, object>();
-            //_Vars.Add("coll", new List<object>() { "x", "v", "z" });
             
         }
 
@@ -56,16 +53,34 @@ namespace StackErp.StackScript
             return  sts;
         }
 
+        public AnyStatus ExecuteFunction(StackAppContext appContext, string codeStr, Dictionary<string, object> param) //Arguments param
+        {
+            AnyStatus sts = AnyStatus.Success;
+            try {
+                currentScriptTag = "Start";
+                var parser =  new JavaScriptParser(codeStr);
+                var program = parser.ParseScript();
+
+                _DataProvider = new ObjectDataProvider(appContext, param);
+                ExecuteBody(program.Body);
+
+            } catch(Exception ex) {
+                sts = AnyStatus.ScriptFailure;
+                sts.Message = ex.Message;
+            }
+
+            return  sts;
+        }
+
         public void ExecuteScript(Script program) 
         {
-            _DataProvider = new ObjectDataProvider();
+            _DataProvider = new ObjectDataProvider(null);
             ExecuteBody(program.Body);
         }
 
         public object ExecuteExpression(string code, EntityModelBase model)
         {
-            _DataProvider = new ObjectDataProvider();
-            _VarProvider = new EntityModelDataProvider(model);
+            _DataProvider = new EntityModelDataProvider(model);
             var parser =  new JavaScriptParser(code);
             var expression = parser.ParseExpression();
 
@@ -73,7 +88,7 @@ namespace StackErp.StackScript
         }
 
         private void ExecuteBody(NodeList<IStatementListItem> bodyColl) 
-        {
+        {            
             foreach(IStatementListItem body in bodyColl)
             {                
                 if (body is Esprima.Ast.VariableDeclaration) {
@@ -91,8 +106,10 @@ namespace StackErp.StackScript
         private void VariableDeclaration(NodeList<VariableDeclarator> declartions) 
         {
             var dec = declartions.First();
-            if (dec.Id is Esprima.Ast.Identifier) {
+            if (dec.Id is Esprima.Ast.Identifier) {                
                 var varNme= ((Esprima.Ast.Identifier)dec.Id).Name;
+                currentScriptTag = $"variable: {varNme}";
+
                 var varVal = GetVarFromExp(dec.Init);
 
                 SetVar(varNme, varVal);
@@ -109,7 +126,7 @@ namespace StackErp.StackScript
 
         private void SetVar(string name, object value) 
         {
-            _Vars[name] = value;
+            _DataProvider.SetVarData(name, value);
         }
 
         private object GetVarFromExp(Expression exp) {
@@ -134,12 +151,7 @@ namespace StackErp.StackScript
         }
 
         private object GetVar(Identifier idf) {
-            if (this._VarProvider != null && !_Vars.ContainsKey(idf.Name))
-            {
-                return this._VarProvider.GetVarData(idf.Name);
-            }
-
-            return _Vars[idf.Name];
+            return this._DataProvider.GetVarData(idf.Name);
         }
 
         private object LteralExp(Literal exp) 
@@ -152,6 +164,8 @@ namespace StackErp.StackScript
         private object BinaryExpression(BinaryExpression expression) {
             var lVal = GetVarFromExp(expression.Left);
             var rVal = GetVarFromExp(expression.Right);
+
+            currentScriptTag = $"BinaryExpression: {expression.Operator}";
             //BinaryOperator
             return BinaryFunctions.Get(expression.Operator).Invoke(new Arguments(lVal, rVal)); //_ExpFunc[expression.operator]([lVal, rVal]);
         }

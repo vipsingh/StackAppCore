@@ -81,12 +81,7 @@ namespace StackErp.UI.View.DataList
             });
 
             context.Data = data;
-        }
-        
-        protected void OnPrepareRow(DataListContext context, DataListDefinition defn, DynamicObj row)
-        {
-            BuildDataRowActions(context, row);
-        }
+        }        
 
         protected object OnPrepareCell(DataListContext context, DataListDefinition defn, string fieldName, object fieldValue, DynamicObj row)
         {
@@ -119,18 +114,21 @@ namespace StackErp.UI.View.DataList
             //add ActionDefinition
         }
 
-        private void BuildDataRowActions(DataListContext context, DynamicObj row)
-        {
-            //check operation
+        protected override void BuildDataRowActions(DataListContext context, DynamicObj row)
+        {            
             var rowId = row.Get("RowId", 0);
-            var actionContext = new ActionContext(null, ActionType.Edit, "BTN_EDIT");
-            actionContext.Query = new RequestQueryString();
-            actionContext.Query.EntityId = context.SourceEntityId;
-            actionContext.Query.ItemId = rowId;
-            var ac = PageActionCreator.Create(actionContext);
-
             var actions = new List<ActionInfo>();
-            actions.Add(ac);
+
+            if (context.Context.UserInfo.HasAccess(context.SourceEntityId, AccessType.Update))
+            {
+                var actionContext = new ActionContext(null, ActionType.Edit, "BTN_EDIT");
+                actionContext.Query = new RequestQueryString();
+                actionContext.Query.EntityId = context.SourceEntityId;
+                actionContext.Query.ItemId = rowId;
+                
+                var ac = PageActionCreator.Create(actionContext);
+                actions.Add(ac);
+            }
 
             row.Add("RowActions", actions);
         }

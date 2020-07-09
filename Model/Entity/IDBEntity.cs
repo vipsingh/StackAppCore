@@ -18,6 +18,8 @@ namespace StackErp.Model.Entity
 
         List<IEntityRelation> Relations {get;}
 
+        int DefaultItemTypeId {get;} 
+
         List<string> ComputeOrderSeq { get; }
 
         bool IsChildEntity {get;}
@@ -42,6 +44,8 @@ namespace StackErp.Model.Entity
         List<int> ReadIds(FilterExpression filter);
 
         IDBEntity GetEntity(EntityCode id);
+
+        List<BaseField> GetLayoutFields(EntityLayoutType type);
         
     }
 

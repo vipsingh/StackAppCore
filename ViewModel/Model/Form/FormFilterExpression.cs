@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
 using StackErp.ViewModel.ViewContext;
@@ -14,7 +15,17 @@ namespace StackErp.ViewModel.Model
         private FilterExpression FilterExp;
         public FormFilterExpression(FormContext formContext, FilterExpression expression)
         {
-            FilterExp = expression;
+            FilterExp = expression.DeepClone();
+        }
+
+        public FormFilterExpression(FormContext formContext)
+        {
+            FilterExp = new FilterExpression(EntityCode.None);
+        }
+
+        public void AddField(FilterExpField field)
+        {
+            this.FilterExp.Add(field);
         }
 
         public IList<string> GetCriteriaFields()
@@ -24,6 +35,8 @@ namespace StackErp.ViewModel.Model
 
         public JObject ToJObject()
         {
+            if (this.FilterExp == null) return null;
+
             return JObject.Parse(this.FilterExp.ToJSONFormat());
         }
     }

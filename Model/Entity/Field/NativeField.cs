@@ -27,6 +27,14 @@ namespace StackErp.Model.Entity
         }
     }
 
+
+    public class PasswordField: StringField
+    {
+        public PasswordField(): base() {
+            Type = FieldType.Password;
+        }
+    }
+
     public class EmailField: StringField
     {
         public EmailField(): base() {

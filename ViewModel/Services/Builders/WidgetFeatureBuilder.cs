@@ -28,6 +28,16 @@ namespace StackErp.ViewModel.Services
                 widget.IsHidden = true;
                 return;
             }
+            else if (exp == "2") //HideOnEdit
+            {
+                var ent = context.FormContext.Entity;
+                if (ent != null)
+                {
+                    exp = @"[{""" + ent.IDField + @""": [3,0]}]";
+                }
+                else 
+                    return;
+            }
             var formContext = context.FormContext;
 
             var criteria = FilterExpression.BuildFromJson(formContext.Entity.EntityId, exp);
@@ -49,6 +59,16 @@ namespace StackErp.ViewModel.Services
             {
                 widget.IsReadOnly = true;
                 return;
+            }
+            else if (exp == "2") //ReadonlyOnEdit
+            {
+                var ent = context.FormContext.Entity;
+                if (ent != null)
+                {
+                    exp = @"[{""" + ent.IDField + @""": [3,0]}]";
+                }
+                else 
+                    return;
             }
             var formContext = context.FormContext;
 

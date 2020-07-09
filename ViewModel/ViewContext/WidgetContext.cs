@@ -95,5 +95,15 @@ namespace StackErp.ViewModel.ViewContext
 
             return cnxt;
         }
+
+        public void AddParameter(string key, object value)
+        {
+            this._parameters.Add(key, value, true);
+        }
+
+        public T GetParameter<T>(string key, T def)
+        {
+            return this._parameters.Get(key, def);
+        }
     }
 }

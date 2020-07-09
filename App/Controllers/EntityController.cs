@@ -14,10 +14,10 @@ using StackErp.UI.View.PageBuilder;
 using StackErp.UI.View.DataList;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
+using StackErp.UI.Controllers;
 
 namespace StackErp.App.Controllers
 {
-    [SPA]
     public class EntityController : StackErp.UI.Controllers.BaseController
     {
         public EntityController(ILogger<EntityController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)

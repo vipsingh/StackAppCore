@@ -16,10 +16,9 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
-    [SPA]
     public class StudioController: BaseController
     {
-        public StudioController(ILogger<AppController> logger,IOptions<AppKeySetting> appSettings): base(logger,appSettings)
+        public StudioController(ILogger<FilterController> logger,IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
 
         }
@@ -53,6 +52,9 @@ namespace StackErp.App.Controllers
             return CreateResult(res);
         }
 
+        #region page designer
+
+        #endregion
         // public IActionResult GetEntityDefData()
         // {
 

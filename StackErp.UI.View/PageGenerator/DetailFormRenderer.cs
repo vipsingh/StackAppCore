@@ -21,16 +21,18 @@ namespace StackErp.UI.View.PageGenerator
 
         protected override void OnRenderComplete()
         {
-            this.FillWidgetsData();            
+            this.FillWidgetsData();
             
             base.OnRenderComplete();
         }
         private void BuildActions()
         {
-            //check operation
-            var actionContext = new ActionContext(FormContext, ActionType.Edit, "BTN_EDIT");
-            actionContext.Query = FormContext.RequestQuery.Clone();
-            FormContext.Actions.Add(PageActionCreator.Create(actionContext));
+            if (this.FormContext.Context.UserInfo.HasAccess(FormContext.Entity.EntityId, AccessType.Update))
+            {
+                var actionContext = new ActionContext(FormContext, ActionType.Edit, "BTN_EDIT");
+                actionContext.Query = FormContext.RequestQuery.Clone();
+                FormContext.Actions.Add(PageActionCreator.Create(actionContext));
+            }
         }
         public void FillWidgetsData()
         {

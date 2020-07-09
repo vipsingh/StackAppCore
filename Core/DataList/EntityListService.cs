@@ -27,7 +27,7 @@ namespace StackErp.Core.DataList
             return deff;
         }
 
-        private EntityListDefinition CreateDefaultListDefn(DBEntity entity, EntityCode entityId)
+        private EntityListDefinition CreateDefaultListDefn(IDBEntity entity, EntityCode entityId)
         {
             var defn = new EntityListDefinition()
             {

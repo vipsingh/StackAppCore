@@ -15,7 +15,12 @@ namespace StackErp.UI.View.DataList
             var c = (PickerListContext)context;
             var service = new PickerListService();
              
-            return service.GetListDefn(c.Field);
+            return service.GetListDefn(c.DataSource);
+        }
+
+        protected override void BuildDataRowActions(DataListContext context, DynamicObj row)
+        {
+
         }
         
     }

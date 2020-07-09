@@ -11,15 +11,15 @@ import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
 import { DesignerContext } from '../../../Core/Studio';
 import { SettingOutlined } from '@ant-design/icons';
-
-const { TabPane } = Tabs;
-
-var fields = [
-    {Id: "Field1"}, {Id: "Field2"}, {Id: "Field3"}, {Id: "Field4"}, {Id: "Field5"}
-];
+import { getComponent } from '../../../Component/WidgetFactory';
+import DesignerFieldProp from "./DesignerFieldProp";
+import { openDialog } from "../../../Component/UI/Dialog";
 
 export default class DesignerPage extends Component<any,any> {
     designerContext: any
+    fields: Array<any>
+    _ix: number
+    fieldPropDlg: any
     constructor(props: any) {
         super(props);
 
@@ -27,15 +27,20 @@ export default class DesignerPage extends Component<any,any> {
             Header: {
                 Id: "header",
                 Text: "",
-                Groups: [{ Id: "gh", Rows: [ { Fields: [ { FieldId: "id1" } ] } ] }]
+                Groups: [{ Id: "gh", Rows: [ { Fields: [ ] } ] }]
             },
             Pages: [{ Id: "page1",
-                Groups: [{ Id: "g1", Rows: [ { Fields: [ { FieldId: "id11" }, { FieldId: "id12" } ] }] }]
+                Groups: [{ Id: "g1", Rows: [ { Fields: [ ] }] }]
             }],
             fieldContainerLink: {
 
             }
         }
+        this.fields = [
+          {WidgetId: "Field1", WidgetType: 1}, {WidgetId: "Field2", WidgetType: 1}, {WidgetId: "Field3", WidgetType: 1}, {WidgetId: "Field4", WidgetType: 4}, {WidgetId: "Field5", WidgetType: 2}
+      ];
+
+        this._ix = 0;
 
         this.designerContext = {
             renderGroupSetting: this.renderGroupSetting
@@ -57,6 +62,15 @@ export default class DesignerPage extends Component<any,any> {
     
     getControl = (container: string) => {
         let fieldId = this.state.fieldContainerLink[container];
+
+        let IComponent: any;
+        let wInfo: any = {};
+        if (fieldId) {
+          wInfo =  _.find(this.fields, { WidgetId: fieldId }) as any;
+          if (!wInfo.Caption) wInfo.Caption = wInfo.WidgetId;
+        
+          IComponent = getComponent(wInfo.WidgetType, false); 
+        }
         
         return (<FieldPanel Id={container} FieldId={fieldId}>
                     {!fieldId || 
@@ -64,9 +78,13 @@ export default class DesignerPage extends Component<any,any> {
                             this.moveField(id, fieldBoxId);
                           }}>
                               <div>
-                                  {this.renderFieldSettingIcon()}
-                              <FormField WidgetId={fieldId} WidgetType={1} Caption="Field" onChange={()=>{}} api={this.getFormAPI()}>
-                                    <label>{fieldId}</label>
+                                  {this.renderFieldSettingIcon(fieldId)}
+                              <FormField WidgetId={fieldId} {...wInfo} >
+                                    {!IComponent || <IComponent 
+                                      {...wInfo}
+                                      api={this.getFormAPI()}
+                                      onChange={() => { }}
+                                    />}
                                 </FormField>
                                 </div> 
                         </MoveBox>
@@ -91,8 +109,8 @@ export default class DesignerPage extends Component<any,any> {
     renderFieldTypes() {
         return (
           <div>
-            {_.map(fields, (item) => {
-                const isReadOnly = _.values(this.state.fieldContainerLink).indexOf(item.Id) >= 0;
+            {_.map(this.fields, (item) => {
+                const isReadOnly = _.values(this.state.fieldContainerLink).indexOf(item.WidgetId) >= 0;
               return (<Box field={item} readOnly={isReadOnly} addField={(fieldId: string, boxId: string) => {
                   this.linkField(fieldId, boxId);
                 }} />
@@ -102,25 +120,36 @@ export default class DesignerPage extends Component<any,any> {
         );
     }
 
-    renderFieldSettingIcon = () => {
-        return (<div style={{ position: "absolute" }}>
-                <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+    renderFieldSettingIcon = (fieldId: string) => {
+      if (!fieldId) return;
+
+      return (<div style={{ position: "absolute", zIndex: 1 }}>
+                <a href="javascript:void(0)" className="ant-dropdown-link" onClick={e => this.onWidgetSelect(fieldId)}>
                     <SettingOutlined />
                 </a></div>)
     }
 
     renderGroupSetting = (pageid: string, group: any) => {
+        var pageMenues = [];
+        pageMenues.push(<Menu.Item>
+          <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group)}> Add Row</a>
+      </Menu.Item>);
+      if (pageid !== "header") {
+        pageMenues.push(<Menu.Item>
+          <a href="javascript:void(0)" onClick={() => this.editgroup(pageid, group)}> Edit Group</a>
+        </Menu.Item>);
+        pageMenues.push(<Menu.Item>
+          <a href="javascript:void(0)" onClick={() => this.addgroup(pageid)}> Add Group</a>
+        </Menu.Item>);
+      }
         var menu = (
             <Menu>
-            <Menu.Item>
-                <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group)}>
-                Add Row
-                </a>
-            </Menu.Item>
+              {pageMenues}
             </Menu>
         );
-        
-        return (<div style={{ position: "absolute", right: "5px" }}>
+
+        //style={{ position: "absolute", right: "5px" }}
+        return (<div>
             <Dropdown overlay={menu}>
                 <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
                     <SettingOutlined />
@@ -128,8 +157,23 @@ export default class DesignerPage extends Component<any,any> {
             </Dropdown>
         </div>)
     }
+
+    onWidgetSelect = (widgetId: string) => {
+      const selectedF = _.find(this.fields, { WidgetId: widgetId });
+
+      this.fieldPropDlg = openDialog("Field", () => { return <DesignerFieldProp
+          selectedField={selectedF}
+          setFieldProp={this.setWidgetProp}
+        />; 
+      }, { hideCommands: true, size: "lg" });
+    }
+
+    setWidgetProp = (toSaveModel: any) => {
+      this.fieldPropDlg.cleanup();
+    }
+
     addgroupRow = (pageid: string, group: any) => {
-        const newRow = { Fields: [ { FieldId: "id21" }, { FieldId: "id22" } ] };
+        const newRow = { Fields: [ { FieldId: `id${this._ix++}` }, { FieldId: `id${this._ix++}` } ] };
         if (pageid === "header") {
             const ix = _.findIndex(this.state.Header.Groups, { Id: group.Id });
             const g = this.state.Header.Groups[ix];
@@ -142,6 +186,18 @@ export default class DesignerPage extends Component<any,any> {
             const h = update(this.state.Pages[pageix], { Groups: { [ix]: { $set: Object.assign({}, g, { Rows: update(g.Rows, {$push: [newRow]}) }) } } });
             this.setState({ Pages: update(this.state.Pages, { [pageix]: { $set: h } }) });
         }
+    }
+
+    editgroup = (pageid: string, group: any) => {
+
+    }
+
+    addgroup = (pageid: string) => {
+      const newRow = { Id: `g${this._ix++}`, Label: "Group", Rows: [ { Fields: [ ] } ] };
+      const pageix = _.findIndex(this.state.Pages, { Id: pageid });
+
+      const h = update(this.state.Pages[pageix], { Groups: { $push: [newRow] } });
+      this.setState({ Pages: update(this.state.Pages, { [pageix]: { $set: h } }) });      
     }
 
     render() {
@@ -188,7 +244,7 @@ const styleBox: React.CSSProperties = {
     readOnly: boolean
   }> = ({ field, addField, readOnly }) => {
     const [{ isDragging }, drag] = useDrag({
-      item: { name: field.Id, type: "FIELDBOX" },
+      item: { name: field.WidgetId, type: "FIELDBOX" },
   
       end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
         const dropResult = monitor.getDropResult()
@@ -207,7 +263,7 @@ const styleBox: React.CSSProperties = {
   
     return (
       <div ref={drag} style={{ ...styleBox, opacity }}>
-            {field.Id}
+            {field.Caption || field.WidgetId}
       </div>
     )
   }
@@ -264,7 +320,7 @@ const style: React.CSSProperties = {
     const opacity = isDragging ? 0.4 : 1
   
     return (
-      <div ref={drag} style={{ border: '1px dashed gray', opacity }}>
+      <div ref={drag} style={{ opacity }}>
         {children}
       </div>
     )

@@ -52,12 +52,21 @@ namespace StackErp.Core
                     entities.Add(entid, dbEntity);
                 }
 
-                Metadata.FixedEntities.BuildSchema(ref entities);
+                Metadata.FixedEntities.BuildSchema(ref entities);                
+
+                var defItemTypes = DB.EntityDBService.GetDefaultItemTypes();
 
                 foreach (var entK in entities)
-                {
+                {                    
                     var ent = entK.Value;
-                    ent.Init();
+                    DynamicObj dataParam = new DynamicObj();
+
+                    var itemTyp = defItemTypes.Where(x => x.Get("entityid", 0) == ent.EntityId.Code);
+                    if (itemTyp.Count() > 0) {
+                        dataParam.Add("DEFAULTLAYOUT", itemTyp.First().Get("id", 0));
+                    }
+
+                    ent.Init(dataParam);
                     foreach (var fieldK in ent.Fields)
                     {
                         fieldK.Value.Init();
@@ -71,25 +80,35 @@ namespace StackErp.Core
 
         }
 
-        public static T GetAs<T>(EntityCode id) where T: DBEntity
+        public static T GetAs<T>(EntityCode id) where T: IDBEntity
         {
             if (entities.Keys.Contains(id.Code))
-                return (T)entities[id.Code];
+                return (T)(entities[id.Code] as IDBEntity);
 
             throw new EntityException($"Requested Entity {id.Code} # {id.Name} not found.");
         }
 
-        public static DBEntity Get(EntityCode id)
+        public static IDBEntity Get(EntityCode id)
         {
-            return GetAs<DBEntity>(id);
+            return GetAs<IDBEntity>(id);
         }
 
         private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields, string tableName)
         {
             DBEntity e;
-            if (entid == 101) {
+            if (entid == 1) {
+                e = new EntityMasterEntity(entid, name, fields,tableName);
+            }
+            else if (entid == 2) {
+                e = new EntitySchemaEntity(entid, name, fields,tableName);
+            }
+            else if (entid == 101) {
                 e = new UserDbEntity(entid, name, fields,tableName);
-            } else {
+            } 
+            else if (entid == 102) {
+                e = new UserRoleEntity(entid, name, fields,tableName);
+            } 
+            else {
                 e = new DBEntity(entid, name, fields, tableName);
             }
 

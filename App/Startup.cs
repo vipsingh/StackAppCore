@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using StackErp.UI;
 using StackErp.Model;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace StackErp.App
 {
@@ -58,22 +59,39 @@ namespace StackErp.App
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppKeySetting>();
             var key = Encoding.ASCII.GetBytes(appSettings.JWTSecret);
-            services.AddAuthentication(x =>
+            
+            // services.AddAuthentication(x =>
+            // {
+            //     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //     x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            // })
+            // .AddJwtBearer(x =>
+            // {
+            //     x.RequireHttpsMetadata = false;
+            //     x.SaveToken = true;
+            //     x.TokenValidationParameters = new TokenValidationParameters
+            //     {
+            //         ValidateIssuerSigningKey = true,
+            //         IssuerSigningKey = new SymmetricSecurityKey(key),
+            //         ValidateIssuer = false,
+            //         ValidateAudience = false
+            //     };
+            // });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(option => {
+                option.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Auth/Login");
+                option.LogoutPath = new Microsoft.AspNetCore.Http.PathString("/Auth/Logout");
+                option.AccessDeniedPath = option.LoginPath;
+            });
+
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
             {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
+                options.IdleTimeout = TimeSpan.FromMinutes(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
             });
         
         }
@@ -98,6 +116,8 @@ namespace StackErp.App
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {  

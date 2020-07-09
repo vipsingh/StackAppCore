@@ -10,26 +10,26 @@ namespace StackErp.ViewModel.ViewContext
     {
         public StackAppContext Context {get;}
         public EntityCode EntityId {get;}
-        public int LayoutId {get;}
+        public int ItemTypeId {get;}
         public TView View {protected set; get;}
-        public LayoutContext(StackAppContext context, int layoutId, EntityCode entityId)
+        public LayoutContext(StackAppContext context, int itemTypeId, EntityCode entityId)
         {
             this.Context = context;
-            this.LayoutId = layoutId;
+            this.ItemTypeId = itemTypeId;
             EntityId= entityId;
         }
 
         public virtual TView Build()
         {
             var service = new EntityLayoutService(Context, EntityId);
-            return View = service.PrepareView(this.LayoutId);
+            return View = service.PrepareView(this.ItemTypeId, EntityLayoutType.None);
         }
     }
 
     public class DeskPageLayoutContext: LayoutContext
     {
-        public DeskPageLayoutContext(StackAppContext context, int layoutId, EntityCode entityId)
-            :base(context, layoutId, entityId)
+        public DeskPageLayoutContext(StackAppContext context, int itemTypeId, EntityCode entityId)
+            :base(context, itemTypeId, entityId)
         {
         }
         public override TView Build()

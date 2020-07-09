@@ -13,7 +13,7 @@ namespace StackErp.ViewModel.FormWidget
     public class EntityFilterWidget: BaseWidget
     {
         public override FormControlType WidgetType { get => FormControlType.EntityFilter; }
-        public IWidget SourcePicker { private set; get; }
+        public ObjectPickerWidget SourcePicker { private set; get; }
         public ActionInfo FilterFormLink { protected set; get; }
         public EntityCode FilterEntityId {set;get;}
         public EntityFilterWidget(WidgetContext cntxt): base(cntxt)
@@ -26,16 +26,32 @@ namespace StackErp.ViewModel.FormWidget
 
             var qs = new RequestQueryString();
             qs.EntityId = FilterEntityId;
-            FilterFormLink = new ActionInfo("/widget/GetFilterFieldForms", qs, "FILTERFORM");
-            DataActionLink = new ActionInfo("/widget/GetFilterFieldData", qs, "FILTERDATA");
+            FilterFormLink = new ActionInfo("/Filter/GetFilterFieldForms", qs, "FILTERFORM");
+            DataActionLink = new ActionInfo("/Filter/GetFilterFieldData", qs, "FILTERDATA");
             CreateSourcePicker();
         }
 
         private void CreateSourcePicker() 
         {
             SourcePicker = new ObjectPickerWidget(this.Context);
+            
+            var sourceParam = new DynamicObj();
+            sourceParam.Add("EntityId", this.FilterEntityId);
+            SourcePicker.AddProperty("PickerSource", "SYSTEM_2");
+            SourcePicker.AddProperty("PickerSourceParams", sourceParam);
+            
             SourcePicker.OnCompile();
+
+            //  var q = new RequestQueryString();
+            // q.WidgetId = this.WidgetId;
+            // q.EntityId = this.Context.FormContext.RequestQuery.EntityId;
+            
+            // var link = new ActionInfo("Filter/GetFilterPickerData", q);
+            // link.ActionType = ActionType.Custom;
+            // link.ExecutionType = ActionExecutionType.Custom;
+            
         }
+        
 
         // protected override bool OnSetData(object value)
         // {

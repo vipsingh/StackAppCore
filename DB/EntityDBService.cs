@@ -21,6 +21,12 @@ namespace StackErp.DB
             return entitiesSchemas;
         }
 
+        public static IEnumerable<DbObject> GetDefaultItemTypes()
+        {
+            var d = DBService.Query("select id, entityid from t_entity_itemtype where code='0'");
+            return d;
+        }
+
         public static int GetNextEntityDBId(int entityId)
         {
             var currId = DBService.Single("select max(MaxID) as a from AUTOID where EntityId=@EntityId", new { EntityId = entityId });

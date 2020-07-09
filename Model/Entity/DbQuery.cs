@@ -11,6 +11,7 @@ namespace StackErp.Model.Entity
         public IDBEntity Entity {get;}
         public QueryType QueryType {private set;get;}
         public DbQueryFieldCollection Fields {get;}
+        public string WhereInjectKeyword {set;get;}
         public FilterExpression FixedFilter {private set;get;}
         public FilterExpression Filters {private set;get;}
 

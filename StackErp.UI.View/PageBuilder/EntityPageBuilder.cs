@@ -2,6 +2,7 @@ using System;
 using StackErp.ViewModel.Model;
 using StackErp.UI.View.PageGenerator;
 using StackErp.ViewModel.ViewContext;
+using StackErp.Model;
 
 namespace StackErp.UI.View.PageBuilder
 {
@@ -9,8 +10,11 @@ namespace StackErp.UI.View.PageBuilder
     {
         public ViewPage CreateNewPage(EditFormContext context)
         {
+            if (!context.Context.UserInfo.HasAccess(context.Entity.EntityId, AccessType.Create))
+                throw new AuthException("Operation not allowed.");
+
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
+            var lConext = new LayoutContext(context.Context, context.ItemTypeId, context.Entity.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -21,8 +25,11 @@ namespace StackErp.UI.View.PageBuilder
         }
         public ViewPage CreateEditPage(EditFormContext context)
         {
+            if (!context.Context.UserInfo.HasAccess(context.Entity.EntityId, AccessType.Update))
+                throw new AuthException("Operation not allowed.");
+
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
+            var lConext = new LayoutContext(context.Context, context.ItemTypeId, context.Entity.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -33,8 +40,11 @@ namespace StackErp.UI.View.PageBuilder
         }
         public ViewPage CreateDetailPage(DetailFormContext context)
         {
+            if (!context.Context.UserInfo.HasAccess(context.Entity.EntityId, AccessType.Read))
+                throw new AuthException("Operation not allowed.");
+
             context.CreateDataModel();
-            var lConext = new LayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
+            var lConext = new LayoutContext(context.Context, context.ItemTypeId, context.Entity.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 
@@ -45,7 +55,10 @@ namespace StackErp.UI.View.PageBuilder
         }
         public ViewPage CreateDeskPage(DeskPageContext context)
         {
-            var lConext = new DeskPageLayoutContext(context.Context, context.RequestQuery.LayoutId, context.RequestQuery.EntityId);
+            if (!context.Context.UserInfo.HasAccess(context.Entity.EntityId, AccessType.Read))
+                throw new AuthException("Operation not allowed.");
+                
+            var lConext = new DeskPageLayoutContext(context.Context, 0, context.RequestQuery.EntityId);
             lConext.Build();
             context.LayoutContext = lConext;
 

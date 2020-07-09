@@ -4,12 +4,11 @@ namespace StackErp.Model
 {
     public enum AccessType
     {
-        None = 0,
-        Add = 1,
-        Update = 2,
-        Delete = 3,
-        View = 4,
-        Message = 5
+        Full = 0,
+        Create = 2,
+        Update = 3,
+        Read = 4,
+        Delete = 5
     }
     public enum OperationType
     {

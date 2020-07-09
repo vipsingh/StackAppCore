@@ -7,10 +7,10 @@ namespace StackErp.DB
     {
         public string Name {get;}
         public object Value {get;}
-        public DbType Type {get;}
+        public DbType? Type {get;}
         public ParameterDirection Direction {get;}
 
-        public DynamicDbParam(string name, object value, DbType type, ParameterDirection direction = ParameterDirection.Input)
+        public DynamicDbParam(string name, object value, DbType? type = null, ParameterDirection direction = ParameterDirection.Input)
         {
             Name=  name;
             Value=value;
@@ -26,7 +26,10 @@ namespace Dapper
     {
         public static void AddParam(this DynamicParameters parameters, StackErp.DB.DynamicDbParam param)
         {
-            parameters.Add(param.Name, param.Value, param.Type, param.Direction);
+            if (param.Type.HasValue)
+                parameters.Add(param.Name, param.Value, param.Type.Value, param.Direction);
+            else
+                parameters.Add(param.Name, param.Value);
         }
     }
 }

@@ -18,12 +18,18 @@ namespace StackErp.Core.DataList
             return defn;
         }
 
+        public DataListDefinition GetListDefn(FieldDataSource pickerSource)
+        {
+            var defn = GetEntityListDefn(pickerSource);
+            return defn;
+        }
+
         public DataListDefinition GetEntityListDefn(FieldDataSource source)
         {
             var defn = new DataListDefinition();
             var ds = source;
             defn.DataSource = ds;
-            //defn.EntityId = ds.Entity;
+
             var _Entity = Core.EntityMetaData.Get(ds.Entity);
             
             defn.ItemIdField = "Id";
@@ -40,7 +46,7 @@ namespace StackErp.Core.DataList
         }
 
 
-        private TList PrepareLayout(DataListDefinition ds, DBEntity entity)
+        private TList PrepareLayout(DataListDefinition ds, IDBEntity entity)
         {
             var fields = new String[] { ds.ItemIdField, ds.ItemViewField };
             var tList = new TList();

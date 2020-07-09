@@ -59,6 +59,11 @@ namespace StackErp.UI.View.DataList
             context.BuildSource(defn);
         }
 
+        protected virtual void OnPrepareRow(DataListContext context, DataListDefinition defn, DynamicObj row)
+        {
+            BuildDataRowActions(context, row);
+        }
+
         protected virtual void ExecutePrepareData(DataListContext context, DataListDefinition defn)
         {
 
@@ -67,6 +72,11 @@ namespace StackErp.UI.View.DataList
         protected virtual void PrepareLinkDefinition(DataListContext context, DataListDefinition defn)
         {
             
+        }
+
+        protected virtual void BuildDataRowActions(DataListContext context, DynamicObj row)
+        {
+
         }
     }
 }

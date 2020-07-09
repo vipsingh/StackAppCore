@@ -36,18 +36,29 @@ CREATE TABLE t_entitymaster
 (
 	masterid integer NOT NULL,
 	id integer,
-	name character varying(100)  NOT NULL,
-	text character varying(200) ,
+	name character varying(60)  NOT NULL,
+	text character varying(60) ,
 	tablename character varying(60) ,
+	pluralname character varying(60) ,
 	appmodule integer NOT NULL default(1),
 	primaryfield character varying(100) ,
 	namefield character varying(60) ,
+	itemtype int,
+	uniquefields char varying(200),
+	parententity int,
+	hasstages bool,
+	stagegroupid int,
+	displayorder int default(0),
+	hasimage bool,
+	deletepolicy int,
+	historytable char varying(100),
+	features char varying(2000),
 	createdby integer NOT NULL,
     updatedby integer,
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
 	CONSTRAINT t_entitymaster_pkey PRIMARY KEY (id),
-	CONSTRAINT t_entitymaster_name_key UNIQUE (name)
+	CONSTRAINT t_entitymaster_name_key UNIQUE (masterid,name)
 );
 
 CREATE TABLE t_entityschema
@@ -66,7 +77,7 @@ CREATE TABLE t_entityschema
 	linkentity_domain character varying(500),	
 	displayexp character varying(500),
 	linkentity_field char varying(60),
-	ismultiselect boolean,
+	-- ismultiselect boolean,
 	relatedexp character varying(200),
 	isunique boolean,
 	isrequired boolean,
@@ -82,7 +93,7 @@ CREATE TABLE t_entityschema
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
 	CONSTRAINT t_entityschema_pkey PRIMARY KEY (id),
-	CONSTRAINT t_entityschema_fieldname_key UNIQUE (entityid,fieldname)
+	CONSTRAINT t_entityschema_fieldname_key UNIQUE (masterid,entityid,fieldname)
 );
 
 CREATE TABLE t_entity_relationship
@@ -107,7 +118,7 @@ CREATE TABLE t_entity_itemtype
 	updatedby integer,
     updatedon timestamp without time zone,
 	CONSTRAINT t_entity_itemtype_pkey PRIMARY KEY (id),
-	CONSTRAINT t_entity_itemtype_name_key UNIQUE (entityid,name)
+	CONSTRAINT t_entity_itemtype_name_key UNIQUE (masterid,entityid,name)
 );
 
 CREATE TABLE t_entity_viewlayout
@@ -191,10 +202,10 @@ values(0,1,1,'Default','0');
 insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
 values(0,1,1,1,'','0', null);
 
-insert into t_entity_itemtype(masterid,id,entityid,name,code)
-values(0,2,2,'Default','0');
-insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
-values(0,2,2,2,'','0', null);
+-- insert into t_entity_itemtype(masterid,id,entityid,name,code)
+-- values(0,2,2,'Default','0');
+-- insert into t_entity_viewlayout(masterid,id,entityid,itemtype,states,viewtype,layoutxml)
+-- values(0,2,2,2,'','0', null);
 
 insert into t_entitylist(masterid,id,entityid,categoryid,name,idfield,viewfield,
 	layoutxml, 
@@ -240,7 +251,10 @@ CREATE TABLE t_user
     mobileno character varying(15),
     emailid character varying(100),
     isactive boolean default(true),
-    expiredon date,	    
+    expiredon date,	  
+	itemtype int,
+	createdby integer NOT NULL,
+    updatedby integer,  
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
 	CONSTRAINT t_user_pkey PRIMARY KEY (id),
@@ -259,6 +273,10 @@ CREATE TABLE t_company_setting
     financialyearmonth integer,
     shortdateformat character varying(30) default('dd-MMM-yyyy'),
     longdateformat character varying(40),
+	createdby integer NOT NULL,
+    updatedby integer,
+	createdon timestamp without time zone,	
+    updatedon timestamp without time zone,
     CONSTRAINT t_company_setting_pkey PRIMARY KEY (companyid)
 );
 
@@ -269,6 +287,10 @@ CREATE TABLE t_currency
     code  character varying(30) NOT NULL,
     name character varying(60) NOT NULL,
     decimalplace integer not null,    
+	createdby integer NOT NULL,
+    updatedby integer,
+	createdon timestamp without time zone,	
+    updatedon timestamp without time zone,
     CONSTRAINT t_currency_pkey PRIMARY KEY (id),
     CONSTRAINT t_currency_code_key UNIQUE (code)
 );
@@ -278,9 +300,15 @@ CREATE TABLE t_role
     masterid integer NOT NULL,
     id integer,
     name character varying(60) NOT NULL,
-    code character varying(10),
-    profileid integer, 
-    CONSTRAINT t_role_pkey PRIMARY KEY (id)
+	inheritby integer, 
+	moduleid int,
+	itemtype int,
+	createdby integer NOT NULL,
+    updatedby integer,
+	createdon timestamp without time zone,	
+    updatedon timestamp without time zone,
+    CONSTRAINT t_role_pkey PRIMARY KEY (id),
+	CONSTRAINT t_role_name_key UNIQUE (masterid,name)
 );
 
 CREATE TABLE t_userrole
@@ -292,28 +320,70 @@ CREATE TABLE t_userrole
     CONSTRAINT t_userrole_pkey PRIMARY KEY (userid,roleid)
 );
 
-CREATE TABLE t_operation
+CREATE TABLE t_operation_type
 (
     masterid integer NOT NULL,
     id integer,
-    name character varying(60) NOT NULL,
-    text character varying(200),
+    name character varying(60) NOT NULL,    
     entityid integer not null,
-    operaiontype integer not null,
-    CONSTRAINT t_operation_pkey PRIMARY KEY (id)
+    CONSTRAINT t_operation_type_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE t_role_operation
 (
     masterid integer NOT NULL,
     roleid integer not null,
-    operation integer not null,    
-    CONSTRAINT t_user_operation_pkey PRIMARY KEY (roleid,operation)
+	entityid integer not null,
+    operation integer not null,
+	invoke boolean,
+    CONSTRAINT t_role_operation_pkey PRIMARY KEY (roleid,entityid,operation)
 );
+
+
+CREATE TABLE t_entity_script
+(
+    id integer NOT NULL,
+    name character varying(100) NOT NULL,
+	entityid integer NOT NULL,
+	issytem boolean,
+	isclientside boolean,
+	script text,	
+	params text,
+	createdby integer NOT NULL,
+    updatedby integer,
+    createdon timestamp without time zone,
+    updatedon timestamp without time zone,
+    CONSTRAINT t_entity_script PRIMARY KEY (id)
+)
+
 ------------------------------------DATA----------------
 insert into t_collection_master values(0,1,1,'Male',null,'M',null,null);
 insert into t_collection_master values(0,1,2,'Female',null,'F',null,null);
 
-insert into t_user values(10,1,'Vipin', null, 'vip@stackerp.com',2, '',1,'9899013097',null,true,null,'2020-01-01', null);
-insert into t_role values(10,1,'System Admin', 'SA', 1);
+insert into t_user values(10,1,'Vipin', null, 'vip',2, '',1,'9899013097','vip@stackerp.com',true,null,'2020-01-01', null,1,1);
+insert into t_role values(0,1,'System Admin', 0, 0, '2020-01-01',  '2020-01-01', 1,1);
 insert into t_userrole values(10,1,1,1);
+insert into t_operation_type values(0,0,'Full Access',0);
+insert into t_operation_type values(0,1,'Create',0);
+insert into t_operation_type values(0,2,'Update',0);
+insert into t_operation_type values(0,3,'Read',0);
+insert into t_operation_type values(0,4,'Delete',0);
+
+---------------------------FUNCTION-----------------------------------
+CREATE OR REPLACE FUNCTION get_related_data(tab regclass, col text, val integer[]) RETURNS text[] AS $func$
+	DECLARE data text[];
+   BEGIN
+   	EXECUTE format('select (select array_agg(%s) from %s where id = ANY(''%s''))::text[]', col, tab, val) into data;
+	RETURN data;
+   END;
+$func$ LANGUAGE plpgsql
+RETURNS NULL ON NULL INPUT;
+
+CREATE OR REPLACE FUNCTION get_collection_datatext(coll_id int, val integer[]) RETURNS text[] AS $func$
+	DECLARE data text[];
+   BEGIN
+   	EXECUTE format('select (select array_agg(datatext) from t_collection_master where id=%s and dataid = ANY(''%s''))::text[]', coll_id, val) into data;
+	RETURN data;
+   END;
+$func$ LANGUAGE plpgsql
+RETURNS NULL ON NULL INPUT;

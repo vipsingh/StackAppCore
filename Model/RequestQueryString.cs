@@ -33,7 +33,7 @@ namespace StackErp.Model
             get { return GetInt("RelatedEntityId"); }
             set { this["RelatedEntityId"] = value.Code.ToString(); }
         }
-        public int LayoutId
+        public int ItemTypeId
         {
             get { return GetInt("LayoutId"); }
             set { this["LayoutId"] = value.ToString(); }
@@ -108,7 +108,7 @@ namespace StackErp.Model
             }
             else
             {
-                return -1;
+                return 0;
             }
         }
         private bool GetBool(string param)

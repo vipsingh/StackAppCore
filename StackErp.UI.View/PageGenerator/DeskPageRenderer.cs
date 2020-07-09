@@ -34,8 +34,11 @@ namespace StackErp.UI.View.PageGenerator
         {
             var q = new RequestQueryString();
             q.EntityId = this.FormContext.Entity.EntityId;
-            var newAction = PageActionCreator.Create(new ActionContext(this.FormContext, ActionType.New, "NEW") { Query = q } );
-            this.FormContext.Actions.Add(newAction);
+            if (this.FormContext.Context.UserInfo.HasAccess(this.FormContext.Entity.EntityId, AccessType.Create))
+            {
+                var newAction = PageActionCreator.Create(new ActionContext(this.FormContext, ActionType.New, "NEW") { Query = q } );
+                this.FormContext.Actions.Add(newAction);
+            }
         }
         public override ViewPage GetViewPage()
         {

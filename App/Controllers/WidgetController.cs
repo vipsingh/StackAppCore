@@ -13,10 +13,9 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.App.Controllers
 {
-    [SPA]
     public class WidgetController : StackErp.UI.Controllers.BaseController
     {
-        public WidgetController(ILogger<AppController> logger,IOptions<AppKeySetting> appSettings): base(logger,appSettings)
+        public WidgetController(ILogger<FilterController> logger,IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
             
         }
@@ -30,28 +29,7 @@ namespace StackErp.App.Controllers
             var res = builder.GetResponse(context);
             
             return CreateResult(res);
-        }
-
-
-        #region FilterField
-        [HttpPost]
-        public IActionResult GetFilterFieldForms([FromBody] CustomRequestInfo request)
-        {  
-            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
-            var page = form.Generate(request, this.RequestQuery);
-            
-            return CreatePageResult(page);
-        }
-
-        [HttpPost]
-        public IActionResult GetFilterFieldData([FromBody] CustomRequestInfo request)
-        {  
-            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
-            var page = form.BuildWithData(request, this.RequestQuery);
-            
-            return CreateResult(page);
-        }
-        #endregion
+        }        
     
         public IActionResult GetListFormData()
         {  

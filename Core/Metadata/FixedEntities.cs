@@ -72,7 +72,7 @@ namespace StackErp.Core.Metadata
             entities.Add(1, d);
 
             var entitySchema = BuildEntitySchemaFields();
-            EntityCode.AllEntities.Add(entitySchema.Name, 2);
+            EntityCode.AllEntities.Add(entitySchema.Name.ToUpper(), 2);
             entities.Add(2, entitySchema);
         }
 
@@ -111,6 +111,24 @@ namespace StackErp.Core.Metadata
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""computeexpression"",""isrequired"": false,""dbname"": ""computeexpression""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""uisetting"",""isrequired"": false,""dbname"": ""uisetting""}"));
             return list;
+        }
+
+        private static void AddEntityLayout()
+        {
+            var entityName = "entityschema";
+
+            var fs = new Dictionary<string, BaseField>();
+            
+            var list = GetEntitySchemaData();
+            foreach(var dbo in list)
+            {
+                var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);                
+                fs.Add(f.Name.ToUpper(), f);
+            }
+            
+            var d = new DBEntity(2, entityName, fs, "t_entityschema");
+            d.TextField = "fieldname";
+            
         }
     }
 }

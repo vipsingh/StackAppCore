@@ -31,18 +31,22 @@ namespace StackErp.ViewModel.ViewContext
                var reqInfo = ListRequest.RequestInfo;
                if (reqInfo.Properties != null)
                {
-                   
+                   var source = reqInfo.Properties.Get("PickerSource", "");
+                   dataSource = Core.Datasource.SystemDataSource.GetPickerSource(source);
                }
-            } else {
+            } 
+            else 
+            {
                 dataSource = Field.ControlInfo.DataSource;
             }
 
-                if (dataSource != null)
-                {
-                    SourceEntityId = Field.ControlInfo.DataSource.Entity;
-                }
-                else
-                    throw new AppException("Datasource is not defined for this list.");
+            if (dataSource != null)
+            {
+                DataSource = dataSource;
+                SourceEntityId = dataSource.Entity;
+            }
+            else
+                throw new AppException("Datasource is not defined for this list.");
             
             base.Init();
         } 
@@ -56,6 +60,15 @@ namespace StackErp.ViewModel.ViewContext
 
             var reqInfo = ListRequest.RequestInfo;
             formContext.PrepareLinkedData(reqInfo);
+            
+            if (reqInfo.Properties != null)
+            {
+                var sourceParams = reqInfo.Properties.Get<DynamicObj>("PickerSourceParams", null);
+                if(sourceParams != null)
+                {
+                    formContext.AddEntityModelInfo("Parameters", sourceParams);
+                }
+            }
             
             var filters = defn.FixedFilter.DeepClone();
             ValueResolver.ResolveFilterExpressionValue(ref filters, formContext);

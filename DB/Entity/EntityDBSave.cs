@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Dapper;
+using Npgsql;
 using StackErp.Model;
 using StackErp.Model.Entity;
 
@@ -165,7 +166,7 @@ namespace StackErp.DB
                 if (!attr.Field.IsDbStore) continue;
 
                 var dbName = attr.Field.DBName;
-                var dbType = DBService.GetDbType(attr.Field.Type, attr.Field.BaseType);
+                DbType? dbType = DBService.GetDbType(attr.Field.Type, attr.Field.BaseType);
                 if (attr.IsChanged)
                 {
                     var val = attr.Value;
@@ -173,12 +174,10 @@ namespace StackErp.DB
                     {
                         if (val is IEnumerable<int>)
                         {
-                            val = string.Join(",", ((IEnumerable<int>)val));
+                            val = ((IEnumerable<int>)val).ToArray();// new DbIntArrayColData((IEnumerable<int>)val);
                         }
-                        else if (val is IEnumerable<string>)
-                            val = string.Join(",", ((IEnumerable<string>)val));
-
-                        dbType = DbType.String;
+                        dbType = null;
+                        
                     }
                     var param = new DynamicDbParam(f.Key, val, dbType);
                     qryA.Add((dbName, param));

@@ -33,6 +33,14 @@ namespace StackErp.ViewModel.Model
         }
     }
 
+    public class AuthErrorResponse: ErrorResponse
+    {
+        public AuthErrorResponse(string message): base(message)
+        {
+            this.ResponseStatus = 401;
+        }
+    }
+
     public class SubmitActionResponse: ActionResponse
     {
         public SubmitStatus Status {set;get;}

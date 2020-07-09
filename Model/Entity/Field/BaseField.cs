@@ -28,8 +28,7 @@ namespace StackErp.Model.Entity
         public EntityCode RefObject { set; get; }
         public DynamicObj Properties { set; get; }
         public string TableName { set; get; }
-        public bool IsMultiSelect { set; get; }
-        public bool IsArrayData { private set; get; }
+        public bool IsArrayData { protected set; get; }
         public int ViewOrder { set; get; }
         
         public FormControlType ControlType { set; get; }
@@ -66,9 +65,7 @@ namespace StackErp.Model.Entity
         public virtual void OnInit()
         {
             ControlInfo.FieldAttribute = new FieldAttribute(){ValueField = this.Name};
-            if (this.IsMultiSelect) {
-                IsArrayData = true;
-            }
+            ControlInfo.WidgetType = ControlType;
         }
         public virtual string ResolveDBName()
         {            
@@ -106,6 +103,8 @@ namespace StackErp.Model.Entity
         public FieldAttribute FieldAttribute {set;get;}
         public int CollectionId  {set;get;}
         public bool IsMultiSelect  {set;get;}
+
+        public FormControlType WidgetType {set;get;}
     }
 
     public class SourceDataMap {
