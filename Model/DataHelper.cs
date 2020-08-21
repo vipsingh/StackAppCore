@@ -84,7 +84,7 @@ namespace StackErp.Model
             return (T)objectValue;// Convert.ChangeType(objectValue, typeof(T));
         }
 
-        internal static object GetDataValue(object value, Type fieldType)
+        public static object GetDataValue(object value, Type fieldType)
         {
             if (value.GetType() == fieldType)
                 return value;
@@ -333,6 +333,28 @@ namespace StackErp.Model
             T tmp = list[indexA];
             list[indexA] = list[indexB];
             list[indexB] = tmp;
+        }
+
+        public static object ResolveWidgetValue(object postValue, TypeCode tCode = TypeCode.Int32)
+        {
+            if(postValue is JObject)
+            {
+                var v = (JObject)postValue;
+                return DataHelper.GetDataValue(v["Value"], tCode);
+                
+            } else if (postValue is JArray) {
+                var postVals = new List<int>();
+                foreach(var o in (JArray)postValue) {
+                    if (o is JObject)
+                        postVals.Add((int)DataHelper.GetDataValue(o["Value"], tCode));
+                    else
+                        postVals.Add((int)DataHelper.GetDataValue(o, tCode));
+                }
+                return postVals;
+            }
+            else {
+                return DataHelper.GetDataValue(postValue, tCode);
+            }
         }
     }
 }

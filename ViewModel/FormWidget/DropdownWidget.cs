@@ -125,23 +125,7 @@ namespace StackErp.ViewModel.FormWidget
 
         public override object GetValue()
         {
-            if(PostValue is JObject)
-            {
-                var v = (JObject)PostValue;
-                Value = v["Value"].ToString();
-            } else if (PostValue is JArray) {
-                var postVals = new List<int>();
-                foreach(var o in (JArray)PostValue) {
-                    if (o is JObject)
-                        postVals.Add((int)DataHelper.GetDataValue(o["Value"], TypeCode.Int32));
-                    else
-                        postVals.Add((int)DataHelper.GetDataValue(o, TypeCode.Int32));
-                }
-                Value = postVals;
-            }
-            else {
-                Value = DataHelper.GetDataValue(PostValue, TypeCode.Int32);
-            }
+            Value = DataHelper.ResolveWidgetValue(PostValue, this.BaseType);
             
             return this.Value;
         }

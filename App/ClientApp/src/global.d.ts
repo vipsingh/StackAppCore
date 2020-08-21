@@ -21,6 +21,7 @@ interface AppSetting {
     DateFormat: string,
     BaseUrl: string,
     ApiUrl: string,
+    AssetUrl: string,
     BaseCurrency: number,
     BaseCurrencySymbol: string,
     DecimalPlaces: number

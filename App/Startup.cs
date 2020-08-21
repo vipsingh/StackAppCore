@@ -137,6 +137,7 @@ namespace StackErp.App
             StackErp.Core.App.ConfigureDB(this.Configuration.GetValue<string>("DBInfo:ConnectionString"));
 
             EntityMetaData.Build();
+            ViewModel.RegisterStackScriptRef.Register();
         }
     }
 }

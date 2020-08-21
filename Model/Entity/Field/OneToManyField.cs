@@ -7,7 +7,6 @@ namespace StackErp.Model.Entity
 {    
     public class OneToManyField: RelationalField
     {
-        public string RefFieldName {get; private set;}
         public OneToManyField(): base() {
             Type = FieldType.OneToMany;
             BaseType = TypeCode.Object;
@@ -22,8 +21,7 @@ namespace StackErp.Model.Entity
     }
 
     public class OneToOneField: RelationalField
-    {
-        public string RefFieldName {get; private set;}
+    {        
         public OneToOneField(): base() {
             Type = FieldType.OneToOne;
             BaseType = TypeCode.Object;

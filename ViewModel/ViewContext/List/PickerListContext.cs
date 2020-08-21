@@ -14,6 +14,8 @@ namespace StackErp.ViewModel.ViewContext
         public BaseField Field {private set; get;}
         public FieldDataSource DataSource {private set; get;}
         public EntityCode RelatedEntityId {private set; get;}
+        public DynamicObj FormModelMapping {private set; get;}
+
         public PickerListContext(StackAppContext context , RequestQueryString query, ListRequestinfo requestInfo)
             : base(context, query, requestInfo)
         {
@@ -47,18 +49,21 @@ namespace StackErp.ViewModel.ViewContext
             }
             else
                 throw new AppException("Datasource is not defined for this list.");
+
+            SetFormModelMapping(ListRequest.RequestInfo);
             
             base.Init();
         } 
 
         protected override void PrepareFilter(DbQuery query, DataListDefinition defn) 
         {
+            var reqInfo = ListRequest.RequestInfo;            
+
             if (defn.FixedFilter == null) return;
             
             var formContext = new EditFormContext(this.Context, RelatedEntityId, new RequestQueryString() { });
             formContext.Build();
-
-            var reqInfo = ListRequest.RequestInfo;
+            
             formContext.PrepareLinkedData(reqInfo);
             
             if (reqInfo.Properties != null)
@@ -75,6 +80,30 @@ namespace StackErp.ViewModel.ViewContext
 
             query.SetFixedFilter(filters);
 
-        }       
+        }    
+
+        private void SetFormModelMapping(CustomRequestInfo reqInfo)
+        {
+            DynamicObj mapping = null;
+            if (this.Field != null && reqInfo.DependencyContext != null && reqInfo.DependencyContext.Dependency != null)
+            {
+                var childs =  reqInfo.DependencyContext.Dependency.Children;
+                if (childs != null && childs.Count > 0)
+                {
+                    mapping = new DynamicObj();
+                    var refmetadat = this.Field.Entity;
+                    foreach(var c in childs)
+                    {
+                        var field = refmetadat.GetFieldSchema(c.WidgetId);
+                        if (field.IsRelatedField && field.Related.LinkField == this.Field.Name)
+                        {
+                            mapping.Add(field.Name, field.Related.Field);
+                        }
+                    }
+                }
+            }
+
+            this.FormModelMapping = mapping;
+        }
     }
 }

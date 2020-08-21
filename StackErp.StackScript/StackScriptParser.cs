@@ -18,7 +18,7 @@ namespace StackErp.StackScript
         public static string Parse(string code) 
         {
             var parser =  new JavaScriptParser(code);
-            var program = parser.ParseScript();
+            var program = parser.ParseModule();
             
             //StringBuilder sb = new StringBuilder();
             //StringWriter sw = new StringWriter(sb);
@@ -39,6 +39,7 @@ namespace StackErp.StackScript
 
         public AnyStatus ExecuteScript(string codeStr) 
         {
+            currentScriptTag = "Start<>";
             AnyStatus sts = AnyStatus.Success;
             try {
                 var parser =  new JavaScriptParser(codeStr);
@@ -47,26 +48,29 @@ namespace StackErp.StackScript
                 ExecuteScript(program);
             } catch(Exception ex) {
                 sts = AnyStatus.ScriptFailure;
-                sts.Message = ex.Message;
+                sts.Message = currentScriptTag + "::" + ex.Message;
             }
 
             return  sts;
         }
 
-        public AnyStatus ExecuteFunction(StackAppContext appContext, string codeStr, Dictionary<string, object> param) //Arguments param
+        public AnyStatus ExecuteFunction<T>(StackAppContext appContext, string codeStr, Dictionary<string, object> param, T output) //Arguments param
         {
-            AnyStatus sts = AnyStatus.Success;
+            AnyStatus sts = AnyStatus.Success;            
             try {
-                currentScriptTag = "Start";
+                currentScriptTag = "Start<>";
+
                 var parser =  new JavaScriptParser(codeStr);
                 var program = parser.ParseScript();
 
                 _DataProvider = new ObjectDataProvider(appContext, param);
+                _DataProvider.output = output;
+
                 ExecuteBody(program.Body);
 
             } catch(Exception ex) {
                 sts = AnyStatus.ScriptFailure;
-                sts.Message = ex.Message;
+                sts.Message = currentScriptTag + "::" + ex.Message;
             }
 
             return  sts;
@@ -126,6 +130,7 @@ namespace StackErp.StackScript
 
         private void SetVar(string name, object value) 
         {
+             currentScriptTag = $"set variable value: {name}";
             _DataProvider.SetVarData(name, value);
         }
 
@@ -157,7 +162,12 @@ namespace StackErp.StackScript
         private object LteralExp(Literal exp) 
         {
             if (exp.Value is double)
-                return Convert.ToDecimal(exp.Value);
+            {
+                if (exp.Raw.Contains("."))
+                    return Convert.ToDecimal(exp.Value);
+                else 
+                    return Convert.ToInt32(exp.Value);
+            }
             return exp.Value;
         }
 
@@ -165,19 +175,39 @@ namespace StackErp.StackScript
             var lVal = GetVarFromExp(expression.Left);
             var rVal = GetVarFromExp(expression.Right);
 
-            currentScriptTag = $"BinaryExpression: {expression.Operator}";
+            currentScriptTag = $"BinaryExpression: {expression.Operator} Left: {lVal}";
             //BinaryOperator
             return BinaryFunctions.Get(expression.Operator).Invoke(new Arguments(lVal, rVal)); //_ExpFunc[expression.operator]([lVal, rVal]);
         }
 
         private void AssignmentExpression(AssignmentExpression expression) {
-            var lVal = ((Identifier)expression.Left).Name;
             var rVal = GetVarFromExp(expression.Right);
-            
-            SetVar(lVal, rVal);
+
+            currentScriptTag = $"Assignment";
+
+            if (expression.Left is MemberExpression) 
+            {
+                SetMemberExpression(expression.Left as MemberExpression, rVal);
+            }
+            else 
+            {
+                var lVal = ((Identifier)expression.Left).Name;                        
+                SetVar(lVal, rVal);
+            }
+        }
+
+        private void SetMemberExpression(MemberExpression expression, object val)
+        {
+            var objName = ((Identifier)expression.Object).Name;
+            if (expression.Property is Identifier)
+            {
+                _DataProvider.SetObjectData(objName, ((Identifier)expression.Property).Name, val);
+            }
         }
 
         private void IfStatement(IfStatement stmt){
+            currentScriptTag = $"IfStatement";
+
             var test = BinaryExpression(stmt.Test as BinaryExpression);
     
             if (test != null && test is bool && (bool)test) {
@@ -226,9 +256,20 @@ namespace StackErp.StackScript
         private object MemberExpression(MemberExpression expression, Arguments args = null)
         {
             var objName = ((Identifier)expression.Object).Name;
+            string propName = ((Identifier)expression.Property).Name;
+            
+            currentScriptTag = $"object member {objName}.{propName}";
+
             if (expression.Property is Identifier)
             {
-                return _DataProvider.GetObjectData(objName, ((Identifier)expression.Property).Name, args);
+                if (args == null) 
+                {
+                    return _DataProvider.GetObjectPropData(objName, propName);
+                }
+                else
+                {                    
+                    return _DataProvider.GetObjectFunctionData(objName, propName, args);
+                }
             }
 
             return null;
@@ -244,9 +285,9 @@ namespace StackErp.StackScript
                 var f = args.First();
                 if (f is Identifier) {
                     var coll = GetVarFromExp(f as Identifier);
-                    IEnumerable<object> collData = null;
-                    if (coll is IEnumerable<object>){
-                        collData = (IEnumerable<object>)coll;
+                    IList collData = null;
+                    if (coll is IList){
+                        collData = (IList)coll;
                     } else throw new ScriptException("Invalid foreach statement");
 
                     var exp = args[1];

@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using StackErp.Model.Utils;
+using System.Collections;
 
 namespace StackErp.Model
 {
     [JsonConverter(typeof(DynamicObjJsonConverter))]
-    public class DynamicObj
+    public class DynamicObj: IEnumerable<KeyValuePair<string, object>>
     {
         public Dictionary<string, Object> _d;
 
@@ -20,6 +21,8 @@ namespace StackErp.Model
             _d = d;
         }
         public Dictionary<string, object>.KeyCollection Keys { get => _d.Keys; }
+
+
         public void Add(string key, object value, bool isOverride = false) {
             if(!ContainsKey(key))
                 _d.Add(key, value);
@@ -46,6 +49,16 @@ namespace StackErp.Model
             }
 
             return def;
+        }
+
+        public object Get(string attrName)
+        {
+            if (_d.ContainsKey(attrName)) 
+            {
+                return _d[attrName];;
+            }
+
+            return null;
         }
         public Object this[string key] { get => this.Get<object>(key, null); }
         public static DynamicObj From(IDictionary<string, Object> data) {
@@ -108,8 +121,7 @@ namespace StackErp.Model
             if (jObject is JObject || jObject is string)
             {
                 return DynamicObj.Parse(jObject.ToString());
-            }
-
+            }            
 
             return null;
         }
@@ -123,6 +135,16 @@ namespace StackErp.Model
             }
 
             return d;
+        }
+
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+        {
+            return _d.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _d.GetEnumerator();
         }
     }
 

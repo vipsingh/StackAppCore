@@ -12,7 +12,7 @@ namespace StackErp.Core.Entity
 {
     public class EntitySchemaEntity : DBEntity
     {
-        public EntitySchemaEntity(int id, string name, Dictionary<string, BaseField> fields, string tableName) : base(id, name, fields, tableName)
+        public EntitySchemaEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, string tableName) : base(id, name, fields, entityType, tableName)
         {
             
         }

@@ -87,6 +87,13 @@ namespace StackErp.Model
             get { return GetString("FieldName"); }
             set { this["FieldName"] = value.ToString(); }
         }
+
+        public string RelationField
+        {
+            get { return GetString("RelationField"); }
+            set { this["RelationField"] = value.ToString(); }
+        }
+        
         public string WidgetId
         {
             get { return GetString("WidgetId"); }

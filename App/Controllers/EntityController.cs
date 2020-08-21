@@ -82,7 +82,13 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult List([FromBody] ListRequestinfo request)
         {
-            var context = new DataListContext(this.StackAppContext, RequestQuery, request);
+            DataListContext context = null;
+            if (!string.IsNullOrEmpty(this.RequestQuery.RelationField))
+            {
+                context = new RelatedEntityListContext(this.StackAppContext, RequestQuery, request);
+            }
+            else
+                context = new DataListContext(this.StackAppContext, RequestQuery, request);
             var builder = new EntityListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);

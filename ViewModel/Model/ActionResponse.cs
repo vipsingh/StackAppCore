@@ -56,8 +56,26 @@ namespace StackErp.ViewModel.Model
     {
         public SubmitStatus Status {set;get;}
         public string VerificationToken {set;get;}
+        public DynamicObj FieldValues {set;get;}
         public FieldActionResponse(object data): base(data)
         {
+        }
+
+        public void AddFieldValue(string fieldId, object value)
+        {
+            AddFieldProps(fieldId, "Value", value);
+        }
+        public void AddFieldProps(string fieldId, string propName, object value)
+        {
+            if (FieldValues == null)
+                FieldValues = new DynamicObj();
+
+            var data = FieldValues.Get<DynamicObj>(fieldId, null);
+            if (data == null) data = new DynamicObj();
+
+            data.Add(propName, value, true);
+
+            FieldValues.Add(fieldId, data, true);
         }
     }
 }

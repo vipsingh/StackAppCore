@@ -10,20 +10,57 @@ namespace StackErp.ViewModel.FormWidget
         public override FormControlType WidgetType { get => FormControlType.EntityListView; }
         public EntityFilterWidget FilterBox {set;get;}
 
+        private EntityCode _entityId;
+        private string relatedField;
+
         public EntityListWidget(WidgetContext cntxt): base(cntxt)
         {
+            _entityId = this.Context.FormContext.EntityId;
+        }
 
+        public EntityListWidget(WidgetContext cntxt, EntityCode entityId): base(cntxt)
+        {
+            _entityId = entityId;
+        }
+
+        public EntityListWidget(WidgetContext cntxt, string RelationField): this(cntxt)
+        {
+            relatedField  = RelationField;
         }
         public override void OnCompile()
         {
             PrepareFilterBox();
-            base.OnCompile();
-            DataActionLink = new ActionInfo("/Entity/List", this.Context.FormContext.RequestQuery, "DETAIL");
+            base.OnCompile();        
+        }
+
+        protected override bool OnFormatSetData(object value)
+        {            
+            DataActionLink = new ActionInfo("/Entity/List", GetReqQuery(), "DETAIL");
+
+            return base.OnSetData(value);
+        }
+
+        private RequestQueryString GetReqQuery()
+        {
+            var rQ = new RequestQueryString();
+            rQ.EntityId = _entityId;
+            
+            if(!string.IsNullOrEmpty(relatedField))
+            {
+                var entityModel = this.Context.FormContext.EntityModelInfo;
+                rQ.ItemId = entityModel.ObjectId;
+                rQ.RelationField = this.relatedField;
+            }
+
+            return rQ;
         }
 
         private void PrepareFilterBox()
         {
-            var editFormContext = new EditFormContext(this.Context.FormContext.Context, this.Context.FormContext.RequestQuery.EntityId, this.Context.FormContext.RequestQuery);
+            var rQ = new RequestQueryString();
+            rQ.EntityId = _entityId;
+
+            var editFormContext = new EditFormContext(this.Context.FormContext.Context, _entityId, rQ);
             editFormContext.Build();
 
             var cntxt = new WidgetContext(editFormContext);
@@ -38,7 +75,7 @@ namespace StackErp.ViewModel.FormWidget
             };
 
             var widget = new EntityFilterWidget(cntxt);
-            widget.FilterEntityId = this.Context.FormContext.RequestQuery.EntityId;
+            widget.FilterEntityId = _entityId;
             widget.OnCompile();
 
             FilterBox = widget;

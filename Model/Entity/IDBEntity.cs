@@ -22,8 +22,7 @@ namespace StackErp.Model.Entity
 
         List<string> ComputeOrderSeq { get; }
 
-        bool IsChildEntity {get;}
-        bool IsTransiant {get;}
+        EntityType EntityType {get;}
 
         Dictionary<string, BaseField> GetFields();
         BaseField GetFieldSchema(string fieldName);

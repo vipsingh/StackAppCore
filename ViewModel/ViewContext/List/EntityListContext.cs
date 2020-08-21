@@ -32,33 +32,21 @@ namespace StackErp.ViewModel.ViewContext
             RelatedEntityId = RequestQuery.EntityId;    
             var RefEntity = Core.EntityMetaData.Get(RelatedEntityId);
                     
-            EntityField = RefEntity.GetFieldSchema(RequestQuery.FieldName);
-            FieldDataSource dataSource = null;
-            // if (Field == null)
-            // {
-            //    var reqInfo = ListRequest.RequestInfo;
-            //    if (reqInfo.Properties != null)
-            //    {
-                   
-            //    }
-            // } else {
-            //     dataSource = Field.ControlInfo.DataSource;
-            // }
+            EntityField = RefEntity.GetFieldSchema(RequestQuery.RelationField);
 
-            //     if (dataSource != null)
-            //     {
-            //         SourceEntityId = Field.ControlInfo.DataSource.Entity;
-            //     }
-            //     else
-            //         throw new AppException("Datasource is not defined for this list.");
+            SourceEntityId = EntityField.RefObject;
             
             base.Init();
         } 
 
         protected override void PrepareFilter(DbQuery query, DataListDefinition defn) 
         {
-            
+            var itemId = RequestQuery.ItemId;
+            var filterExp = new FilterExpression(SourceEntityId);
+            var relField = (RelationalField)EntityField;
+            filterExp.Add(new FilterExpField(relField.RefFieldName, FilterOperationType.Equal, itemId));
 
+            query.SetFixedFilter(filterExp);
         }       
     }
 }

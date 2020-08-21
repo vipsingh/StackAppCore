@@ -21,4 +21,5 @@ namespace StackErp.ViewModel.Model
 
         public List<DynamicObj> FilterBar {set; get;} 
     }
+
 }

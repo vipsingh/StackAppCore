@@ -20,6 +20,16 @@ namespace StackErp.ViewModel.Model
         public DynamicObj Parameters {set;get;}
     }
 
+    public class FieldRequestInfo: CustomRequestInfo
+    {
+        public object GetFieldValue(string widgetId) 
+        {
+            if (DependencyContext != null) return DependencyContext.GetWidgetValue(widgetId);
+
+            return null;
+        }
+    }
+
     public class ListRequestinfo
     {
         public DataListRequestType RequestType {set;get;}

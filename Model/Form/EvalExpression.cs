@@ -182,7 +182,8 @@ namespace StackErp.Model.Form
 
     public class FieldPathExpression: UIExpression
     {
-        public string ParentField {private set; get;}
+        public string LinkField {private set; get;}
+        public string Field {private set; get;}
         public FieldPathExpression(string exp): base(exp)
         {
 
@@ -195,7 +196,8 @@ namespace StackErp.Model.Form
 
             var farr = expression.Split('.');
 
-            ParentField = farr[0];
+            LinkField = farr[0];
+            Field = farr[1];
 
             return farr.ToList();
         } 

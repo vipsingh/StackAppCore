@@ -47,8 +47,18 @@ namespace StackErp.ViewModel.Model
         public WidgetDependencyInfo Dependency { set;get; }
         public InvariantDictionary<UIFormField> RefData {set; get;}
 
-        public object GetData(string key)
+        public UIFormField GetWidgetData(string key)
         {
+            if (RefData == null) return null;
+
+            return RefData[key];
+        }
+
+        public object GetWidgetValue(string key)
+        {
+            var d = GetWidgetData(key);
+            if (d != null) return d.Value;
+
             return null;
         }
     }

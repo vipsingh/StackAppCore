@@ -15,8 +15,7 @@ namespace StackErp.Core.Studio
             foreach(var entK in EntityMetaData.entities)
             {
                 var ent = entK.Value;
-                if (ent.IsChildEntity) continue;
-                if (ent.IsTransiant) continue;
+                if (ent.EntityType != EntityType.CoreEntity) continue;                
 
                 var o =  new DynamicObj();
                 o.Add("Module", ent.AppModule);

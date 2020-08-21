@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Tabs, PageHeader } from 'antd';
 import GridView from "../../../Component/ListView/GridView";
-import TextArea from 'antd/lib/input/TextArea';
 import _ from 'lodash';
 import ActionLink from '../../../Component/ActionLink';
+import EntityForm from '../../../Component/Form/EntityForm';
 
 const { TabPane } = Tabs;
 
@@ -58,10 +58,13 @@ export default class EntityPage extends Component<{ data: any }, {
 
     }
 
-    render() {
+    renderLayoutList() {
 
+    }
+
+    renderPage = (props: any) => {
         return (<div>
-            
+                    
             {this.renderHeader()}
 
             <Tabs style={{ marginBottom: 32 }}>
@@ -69,15 +72,26 @@ export default class EntityPage extends Component<{ data: any }, {
                     {this.renderFieldList()}
                 </TabPane>
                 <TabPane tab="Layout" key="2">
-                    <TextArea autoSize={{ minRows: 20, maxRows: 50 }} />
+                    {props.getControl("LayoutList")}
                 </TabPane>
                 <TabPane tab="List" key="3">
-                    List
+                    {props.getControl("EntityListList")}
                 </TabPane>
                 <TabPane tab="Actions" key="4">
-                    Action
+                    {props.getControl("EntityActionList")}
                 </TabPane>
             </Tabs>
         </div>);
+    }
+
+    render() {
+
+        return (<EntityForm
+            Schema={this.state.Schema}
+            FormData={null}
+            render={
+                this.renderPage
+            }
+         />   );        
     }
 }

@@ -24,9 +24,8 @@ namespace StackErp.UI.View.DataList
 
         protected override void Compile(DataListContext context, DataListDefinition defn)
         {
-            //build header
+            base.Compile(context, defn);
             PrepareFields(context, defn);
-
         }        
 
         protected void PrepareFields(DataListContext context, DataListDefinition defn)
@@ -69,21 +68,7 @@ namespace StackErp.UI.View.DataList
             return widget;
         }
 
-        protected override void ExecutePrepareData(DataListContext context, DataListDefinition defn)
-        {
-            EntityListService service = new EntityListService();
-            var data = service.ExecuteData(context.DbQuery, 
-                (DynamicObj row) => {
-                    this.OnPrepareRow(context, defn, row);
-                },
-                (string fieldName, object val, DynamicObj row) => {
-                    return this.OnPrepareCell(context, defn, fieldName, val, row);
-            });
-
-            context.Data = data;
-        }        
-
-        protected object OnPrepareCell(DataListContext context, DataListDefinition defn, string fieldName, object fieldValue, DynamicObj row)
+        protected override object OnPrepareCell(DataListContext context, DataListDefinition defn, string fieldName, object fieldValue, DynamicObj row)
         {
             if (!context.Fields.ContainsKey(fieldName))
                 return new { Value = fieldValue };

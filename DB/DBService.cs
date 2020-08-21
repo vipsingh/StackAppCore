@@ -125,6 +125,9 @@ namespace StackErp.DB
 
         public static DbType GetDbType(FieldType fieldType, TypeCode type)
         {
+            if (fieldType == FieldType.Xml)
+                return DbType.Xml;
+                
             DbType t = DbType.String;
             switch(type) {
                 case TypeCode.Object:
@@ -172,7 +175,6 @@ namespace StackErp.DB
                 case TypeCode.DateTime:
                     t = DbType.DateTime;
                     break;
-
 
             }
         

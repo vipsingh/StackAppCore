@@ -12,11 +12,15 @@ namespace StackErp.StackScript
     public delegate object Function(Arguments arguments);
     public static class ScriptFunctions
     {
-        static Dictionary<string, Function> _binder;
+        static InvariantDictionary<Function> _binder;
         static ScriptFunctions()
         {
-            _binder = new Dictionary<string, Function>();
-            _binder.Add("Collection", Collection); //DataType
+            _binder = new InvariantDictionary<Function>();
+            #region DataTypes
+            _binder.Add("Collection", Collection);
+            _binder.Add("Object", Obj);
+            _binder.Add("Date", Date);
+            #endregion
 
             _binder.Add("iftrue", IfTrue);
             _binder.Add("ifnull", IfNull);
@@ -24,6 +28,9 @@ namespace StackErp.StackScript
             _binder.Add("contains", Contains);
 
             _binder.Add("log", Log);
+            _binder.Add("throw", Throw);
+
+            //_binder.Add("navigate", Navigate);
         }
 
         internal static Function Get(string name)
@@ -48,18 +55,60 @@ namespace StackErp.StackScript
             return null;
         });
 
+        internal static Function Throw => new Function((arguments) =>
+        {
+            throw new ScriptUserException(arguments.Get(0).ToString());            
+        });
+
         #region DataType
         internal static Function Collection => new Function((arguments) =>
         {
-            var list = new List<object>();
-            list.AddRange(arguments);
-            return list;
+            if (arguments == null || arguments.Count == 0)
+            {
+                return new List<object>();
+            }
+            else 
+            {
+                var arg1 = arguments.Get(0);
+                if (arg1 is string)
+                {
+                    var list = new List<string>();
+                    list.AddRange(arguments.Cast<string>());
+                    return list;
+                }
+                else if (arg1 is int)
+                {
+                    var list = new List<int>();
+                    list.AddRange(arguments.Cast<int>());
+                    return list;
+                }
+                else if (arg1 is decimal)
+                {
+                    var list = new List<decimal>();
+                    list.AddRange(arguments.Cast<decimal>());
+                    return list;
+                }
+
+                return new List<object>();
+            }                        
         });
-        internal static Function Map => new Function((arguments) =>
+        internal static Function Obj => new Function((arguments) =>
         {
             var o = new DynamicObj();
             //
             return o;
+        });
+        internal static Function Date => new Function((arguments) =>
+        {
+            if (arguments == null || arguments.Count == 0) return DateTime.Now;
+            else 
+            {
+                var arg1 = arguments.Get(0);
+                if (!(arg1 is DateTime))
+                    throw new ScriptException("Invalid argument in Date. Only iso date format string allowed.");
+
+                return DateTime.Parse(arg1.ToString());
+            }
         });
         #endregion
 
@@ -197,6 +246,17 @@ namespace StackErp.StackScript
             if (obj == null)
                 return defaultValue;
             return (T)Convert.ChangeType(obj, typeof(T), CultureInfo.InvariantCulture);
+        }
+
+        public Type[] ToTypeArray()
+        {
+            var arr = new Type[_list.Count];
+            for(int i=0;i<_list.Count;i++)
+            {
+                arr[i] = _list[i].GetType();
+            }
+
+            return arr;
         }
 
         #region [ -- Interface implementations -- ]

@@ -51,5 +51,11 @@ namespace StackErp.ViewModel
 
             return TRow;
         }
+
+        public virtual ViewPage GetPage(RequestQueryString reqQuery) 
+        {
+            View.CurrentQuery = reqQuery.ToQueryString();
+            return this.View;
+        }
     }
 }

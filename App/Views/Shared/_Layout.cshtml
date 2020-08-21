@@ -2,19 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+        <!-- Call App Mode on ios devices -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <!-- Remove Tap Highlight on Windows Phone IE -->
+        <meta name="msapplication-tap-highlight" content="no">
+        <link rel="apple-touch-icon" sizes="180x180" href="~/img/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon.png">
     <title>@ViewData["Title"] - App</title>
-    @* <link rel="stylesheet" href="~/css/sitex.css" /> *@
+    <link rel="stylesheet" href="~/css/sitex.css" />
 </head>
 <body>    
     <div class="container">        
         @RenderBody()
     </div>
-    @* <script src="~/js/sitex.js"></script> *@
-    <script src="http://localhost:3000/static/js/bundle.js" asp-append-version="true"></script>
+    <script src="~/js/sitex.js"></script>
+    @* <script src="http://localhost:3000/static/js/bundle.js" asp-append-version="true"></script>
     <script src="http://localhost:3000/static/js/0.chunk.js" asp-append-version="true"></script>
     <script src="http://localhost:3000/static/js/main.chunk.js" asp-append-version="true"></script>
-    <script src="http://localhost:3000/main.1adb33cd0541b2533c6b.hot-update.js"></script>
+    <script src="http://localhost:3000/main.1adb33cd0541b2533c6b.hot-update.js"></script> *@
     @RenderSection("Scripts", required: false)
 </body>
 </html>

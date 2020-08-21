@@ -17,10 +17,10 @@ namespace StackErp.DB.DataList
         public static EntityListDefinition GetEntityList(EntityCode entityId)
         {
             var entityList = DBService.Query("select * from t_entitylist where entityid=@entityid", new { entityid = entityId.Code });
-
-            var l = new EntityListDefinition();
+            
             if (entityList.Count() > 0)
             {
+                var l = new EntityListDefinition();
                 var db = entityList.First();
                 l.EntityId = db.Get("entityid", 0);
                 l.Name = db.Get("name", "");
@@ -58,9 +58,11 @@ namespace StackErp.DB.DataList
                 {
                     l.FilterPolicy = FilterExpression.BuildFromJson(l.EntityId, filterpolicy);
                 }
+
+                return l;
             }
 
-            return l;
+            return null;
         }
     }
 }

@@ -28,11 +28,13 @@ namespace StackErp.Model.Entity
         public string ErrorMessage {set;get;}
         public bool IsChanged {set;get;}
 
+        public object FormattedValue {set;get;}
+
         public FieldData(BaseField field, object defaultValue = null)
         {
             Field = field;
             IsValid = true;
-            if (!(defaultValue == null || (defaultValue is string && String.IsNullOrEmpty((string)defaultValue))))
+            //if (!(defaultValue == null || (defaultValue is string && String.IsNullOrEmpty((string)defaultValue))))
             {
                 bool isValid = false;
                 Field.ResolveSetValue(defaultValue, out isValid);
@@ -46,7 +48,12 @@ namespace StackErp.Model.Entity
         public void SetValue(object value)
         {
             bool isValid = false;
-            Value = Field.ResolveSetValue(value, out isValid);
+            if (value == null) 
+            {
+                isValid = true;
+            }
+            else
+                Value = Field.ResolveSetValue(value, out isValid);
 
             IsChanged = true;
             IsValid = isValid;

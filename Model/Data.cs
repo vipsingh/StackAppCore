@@ -7,12 +7,12 @@ namespace StackErp.Model
 {
     public class DbObject
     {
-        private Dictionary<string, Object> _d;
+        private InvariantDictionary<Object> _d;
 
         public DbObject() {
-            _d = new Dictionary<string, object>();
+            _d = new InvariantDictionary<object>();
         }
-        private DbObject(Dictionary<string, object> d)
+        private DbObject(InvariantDictionary<object> d)
         {
             _d = d;
         }

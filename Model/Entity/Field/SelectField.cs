@@ -46,8 +46,8 @@ namespace StackErp.Model.Entity
 
         public override object ResolveDbValue(DbObject db)
         {
-            var v = db.Get(this.DBName, 0);
-            var t = db.Get<string>(this.DBName + "__name", null);
+            var v = db.Get(this.Name, 0);
+            var t = db.Get<string>(this.Name + "__name", null);
 
             if (v == 0)
                 return null;

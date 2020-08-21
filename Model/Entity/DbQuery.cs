@@ -96,6 +96,7 @@ namespace StackErp.Model.Entity
                 f.Field = fSchema;
                 f.DbName = fSchema.DBName;
                 f.Alias = Entity.DBName;
+                f.TableName = Entity.DBName;
             }
             
             _isresolved =true;
@@ -146,6 +147,7 @@ namespace StackErp.Model.Entity
         public bool IsSelect {set;get;}
         public string Alias {set;get;}   
         public string DbName {set;get;}
+        public string TableName {set;get;}
         public string Format {set;get;}
         public TypeCode DataType {set;get;}
         public string SummaryType {set;get;}

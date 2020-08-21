@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.Core;
+using StackErp.Core.Entity;
 
 namespace StackErp.Core.Metadata
 {
     public class FixedEntities
     {
-        public static void BuildSchema(ref IDictionary<int, DBEntity> entities)
+        public static void BuildSchema(ref IDictionary<int, DBEntity> entities, List<DbObject> dbentities)
         {
             var entityName = "entitymaster";
 
             var fs = new Dictionary<string, BaseField>();
             var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""Name"",""dbname"": ""Name"",""isrequired"": true}");
             
-            var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
+            var f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);            
             fs.Add("NAME", f);
 
             dbo = DbObject.FromJSON(@"
@@ -27,7 +28,7 @@ namespace StackErp.Core.Metadata
                 }
             ");
             
-            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);            
             fs.Add("TEXT", f);
 
             dbo = DbObject.FromJSON(@"
@@ -39,7 +40,7 @@ namespace StackErp.Core.Metadata
                 }
             ");
             
-            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);            
             fs.Add("TABLENAME", f);
 
             dbo = DbObject.FromJSON(@"
@@ -51,7 +52,7 @@ namespace StackErp.Core.Metadata
                 }
             ");
             
-            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);  
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);  
             fs.Add("PRIMARYFIELD", f);
 
             dbo = DbObject.FromJSON(@"
@@ -63,20 +64,42 @@ namespace StackErp.Core.Metadata
                 }
             ");
             
-            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);            
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);            
             fs.Add("NAMEFIELD", f);
 
-            var d = new DBEntity(1, entityName, fs, "t_entitymaster");
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""parententity"",""isrequired"": false,""dbname"": ""namefield""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("PARENTENTITY", f);  
+
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 20,""fieldname"": ""layouts"",""isrequired"": false,""linkentity"": 4,""linkentity_field"":""entityid""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("LAYOUTS", f);  
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 20,""fieldname"": ""entitylists"",""isrequired"": false,""linkentity"": 5,""linkentity_field"":""entityid""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ENTITYLISTS", f); 
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 20,""fieldname"": ""entityactions"",""isrequired"": false,""linkentity"": 5,""linkentity_field"":""entityid""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ENTITYACTIONS", f);            
+
+            var d = new EntityMasterEntity(1, entityName, fs, EntityType.MetadataEntity,"t_entitymaster");
             EntityCode.AllEntities.Add(entityName.ToUpper(), 1);
 
             entities.Add(1, d);
 
-            var entitySchema = BuildEntitySchemaFields();
+            var entitySchema = BuildEntitySchemaFields(dbentities);
             EntityCode.AllEntities.Add(entitySchema.Name.ToUpper(), 2);
             entities.Add(2, entitySchema);
+
+            AddEntityType(ref entities, dbentities);
+            AddEntityList(ref entities);
+            AddEntityActions(ref entities);
         }
 
-        private static DBEntity BuildEntitySchemaFields()
+        private static DBEntity BuildEntitySchemaFields(List<DbObject> dbentities)
         {
             var entityName = "entityschema";
 
@@ -85,11 +108,11 @@ namespace StackErp.Core.Metadata
             var list = GetEntitySchemaData();
             foreach(var dbo in list)
             {
-                var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);                
+                var f = EntityMetaData.BuildField(entityName, entityName, dbo, dbentities);                
                 fs.Add(f.Name.ToUpper(), f);
             }
             
-            var d = new DBEntity(2, entityName, fs, "t_entityschema");
+            var d = new EntitySchemaEntity(2, entityName, fs, EntityType.MetadataEntity, "t_entityschema");            
             d.TextField = "fieldname";
             return d;
         }
@@ -113,22 +136,113 @@ namespace StackErp.Core.Metadata
             return list;
         }
 
-        private static void AddEntityLayout()
+        private static void AddEntityType(ref IDictionary<int, DBEntity> entities, List<DbObject> dbentities)
         {
-            var entityName = "entityschema";
+            string entityName = "entityitemtype";
+            int entId = 3;
+            var fs = new Dictionary<string, BaseField>();                       
+            
+            var d = new DBEntity(entId, entityName, fs, EntityType.MetadataEntity, "t_entity_itemtype");            
+            
+            EntityCode.AllEntities.Add(entityName.ToUpper(), entId);  
+            entities.Add(entId, d);
 
-            var fs = new Dictionary<string, BaseField>();
+            entityName = "entityviewlayout";
+            entId = 4;
             
-            var list = GetEntitySchemaData();
-            foreach(var dbo in list)
-            {
-                var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);                
-                fs.Add(f.Name.ToUpper(), f);
-            }
+            var d1 = new EntityLayoutEntity(entId, entityName, new Dictionary<string, BaseField>(), EntityType.MetadataEntity, "t_entity_viewlayout");            
             
-            var d = new DBEntity(2, entityName, fs, "t_entityschema");
-            d.TextField = "fieldname";
+            EntityCode.AllEntities.Add(entityName.ToUpper(), entId);  
+            entities.Add(entId, d1);
+        }
+
+        private static void AddEntityList(ref IDictionary<int, DBEntity> entities)
+        {
+            string entityName = "entitylist";
+            int entId = 5;
+            var fs = new Dictionary<string, BaseField>();                       
+
+            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""name"",""isrequired"": true,""dbname"": ""name""}");
+            var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("NAME", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""idfield"",""isrequired"": true,""dbname"": ""idfield""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("IDFIELD", f);
             
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true,""dbname"": ""idfield"",""viewtype"":-1}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ENTITYID", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""viewfield"",""isrequired"": false,""dbname"": ""viewfield""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("VIEWFIELD", f);
+            
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""orderby"",""isrequired"": false,""dbname"": ""orderby""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ORDERBY", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 18,""fieldname"": ""layoutxml"",""isrequired"": true,""dbname"": ""layoutxml""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("LAYOUTXML", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""fixedfilter"",""isrequired"": false,""dbname"": ""fixedfilter""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("FIXEDFILTER", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 13,""fieldname"": ""filterpolicy"",""isrequired"": false,""dbname"": ""filterpolicy""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("FILTERPOLICY", f);
+
+            var d = new EntityListEntity(entId, entityName, fs, EntityType.MetadataEntity, "t_entitylist");            
+            
+            EntityCode.AllEntities.Add(entityName.ToUpper(), entId);  
+            entities.Add(entId, d);
+        }
+
+        private static void AddEntityActions(ref IDictionary<int, DBEntity> entities)
+        {
+            string entityName = "entityaction";
+            int entId = 6;
+            var fs = new Dictionary<string, BaseField>();                       
+
+            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""text"",""isrequired"": true,""dbname"": ""name""}");
+            var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
+            fs.Add("TEXT", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true,""dbname"": ""idfield"",""viewtype"":-1}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ENTITYID", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""viewtype"",""isrequired"": false,""dbname"": ""viewtype""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("VIEWTYPE", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""actiontype"",""isrequired"": false,""dbname"": ""actiontype""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("ACTIONTYPE", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""action"",""isrequired"": false,""dbname"": ""action""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
+            fs.Add("ACTION", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""queryparam"",""isrequired"": false,""dbname"": ""queryparam""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
+            fs.Add("QUERYPARAM", f);            
+
+                        dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""dataparam"",""isrequired"": false,""dbname"": ""dataparam""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
+            fs.Add("DATAPARAM", f);            
+
+                        dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""confirmmessage"",""isrequired"": false,""dbname"": ""confirmmessage""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
+            fs.Add("CONFIRMMESSAGE", f);            
+
+            var d = new EntityActionEntity(entId, entityName, fs, EntityType.MetadataEntity, "t_entityactions");            
+            d.TextField = "text";
+
+            EntityCode.AllEntities.Add(entityName.ToUpper(), entId);  
+            entities.Add(entId, d);
         }
     }
 }

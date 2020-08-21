@@ -13,6 +13,7 @@ namespace StackErp.ViewModel.ViewContext
     {
         public StackAppContext Context { get; }
         public IDBEntity Entity { protected set; get;}
+        public EntityCode EntityId { get;}
         public EntityLayoutType EntityLayoutType { protected set; get;}
         public int ObjectId { private set; get;}
         public int ItemTypeId { private set; get;}
@@ -45,12 +46,11 @@ namespace StackErp.ViewModel.ViewContext
     // FieldDependency: Array<{Type: string, Field: string, Parent: string[]}>
     // _ruleIndex: number
 
-        protected EntityCode _entity;
         public FormContext(StackAppContext context, EntityCode entity, RequestQueryString requestQuery)
         {
             Context = context;
             RequestQuery = requestQuery;
-            _entity = entity;
+            EntityId = entity;
             _controls = new InvariantDictionary<IWidget>();
             _parms = new DynamicObj();
             Actions = new PageActions();
@@ -84,7 +84,7 @@ namespace StackErp.ViewModel.ViewContext
         }
 
         protected virtual void PrepareEntityContext() {
-            var entityCntxt = new ObjectModelInfo(this.ObjectId, this._entity);
+            var entityCntxt = new ObjectModelInfo(this.ObjectId, this.EntityId);
             entityCntxt.ItemType = ItemTypeId;            
 
             this.EntityModelInfo = entityCntxt;

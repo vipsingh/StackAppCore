@@ -34,11 +34,14 @@ namespace StackErp.Model.Entity
         public FormControlType ControlType { set; get; }
         private string _viewName;
         public string ViewName { set { _viewName = value; } get { return String.IsNullOrEmpty(_viewName)? this.Name: _viewName; } }
-        public ControlDefinition ControlInfo { set; get; }
+        public ControlDefinition ControlInfo { protected set; get; }
 
-        public string LinkFieldName { set; get; }
-        public FieldPathExpression Related { set; get; }
-        //OnChangeInfo: { DependUpon: string[] }
+        public string RefFieldName {get; protected set;}
+        
+        public FieldPathExpression Related { set; get; }        
+        public bool IsRelatedField { get => this.Related != null; }
+
+        public bool IsVirtualField { get => false; }
 
         public short DecimalPlace {set;get;}
         public bool AllowZero { get; set; }
@@ -64,12 +67,24 @@ namespace StackErp.Model.Entity
         }
         public virtual void OnInit()
         {
-            ControlInfo.FieldAttribute = new FieldAttribute(){ValueField = this.Name};
+            ControlInfo.FieldAttribute = new FieldAttribute(){ ValueField = this.Name };
             ControlInfo.WidgetType = ControlType;
-        }
-        public virtual string ResolveDBName()
-        {            
-            return this.Name;
+
+            if (this.IsRelatedField)
+            {
+                var fieldAttr = ControlInfo.FieldAttribute;
+                var sch = this.Entity.GetFieldSchema(Related.LinkField);
+                if (sch == null) {
+                    throw new MetadataException(string.Format("Invalid link field in related field {0}.{1}", this.Entity.Name, this.Name));
+                }
+
+                fieldAttr.RefEntity = sch.RefObject;
+                if (string.IsNullOrEmpty(this.DBName))
+                {
+                    this.RefFieldName = Related.Field;
+                    this.RefObject = sch.RefObject;
+                }
+            }
         }
 
         public void AddProperty(string key, object value)
@@ -86,7 +101,7 @@ namespace StackErp.Model.Entity
 
         public virtual object ResolveDbValue(DbObject db)
         {
-            var v = db.Get(this.DBName, String.Empty);
+            var v = db.Get(this.Name, String.Empty);
 
             return DataHelper.GetDataValue(v, this.BaseType);
         }

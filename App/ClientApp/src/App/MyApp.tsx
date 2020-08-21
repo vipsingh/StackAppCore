@@ -42,7 +42,7 @@ export default class MyApp extends Component<{}, {collapsed: boolean}> {
               >
                 <AppRoutes />
               </div>
-              <Footer style={{ textAlign: "center" }}>StackERP ©2018</Footer> 
+              <Footer style={{ textAlign: "center" }}>StackERP ©2020</Footer> 
             </Content>
             
           </Layout>

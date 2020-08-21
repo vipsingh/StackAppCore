@@ -7,6 +7,8 @@ export default class Header extends React.Component {
     }
 
     render() {
+      const logoUrl = `${_AppSetting.AssetUrl}/img/logo.png`;
+
         const rightContent = [
             <Menu key="user" mode="horizontal" onClick={this.handleClickMenu}>
               <Menu.SubMenu
@@ -28,7 +30,7 @@ export default class Header extends React.Component {
         ];
         
         return (<Layout.Header className="app-header">
-                    <div className="logo"></div>
+                    <div className="logo"><img alt="logo" src={logoUrl} width="100%" style={{ marginTop: "-40px" }}/></div>
                     <div className="right-container">{rightContent}</div>
           </Layout.Header>);
     }

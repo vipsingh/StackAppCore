@@ -1,6 +1,7 @@
 using System;
 using StackErp.Model;
 using StackErp.Model.Layout;
+using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -15,7 +16,8 @@ namespace StackErp.UI.View.PageGenerator
 
         protected override void Compile(LayoutContext layoutContext)
         {
-            base.Compile(layoutContext);            
+            base.Compile(layoutContext);  
+            BuildActions();          
         }
         protected override void CompileWidgets(TView view)
         {
@@ -24,9 +26,10 @@ namespace StackErp.UI.View.PageGenerator
                 this.FieldCompiler.Compile(null, field);                                
             }
         }
+
         protected override void OnRenderComplete()
-        {           
-            BuildActions();
+        {
+            this.FillWidgetsData();
             
             base.OnRenderComplete();
         }
@@ -38,6 +41,15 @@ namespace StackErp.UI.View.PageGenerator
             {
                 var newAction = PageActionCreator.Create(new ActionContext(this.FormContext, ActionType.New, "NEW") { Query = q } );
                 this.FormContext.Actions.Add(newAction);
+            }
+        }
+
+        public void FillWidgetsData()
+        {            
+            foreach(var widgetKey in this.FormContext.Widgets)
+            {
+                var widget = widgetKey.Value;
+                widget.SetValue(null);
             }
         }
         public override ViewPage GetViewPage()

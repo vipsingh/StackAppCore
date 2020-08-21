@@ -2,6 +2,14 @@ using System;
 
 namespace StackErp.Model
 {
+
+    public enum EntityType
+    {
+        CoreEntity=1,
+        ChildEntity=2,
+        MetadataEntity=3,
+        Transiant=4
+    }
 public enum FieldType {
     None = 0,
     Text = 1,

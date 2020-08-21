@@ -47,12 +47,65 @@ namespace StackErp.Core
                         fields.Add(fname.ToUpper(), field);
                     }
 
-                    var dbEntity = GetDBEntity(entid, name, fields, table);
+                    var entityType = EntityType.CoreEntity;
+                    var parententity = ent.Get("parententity", 0);
+                    if (parententity > 0)
+                    {
+                        entityType = EntityType.ChildEntity;
+                    }
+
+                    var hasstages = ent.Get("hasstages", false);
+                    if (hasstages)
+                    {
+                        fields.Add("STAGEID", new IntegerField()
+                        {
+                            Type = FieldType.Integer,
+                            Name = "stageid",
+                            DBName = "stageid",
+                            IsReadOnly = true,
+                            IsDbStore = true,
+                            ViewId = -1
+                        });
+
+                        fields.Add("STATUSID", new IntegerField()
+                        {
+                            Type = FieldType.Integer,
+                            Name = "statusid",
+                            DBName = "statusid",
+                            Text = "Status",
+                            IsReadOnly = true,
+                            IsDbStore = true,
+                            ViewId = 0                                                        
+                        });                        
+                    }
+
+                    var hasimage = ent.Get("hasimage", false);
+                    if (hasimage)
+                    {
+                        fields.Add("OBJECTIMAGE", new ImageField()
+                        {
+                            Type = FieldType.Integer,
+                            Name = "objectimage",
+                            DBName = "objectimage",
+                            Text = "Image",
+                            IsReadOnly = true,
+                            IsDbStore = true,
+                            ViewId = 0                                                        
+                        }); 
+                    }
+                    
+                    var dbEntity = GetDBEntity(entid, name, fields, entityType, table);
+                    dbEntity.ParentEntity = parententity;
+                    dbEntity.HasStages = hasstages;
+                    if (hasstages)
+                        dbEntity.StageGroupId = ent.Get("stagegroupid", 0);
+
+                    dbEntity.EntityFeatures = ent.Get("features", "");
 
                     entities.Add(entid, dbEntity);
                 }
 
-                Metadata.FixedEntities.BuildSchema(ref entities);                
+                Metadata.FixedEntities.BuildSchema(ref entities, dbentities);                
 
                 var defItemTypes = DB.EntityDBService.GetDefaultItemTypes();
 
@@ -65,12 +118,14 @@ namespace StackErp.Core
                     if (itemTyp.Count() > 0) {
                         dataParam.Add("DEFAULTLAYOUT", itemTyp.First().Get("id", 0));
                     }
-
-                    ent.Init(dataParam);
+                    
                     foreach (var fieldK in ent.Fields)
                     {
+                        fieldK.Value.ControlType = GetDefaultControl(fieldK.Value.Type);
                         fieldK.Value.Init();
                     }
+
+                    ent.Init(dataParam);
                 }
             }
             catch (Exception ex)
@@ -93,23 +148,17 @@ namespace StackErp.Core
             return GetAs<IDBEntity>(id);
         }
 
-        private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields, string tableName)
+        private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields, EntityType entityType, string tableName)
         {
             DBEntity e;
-            if (entid == 1) {
-                e = new EntityMasterEntity(entid, name, fields,tableName);
-            }
-            else if (entid == 2) {
-                e = new EntitySchemaEntity(entid, name, fields,tableName);
-            }
-            else if (entid == 101) {
-                e = new UserDbEntity(entid, name, fields,tableName);
+            if (entid == 101) {
+                e = new UserDbEntity(entid, name, fields,entityType,tableName);
             } 
             else if (entid == 102) {
-                e = new UserRoleEntity(entid, name, fields,tableName);
+                e = new UserRoleEntity(entid, name, fields,entityType,tableName);
             } 
             else {
-                e = new DBEntity(entid, name, fields, tableName);
+                e = new DBEntity(entid, name, fields, entityType,tableName);
             }
 
             return e;

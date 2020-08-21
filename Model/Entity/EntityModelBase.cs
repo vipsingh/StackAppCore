@@ -12,20 +12,29 @@ namespace StackErp.Model
         protected FieldDataCollection _attr;
         public FieldDataCollection Attributes { get => _attr; }
         public Int32 ID { get; protected set; }
-        public EntityCode EntityId { get; }
+        public EntityCode EntityId { get => Entity.EntityId; }
+        public IDBEntity Entity {get;}
         public int _id { protected set; get; }
         public bool IsNew { get => !(this._id > 0); }
         public bool IsDeleted {set;get;}
 
         private DbObject dbObject;
-        public DBModelBase(EntityCode entityId)
-        {
-            this.EntityId = entityId;
+        public DBModelBase(IDBEntity entity)
+        {                        
+            Entity = entity;
+            DbTableName = entity.DBName;
             _attr = new FieldDataCollection();
         }
         public virtual object GetValue(string field)
         {
-            return this.dbObject.Get<object>(field, null);
+            if (_attr.ContainsKey(field.ToUpper())) 
+            {
+                var f = _attr[field.ToUpper()];
+
+                return f.Value;
+            }
+
+            return null;
         }
         
         public virtual void BuiltWithDB(DbObject dbData)
@@ -33,6 +42,14 @@ namespace StackErp.Model
             dbObject = dbData;
             //this._attr = dbData;
             this.ID = _id = dbData.Get("id", 0);                       
+
+            foreach(var f in dbData.Keys)
+            {
+                var field = Entity.GetFieldSchema(f);
+                var val = field.ResolveDbValue(dbData);
+
+                _attr.Add(f.ToUpper(), new FieldData(field, val){ IsChanged = false });
+            }
         }
 
         public void SetMasterId(int masterId)
@@ -43,7 +60,6 @@ namespace StackErp.Model
     
     public class EntityModelBase: DBModelBase
     {        
-        public IDBEntity Entity {get;}
         public short RecordStatus { get; }        
 
         public DateTime CreatedOn {private set; get; }
@@ -58,10 +74,8 @@ namespace StackErp.Model
         public bool IsChangeTrackOff { private set; get; }
 
 
-        public EntityModelBase(IDBEntity entity): base(entity.EntityId)
+        public EntityModelBase(IDBEntity entity): base(entity)
         {
-            Entity = entity;
-            DbTableName = entity.DBName;
         }        
 
         public virtual void CreateDefault() {

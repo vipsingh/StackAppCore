@@ -9,11 +9,13 @@ namespace StackErp.StackScript
     internal class ObjectDataProvider
     {
         Dictionary<string, object> _Vars;
+        internal object output;
         private StackAppContext _appContext;
         internal ObjectDataProvider(StackAppContext appContext)
         {
             _Vars = new Dictionary<string, object>();
             _appContext = appContext;
+            output = null;
         }
 
         internal ObjectDataProvider(StackAppContext appContext, Dictionary<string, object> param): this(appContext)
@@ -24,28 +26,63 @@ namespace StackErp.StackScript
              }
         }
 
-        internal object GetObjectData(string objectName, string propName, Arguments args = null)
+        internal object GetObjectFunctionData(string objectName, string propName, Arguments args)
         {
             object val = null;
             switch(objectName) {
                 case "_":
                     val = GetUtilityResult(propName, args);
                     break;
-                case "$app":
-                    val = GetAppVariable(propName);
-                    break;
-                case "$context"://used on server
-                    val = GetContextVariable(propName);
-                    break;
-                // case "model":
-                //     val = GetParamData(propName, args);
-                //     break;
                 default:
                     return ProcessFunction(objectName, propName, args);
                     break;
             }
 
             return val;
+        }
+
+        internal object GetObjectPropData(string objectName, string propName)
+        {
+            object val = null;
+
+            switch(objectName) 
+            {                
+                case "$app":
+                    val = GetAppVariable(propName);
+                    break;
+                case "$context"://used on server
+                    val = GetContextVariable(propName);
+                    break;
+                default:
+                    return ProcessObjectProp(objectName, propName);
+                    break;
+            }
+
+            return val;
+        }
+
+        internal void SetObjectData(string objectName, string propName, object value)
+        {
+            var model = GetVarData(objectName);
+            if (model != null) 
+            {
+                if (model is DynamicObj) 
+                {
+                    ((DynamicObj)model).Add(propName, value, true);
+                    return;
+                }
+
+                var type = model.GetType();                
+                var prop =  type.GetProperty(propName);
+                if (prop != null)
+                {                    
+                    prop.SetValue(model, DataHelper.GetDataValue(value, prop.PropertyType));
+                }
+                else 
+                {
+                    throw new ScriptException($"Object at {objectName}.{propName} is not valid.");
+                }
+            }
         }
 
         // internal object GetParamData(string propName, Arguments args = null)
@@ -62,9 +99,35 @@ namespace StackErp.StackScript
             return d.Function.Invoke(vr, args);
         }
 
+        internal object ProcessObjectProp(string objectName, string propName)
+        {
+            var model = GetVarData(objectName);
+            if (model != null) 
+            {
+                if (model is DynamicObj) 
+                {                    
+                    return ((DynamicObj)model).Get(propName);
+                }
+
+                var prop =  model.GetType().GetProperty(propName);
+                if (prop != null)
+                {
+                    return prop.GetValue(model);
+                }
+                else {
+                    throw new ScriptException($"Object at {objectName}.{propName} is not valid.");
+                }
+            }
+
+            return null;
+        }
+
 
         internal virtual object GetVarData(string propName)
         {
+            if (propName.ToLower() == "output") return output;
+            if (propName.ToLower() == "$context") return _appContext;
+
             return _Vars[propName];
         }
 

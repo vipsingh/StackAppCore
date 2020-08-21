@@ -6,7 +6,7 @@ using System.Linq;
 namespace StackErp.Model.Entity
 {
     public abstract class RelationalField : BaseField
-    {
+    {        
         public bool IsLazyLoad { set; get; }
         public override void OnInit()
         {
@@ -17,7 +17,6 @@ namespace StackErp.Model.Entity
 
     public class ObjectLinkField : RelationalField
     {
-        public bool IsPickList { set; get; }
         public ObjectLinkField() : base()
         {
             Type = FieldType.ObjectLink;
@@ -58,8 +57,8 @@ namespace StackErp.Model.Entity
 
         public override object ResolveDbValue(DbObject db)
         {
-            var v = db.Get(this.DBName, 0);
-            var t = db.Get<string>(this.DBName + "__name", null);
+            var v = db.Get(this.Name, 0);
+            var t = db.Get<string>(this.Name + "__name", null);
 
             if (v == 0)
                 return null;
@@ -74,8 +73,11 @@ namespace StackErp.Model.Entity
         }
 
         private void BuildPickerDataSource()
-          {
+        {
             var refEntity = this.Entity.GetEntity(this.RefObject);
+            
+            ControlInfo.FieldAttribute.TextField = refEntity.TextField;
+
             var filterDomain = this._TempSchemaData.Get("linkentity_domain", "");
             this.ControlInfo.DataSource = new FieldDataSource
             {
@@ -135,8 +137,8 @@ namespace StackErp.Model.Entity
         public override object ResolveDbValue(DbObject db)
         {
             List<SelectOption> v = null;
-            var d = db.Get<int[]>(this.DBName, null);
-            var reldata = db.Get<string[]>(this.DBName + "__data", null);
+            var d = db.Get<int[]>(this.Name, null);
+            var reldata = db.Get<string[]>(this.Name + "__data", null);
             if (d != null)
             {
                 v = new List<SelectOption>();

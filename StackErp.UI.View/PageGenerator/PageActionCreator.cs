@@ -71,15 +71,13 @@ namespace StackErp.UI.View.PageGenerator
             {
                 url = "";
             }
-            else if (definition.ActionType == ActionType.Page)
-            {
-                url = string.Format("{0}{1}", context.Context.AppRoot, url);
-            }
-
-            if(string.IsNullOrEmpty(url))
+            
+            if(definition.ActionType != ActionType.Page)
             {
                 url = GetUrlFromActionType(definition.ActionType);
             }
+
+            url = string.Format("{0}{1}", context.Context.AppRoot, url);
 
             var q = context.RequestQuery.Clone();
             
@@ -113,19 +111,6 @@ namespace StackErp.UI.View.PageGenerator
             else if (type == ActionType.Function)
                 return AppLinkProvider.EXEC_FUNC_URL;
             return "";
-        }
-
-        private static ActionExecutionType GetExecTypeFromActionType(ActionType type)
-        {
-            switch(type)
-            {
-                case ActionType.View:
-                case ActionType.Edit:
-                case ActionType.New:
-                case ActionType.Url:
-                    return ActionExecutionType.Redirect;
-            }
-            return ActionExecutionType.None;
         }
     }
 }

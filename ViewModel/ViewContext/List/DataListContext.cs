@@ -65,21 +65,9 @@ namespace StackErp.ViewModel.ViewContext
             this.DbQuery.BuildListDefn(defn);
             this.IdColumn = this.DbQuery.ItemIdField;
             this.ItemViewField = defn.ItemViewField;
-
-            // this.DbQuery.ItemIdField = defn.ItemIdField;
-            
-            // if (defn.Layout != null)
-            // {
-            //     this.DbQuery.BuildWithLayout(defn.Layout);
-            // }            
-            
-            // this.IdColumn = defn.ItemIdField;
-            // this.ItemViewField = defn.ItemViewField;
             
             PrepareFilter(this.DbQuery, defn);
-            PrepareRequestFilter(this.DbQuery, ListRequest.GridRequest);
-
-            this.DbQuery.ResolveFields();
+            PrepareRequestFilter(this.DbQuery, ListRequest.GridRequest);            
 
             var gridReq = ListRequest.GridRequest;
             if (gridReq != null)

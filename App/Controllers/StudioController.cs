@@ -11,6 +11,7 @@ using StackErp.App.Models;
 using StackErp.Model;
 using StackErp.UI.Controllers;
 using StackErp.UI.View.DataList;
+using StackErp.UI.View.Studio;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -24,13 +25,9 @@ namespace StackErp.App.Controllers
         }
         public IActionResult Studio()
         {
-            var page = new ViewPage();
-            page.PageType = AppPageType.AppStudio;
-            page.CurrentQuery = this.RequestQuery.ToQueryString();
-            page.Actions = new InvariantDictionary<Model.Form.ActionInfo>();
-            page.Actions.Add("BTN_NEW", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, this.RequestQuery){ Title = "New", LinkTarget="POPUP" });
+            var page = new StudioPage(StackAppContext);
 
-            return CreatePageResult(page);
+            return CreatePageResult(page.GetPage(this.RequestQuery));
         }
 
         public IActionResult GetFieldList([FromBody] ListRequestinfo request)

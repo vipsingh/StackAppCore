@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackErp.Model;
 using StackErp.UI.View.DataList;
+using StackErp.UI.View.PageAction;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -29,7 +30,7 @@ namespace StackErp.App.Controllers
             var res = builder.GetResponse(context);
             
             return CreateResult(res);
-        }        
+        }
     
         public IActionResult GetListFormData()
         {  
@@ -45,6 +46,14 @@ namespace StackErp.App.Controllers
             builder.Build(context);
             var res = builder.GetResponse(context);
             
+            return CreateResult(res);
+        }
+
+        [HttpPost]
+        public IActionResult ProcessFieldEvent([FromQuery]string type, [FromBody]CustomRequestInfo requestInfo)
+        {
+            var res = FormEventProcesser.ProcessFieldEvent(StackAppContext, type, requestInfo);
+
             return CreateResult(res);
         }
     }

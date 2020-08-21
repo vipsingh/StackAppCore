@@ -11,6 +11,7 @@ using StackErp.App.Models;
 using StackErp.Core;
 using StackErp.Model;
 using StackErp.StackScript;
+using StackErp.ViewModel.Model;
 
 namespace StackErp.App.Controllers
 {
@@ -23,19 +24,11 @@ namespace StackErp.App.Controllers
         public HomeController(ILogger<HomeController> logger, IOptions<AppKeySetting> appSettings)
         {
             _logger = logger;
-            ScriptFunctions.RegisterFunction("GetEntity", GetEntity);
 
             appContext = new StackAppContext();
             appContext.Init(appSettings.Value); 
         }
-
-        public static Function GetEntity => new Function((arguments) =>
-        {
-            var arg1 = arguments.Get(0);
-            
-            return EntityMetaData.Get((int)arg1);
-        });
-
+        
         public IActionResult Index()
         {
             //var d = StackErp.Core.EntityMetaData.Get(EntityCode.Get("UserMaster")).GetSingle(1);
@@ -45,7 +38,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult StackScript([FromBody] string scr)
         {
-            new StackErp.StackScript.StackScriptExecuter().ExecuteScript(scr);
+            StackErp.StackScript.StackScriptParser.Parse(scr);
 
             return Content("executed");
         }
@@ -53,14 +46,24 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult StackScriptFunction([FromQuery]int id, [FromBody] string scr)
         {
-            var d = StackErp.Core.EntityMetaData.Get(99).GetSingle(id);
-            
             var args = new Dictionary<string, object>();
+
+            // FieldRequestInfo requestInfo = new  FieldRequestInfo();
+            // requestInfo.Value = id;
+            // args.Add("input", requestInfo);
+
+            // FieldActionResponse output = new FieldActionResponse(null);
+            // var sts = new StackErp.StackScript.StackScriptExecuter().ExecuteFunction(appContext, scr, args, output);
+
+            /////////////////////////////////////////////////////////////////////
+
+            var d = StackErp.Core.EntityMetaData.Get(99).GetSingle(id);
             args.Add("model", d);
 
-            new StackErp.StackScript.StackScriptExecuter().ExecuteFunction(appContext, scr, args);
+            DynamicObj output = new DynamicObj();
+            var sts = new StackErp.StackScript.StackScriptExecuter().ExecuteFunction(appContext, scr, args, output);
 
-            return Content("executed");
+            return Json(new {sts, output});
         }
         public IActionResult Privacy()
         {

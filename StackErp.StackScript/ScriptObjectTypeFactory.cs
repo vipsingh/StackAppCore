@@ -18,6 +18,21 @@ namespace StackErp.StackScript
             RegisterDbEntity();
         }        
 
+        public static void Register(Type type, Dictionary<string, ObjectFunctionScriptInfo> functions)
+        {
+            _data.Add(type, functions);
+        }
+
+        public static void Register(Type type, params string[] funcs)
+        {
+            var d = new  Dictionary<string, ObjectFunctionScriptInfo>();
+            foreach(var f in funcs)
+            {
+                d.Add(f, new ObjectFunctionScriptInfo(type, f));
+            }
+            _data.Add(type, d);
+        }
+
         public static ObjectFunctionScriptInfo GetFunction(Type type, string name)
         {
             Type ty1 = null;
@@ -25,9 +40,15 @@ namespace StackErp.StackScript
             {
                 foreach(Type t in _data.Keys)
                 {
-                    if (type.IsSubclassOf(t))
+                    if (t.IsInterface && t.IsAssignableFrom(type)) 
                     {
                         ty1 = t;
+                        break;
+                    }
+                    else if (type.IsSubclassOf(t))
+                    {
+                        ty1 = t;
+                        break;
                     }
                 }
             }
@@ -35,7 +56,7 @@ namespace StackErp.StackScript
                 ty1 = type;
 
             if (ty1 == null)    
-                throw new ScriptException($"Function {type.Name}.{name} is not valid.");
+                throw new ScriptException($"Object at {type.Name}.{name} is not valid.");
 
             var dic = _data[ty1];
             
@@ -52,20 +73,19 @@ namespace StackErp.StackScript
 
         static void RegisterEntityModelBase()
         {
-            var d = new  Dictionary<string, ObjectFunctionScriptInfo>();
-            d.Add("GetValue", new ObjectFunctionScriptInfo(typeof(EntityModelBase), "GetValue"));
-            d.Add("SetValue", new ObjectFunctionScriptInfo(typeof(EntityModelBase), "SetValue"));
-            
-            _data.Add(typeof(EntityModelBase), d);
+            Register(typeof(EntityModelBase), "GetValue", "SetValue");
+            Register(typeof(DBModelBase), "GetValue");
         }
 
         static void RegisterDbEntity()
         {
-            var d = new  Dictionary<string, ObjectFunctionScriptInfo>();
-            d.Add("Save", new ObjectFunctionScriptInfo(typeof(IDBEntity), "Save"));            
+            Register(typeof(IDBEntity), "Save", "GetDefault", "GetSingle", "ReadIds", "Read", "ReadAll");
+        } 
 
-            _data.Add(typeof(IDBEntity), d);
-        }
+        static void RegisterCommon()
+        {
+            Register(typeof(System.Collections.IList), "Add", "Contains", "IndexOf", "Remove", "RemoveAt");
+        }        
     }
 
     public class ObjectFunctionScriptInfo
@@ -86,11 +106,15 @@ namespace StackErp.StackScript
 
             Function = new ScriptObjectunction((Model, arguments) =>
             {  
-                return Model.GetType().GetMethod(Name).Invoke(Model, arguments.ToArray());
+                var method = Model.GetType().GetMethod(Name, arguments.ToTypeArray());
+                if (method == null) throw new ScriptException($"No method found with name: {Name} and parameters");
+
+                return method.Invoke(Model, arguments.ToArray());
             });
         }
         public ScriptObjectunction Function {set;get;}
         // public List<Type> ParamTypes {set;get;}
         // public Type ReturnType {set;get;}
+
     }
 }

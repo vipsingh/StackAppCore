@@ -32,7 +32,7 @@ namespace StackErp.DB.DataList
             _QueryInfo = queryInfo;
         }
         List<(string, string, string)> _selectFields;
-        List<(string, List<string>)> _toJoinTables;
+        Dictionary<string, (string, string, List<string>)> _toJoinTables;
         string _entTable;
         short idx = 0;
         public string BuildSql()
@@ -40,7 +40,7 @@ namespace StackErp.DB.DataList
             _entTable = _QueryInfo.Entity.DBName;
 
             _selectFields = new List<(string, string, string)>();
-            _toJoinTables = new List<(string, List<string>)>();
+            _toJoinTables = new Dictionary<string, (string,string, List<string>)>();
 
             AddSelectField("ID", _entTable + ".id", "id");
 
@@ -53,16 +53,29 @@ namespace StackErp.DB.DataList
                 var fieldSchema = field.Field;
                 if (field.IsSelect)
                 {
-                    AddSelectField(field.FieldName, _entTable + "." + fieldSchema.DBName, field.FieldName);
+                    if (!string.IsNullOrEmpty(field.DbName))
+                        AddSelectField(field.FieldName, _entTable + "." + fieldSchema.DBName, field.FieldName);
 
                     if (fieldSchema.RefObject.Code > 0)
                     {
                         var rel = relations.Find(x => x.ParentRefField.Name == fieldSchema.Name);
+                        if (fieldSchema.IsRelatedField) 
+                        {
+                            rel = relations.Find(x => x.ParentRefField.Name == fieldSchema.Related.LinkField);
+                        }
                         if(rel != null)
                         {
                             AddRefTable(rel);
                         }
                     }
+
+                    if (fieldSchema.IsRelatedField)
+                    {
+                        var tab = _toJoinTables[fieldSchema.Related.LinkField];
+                        var refField = fieldSchema.Related.Field;
+                        AddSelectField(field.FieldName, $"{tab.Item2}.{refField}", field.FieldName); 
+                    }
+
                     if (fieldSchema is SelectField)
                     {
                         AddCollectionTable(fieldSchema);
@@ -91,17 +104,21 @@ namespace StackErp.DB.DataList
                 if (rel.Type == EntityRelationType.ManyToOne)
                 {
                     AddSelectField(rel.ParentRefField.Name, $"{idf}.{rel.ChildDisplayField.DBName}", $"{rel.ParentRefField.Name}__name");                    
-                    //_addedFields.Add((rel.ParentRefField.Name, rel.ParentRefField.DBName, rel.ParentRefField.Name));
+
                     shouldJoin = true;
                 }
                 else if (rel.Type == EntityRelationType.ManyToMany)
                 {
                     AddSelectField(rel.ParentRefField.Name, $"get_related_data('{refEnt.DBName}', '{rel.ChildDisplayField.DBName}', {_entTable}.{rel.ParentRefField.DBName})", $"{rel.ParentRefField.Name}__data");
-                }
+                }                
 
                 if (shouldJoin)
-                {
-                    _toJoinTables.Add(($"{refEnt.DBName} as {idf}", new List<string>() { $"{_entTable}.{rel.ParentRefField.DBName} = {idf}.id"} ));
+                {   
+                    if (!_toJoinTables.ContainsKey(rel.ParentRefField.Name))                 
+                    {
+                        _toJoinTables.Add(rel.ParentRefField.Name, 
+                            (refEnt.DBName, idf.ToString(), new List<string>() { $"{_entTable}.{rel.ParentRefField.DBName} = {idf}.id"} ));
+                    }
                 }
 
             idx++;
@@ -120,11 +137,12 @@ namespace StackErp.DB.DataList
             {
                 AddSelectField(fieldSchema.Name, $"{idf}.datatext", $"{fieldSchema.Name}__name");
 
-                _toJoinTables.Add(($"t_collection_master as {idf}", 
-                    new List<string>() { 
-                        $"{idf}.id = {collectionid}",
-                        $"{_entTable}.{fieldSchema.DBName} = {idf}.dataid"
-                    } 
+                _toJoinTables.Add(fieldSchema.Name, 
+                    ("t_collection_master", idf.ToString(),
+                        new List<string>() { 
+                            $"{idf}.id = {collectionid}",
+                            $"{_entTable}.{fieldSchema.DBName} = {idf}.dataid"
+                        } 
                 ));
                 idx++;
             }
@@ -148,10 +166,11 @@ namespace StackErp.DB.DataList
 
             if (_toJoinTables != null)
             {
-                _toJoinTables.ForEach(x =>
+                foreach(var k in _toJoinTables)
                 {
-                    qry += $" LEFT JOIN {x.Item1} ON {string.Join(" AND ", x.Item2)}";
-                });
+                    var x = k.Value;
+                    qry += $" LEFT JOIN {x.Item1} as {x.Item2} ON {string.Join(" AND ", x.Item3)}";
+                }
             }            
 
             return qry;

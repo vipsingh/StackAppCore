@@ -32,5 +32,12 @@ namespace StackErp.StackScript
         public ScriptRuntimeException(string message)
             : base(message)
         { }
+    }
+
+    public class ScriptUserException : ScriptException
+    {
+        public ScriptUserException(string message)
+            : base(message)
+        { }
     } 
 }

@@ -41,5 +41,12 @@ namespace StackErp.Model
         }
     }
 
+    public class MetadataException: AppException 
+    {
+        public MetadataException(string message): base(message) {
+            
+        }
+    }
+
 }
    

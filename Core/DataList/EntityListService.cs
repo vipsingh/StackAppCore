@@ -56,39 +56,10 @@ namespace StackErp.Core.DataList
             return defn;
         }
 
-        public List<DynamicObj> ExecuteData(DbQuery query, Action<DynamicObj> onPrepareRow, Func<string, object, DynamicObj, object> onFormattedFieldValue)
+        public IEnumerable<DbObject> ExecuteData(DbQuery query)
         {
             var data = QueryDbService.ExecuteEntityQuery(query);
-            return PrepareEntityData(data, query, onPrepareRow, onFormattedFieldValue);
-        }
-
-        public List<DynamicObj> PrepareEntityData(IEnumerable<DbObject> data, DbQuery query, Action<DynamicObj> onPrepareRow, Func<string, object, DynamicObj, object> onFormattedFieldValue)
-        {
-            var res = new List<DynamicObj>();
-            var idField = query.Entity.GetFieldSchema(query.ItemIdField);
-            foreach(var dataRow in data)
-            {
-                var row = new DynamicObj();
-                row.Add("RowId", dataRow.Get(idField.ViewName, 0));
-
-                foreach(var field in query.Fields)
-                {
-                    if (field.IsSelect)
-                    {
-                        row.Add(field.Field.Name, onFormattedFieldValue(field.Field.Name, field.Field.ResolveDbValue(dataRow), row), true);
-                    } 
-                    else 
-                    {
-                        row.Add(field.Field.Name, field.Field.ResolveDbValue(dataRow));
-                    }
-                }
-
-                onPrepareRow(row);
-
-                res.Add(row);
-            }
-
-            return res;
+            return data;
         }
     }
 }

@@ -43,6 +43,11 @@ namespace StackErp.Model
         public const int None = 0;
         public const int EntityMaster = 1;
         public const int EntitySchema = 2;
+        public const int ItemType = 3;
+        public const int EntityLayout = 4;
+        public const int EntityList = 5;
+        public const int EntityAction = 6;
+        
         public const int User = 101;
         public const int UserRole = 102;  
 

@@ -95,7 +95,20 @@ namespace StackErp.Model.Layout
                 f.ReadOnly = attrs["readonly"].Value.Trim();                
             }
 
+            f.FullRow = GetXmlAttrValue(attrs, "fullrow", false);
+            f.Text = GetXmlAttrValue(attrs, "text", "");
+            f.Widget = GetXmlAttrValue(attrs, "widget", FormControlType.None);
+            f.Format = GetXmlAttrValue(attrs, "format", "");
+
             return f;
+        }
+
+        private static T GetXmlAttrValue<T>(XmlAttributeCollection collection, string name, T defaultvalue)
+        {
+            if (collection[name] != null)
+                return DataHelper.GetData(collection[name].Value.Trim(), defaultvalue);    
+            
+            return defaultvalue;
         }
     }
 

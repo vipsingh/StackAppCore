@@ -132,6 +132,8 @@ CREATE TABLE t_entity_viewlayout
 	layoutxml xml,
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
+	createdby integer,
+	updatedby integer,
 	CONSTRAINT t_entity_viewlayout_pkey PRIMARY KEY (id)
 );
 
@@ -190,6 +192,26 @@ create table t_entitylist
     updatedon timestamp without time zone,
 	CONSTRAINT t_entitylist_pkey PRIMARY KEY (id)
 );
+
+create table t_entitystatus_master
+(
+	masterid integer NOT NULL,
+    id integer,	
+	entityid integer,
+	name character varying(100) not null,
+	stageid int,
+	displaylevel1 character varying(60),
+	displaylevel2 character varying(60),
+	languageid int,
+	displayorder int default(0),
+	description character varying(500),
+	isautoassignment bool,	
+	createdby integer NOT NULL,
+    updatedby integer,
+    createdon timestamp without time zone NOT NULL,	
+    updatedon timestamp without time zone,
+    CONSTRAINT t_entitystatus_master_pkey PRIMARY KEY (id)
+)
 
 insert into autoid values(1, 10000);
 insert into autoid values(2, 1000000);
@@ -355,6 +377,7 @@ CREATE TABLE t_entity_script
     updatedon timestamp without time zone,
     CONSTRAINT t_entity_script PRIMARY KEY (id)
 )
+
 
 ------------------------------------DATA----------------
 insert into t_collection_master values(0,1,1,'Male',null,'M',null,null);

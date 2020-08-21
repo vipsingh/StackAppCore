@@ -46,8 +46,16 @@ public enum EntityLayoutType {
     View = 2,
     QuickView = 3,
     EmailView = 4,
-    Calendar = 5,
-    Kanban =6
+    Print = 5
+}
+
+public enum ReportLayoutType
+{
+    Grid = 0,
+    Card = 1,
+    Calendar = 2,
+    Kanban = 3,
+    Graph = 4
 }
 
 // public enum LayoutViewType {

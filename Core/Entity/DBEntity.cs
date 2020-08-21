@@ -12,8 +12,9 @@ using StackErp.Model.Entity;
 
 namespace StackErp.Core
 {
-    public class DBEntity : IDBEntity
+    public partial class DBEntity : IDBEntity
     {
+        #region Properties
         public EntityCode EntityId { get; }
         public AppModuleCode AppModule { get; }
         public string Name { get; }
@@ -30,23 +31,34 @@ namespace StackErp.Core
         public List<string> ComputeOrderSeq { private set; get; }
 
         //If true than it can not be used directly
-        public bool IsChildEntity {private set;get;}        
-        public bool IsTransiant {protected set;get;}
+        public EntityType EntityType {protected set;get;}
         public EntityDeletePolicyType DeletePolicyType {protected set;get;}
 
         public int DefaultItemTypeId {private set;get;} 
+        public int ParentEntity {set;get;} 
+        public bool HasStages {set;get;} 
+        public int StageGroupId {set;get;}
+        public string EntityFeatures {set;get;}
 
         private string _detailQry;
         private InvariantDictionary<string> _relatedFieldDataQryList;
-        public DBEntity(int id, string name, Dictionary<string, BaseField> fields, string dbName = "")
+        #endregion
+        public DBEntity(int id, 
+            string name, 
+            Dictionary<string, BaseField> fields, 
+            EntityType entityType,
+            string dbName = "")
         {
             this.EntityId = id;
             this.Name = name;
             this.DBName = dbName; //t_{namespace}
             this.IDField = "ID";
             this.Text = name;
+            this.EntityType = entityType;
 
             this.Fields = new InvariantDictionary<BaseField>();
+
+            #region Default Fields
             if (fields.Where(f => f.Key.ToUpper() == "ID").Count() == 0)
             {
                 this.Fields.Add("ID", new ObjectKeyField()
@@ -102,15 +114,19 @@ namespace StackErp.Core
                 ViewId = -1
             });
 
-            fields.Add("ITEMTYPE", new IntegerField()
+            if (entityType == EntityType.CoreEntity)
             {
-                Type = FieldType.Integer,
-                Name = "ItemType",
-                DBName = "itemtype",
-                IsReadOnly = true,
-                IsDbStore = true,
-                ViewId = -1
-            });
+                fields.Add("ITEMTYPE", new IntegerField()
+                {
+                    Type = FieldType.Integer,
+                    Name = "ItemType",
+                    DBName = "itemtype",
+                    IsReadOnly = true,
+                    IsDbStore = true,
+                    ViewId = -1
+                });
+            }
+            #endregion
 
             var orderedFields = fields.Select(x => x.Value).OrderBy(x => x.ViewOrder);
 
@@ -209,103 +225,7 @@ namespace StackErp.Core
 
             this.ComputeOrderSeq = seqArr;
         }
-
-        #region Data Fetch
-        public virtual EntityModelBase GetSingle(int id)
-        {
-            var sql = _detailQry;
-            var arr = DBService.Query(sql, new { ItemId = new int[] {id} });
-            //var relatedFieldData = DBService.Query(_relatedFieldDataQryList, new { ItemId = new int[] {id} });
-            if (arr.Count() > 0)
-            {
-                var d = arr.First();
-                return BuildModelFromDbObj(d);
-            }
-            throw new EntityException("Record not found.");
-        }
-
-        private EntityRecordModel BuildModelFromDbObj(DbObject dbObj) //InvariantDictionary<IEnumerable<DbObject>> relatedFieldData
-        {
-            var model = new EntityRecordModel(this);
-            // foreach(var fData in relatedFieldData)
-            // {
-            //     dbObj.Add(fData.Key + "__data", fData.Value);
-            // }
-            model.BuiltWithDB(dbObj);
-
-            return model;
-        }
-
-        public List<EntityModelBase> GetAll(FilterExpression filter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<EntityModelBase> GetAll(int[] ids)
-        {
-            var sql = _detailQry;
-            var arr = DBService.Query(sql, new { ItemId = ids });
-            var list = new List<EntityModelBase>();
-            if (arr.Count() > 0)
-            {
-                foreach(var a in arr)
-                {
-                    var model = new EntityRecordModel(this);
-                    model.BuiltWithDB(a);
-                    list.Add(model);
-                }
-            }
-
-            return list;
-        }
-
-        public DBModelBase Read(int id, List<string> fields)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter)
-        {
-            var q = new DbQuery(this);
-            foreach(var f in fields)
-            {
-                q.AddField(f, true);
-            }
-            q.AddField(this.IDField, true);
-            
-            q.SetFixedFilter(filter);
-
-            var data = QueryDbService.ExecuteEntityQuery(q);   
-            var models = new List<DBModelBase>();
-            foreach(var d in data)
-            {
-                var m = new DBModelBase(this.EntityId);
-                m.BuiltWithDB(d);
-                models.Add(m);
-            }         
-
-            return models;
-        }
-
-        public List<int> ReadIds(FilterExpression filter)
-        {
-            var q = new DbQuery(this);
-            q.AddField(this.IDField, true);
-            q.SetFixedFilter(filter);
-            var data = QueryDbService.ExecuteEntityQuery(q);            
-            var list = new List<int>();
-            if (data.Count() > 0)
-            {
-                foreach(var d in data)
-                {
-                    list.Add(d.Get(this.IDField, 0));
-                }
-            }
-
-            return list;
-        }
-        #endregion
-
+        
         #region Schema related
         public Dictionary<string, BaseField> GetFields()
         {
@@ -350,13 +270,6 @@ namespace StackErp.Core
         // }
         #endregion
 
-        public EntityModelBase GetDefault()
-        {
-            EntityRecordModel model = new EntityRecordModel(this);
-            model.CreateDefault();
-
-            return model;
-        }
         public IDBEntity GetEntity(EntityCode id)
         {
             return Core.EntityMetaData.Get(id);
@@ -404,6 +317,7 @@ namespace StackErp.Core
         
         protected virtual bool Validate(EntityModelBase model)
         {
+            //check concurrency based on LastModifiedOn
             bool IsValid = true;            
             var validator = new DataValidator();
             foreach (var f in model.Attributes)
@@ -429,7 +343,7 @@ namespace StackErp.Core
         {
             AnyStatus sts = AnyStatus.Success;
             
-            SaveRelatedData(appContext, model, connection, transaction);
+            sts = SaveRelatedData(appContext, model, connection, transaction);
             
             return sts;
         }

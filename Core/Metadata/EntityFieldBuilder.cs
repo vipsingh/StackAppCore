@@ -33,7 +33,6 @@ namespace StackErp.Core
 
             field.IsRequired = sch.Get("isrequired", false);
             
-
             var computeexpression = sch.Get("computeexpression", "");
             if (!string.IsNullOrEmpty(computeexpression))
             {
@@ -49,11 +48,18 @@ namespace StackErp.Core
             var linkEnt = sch.Get("linkentity", 0);
 
             if (field.Type == FieldType.ObjectLink || field.Type == FieldType.MultiObjectLink)
-            {                
-                var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
-                if (linkDbEnt.Count() > 0)
+            {   
+                if (dbentities ==null)
                 {
                     field.RefObject = linkEnt;
+                }
+                else
+                {             
+                    var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
+                    if (linkDbEnt.Count() > 0)
+                    {
+                        field.RefObject = linkEnt;
+                    }
                 }
 
                 field._TempSchemaData.Add("linkentity_domain", sch.Get("linkentity_domain", ""));                             
@@ -65,16 +71,20 @@ namespace StackErp.Core
                 ((SelectField)field).CollectionId = collectionid;
             }
 
-
-            field.ControlType = GetDefaultControl(field.Type);
-
             if (field is OneToManyField)
             {
                 var rField = (OneToManyField)field;
-                var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
-                if (linkDbEnt.Count() > 0)
+                if (dbentities ==null)
                 {
                     rField.RefObject = linkEnt;
+                }
+                else
+                {
+                    var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
+                    if (linkDbEnt.Count() > 0)
+                    {
+                        rField.RefObject = linkEnt;
+                    }
                 }
 
                 var linkentity_field = sch.Get("linkentity_field", "");
@@ -125,6 +135,9 @@ namespace StackErp.Core
                 case FieldType.Html:
                     field = new HtmlField();
                     break;
+                case FieldType.Xml:
+                    field = new XmlField();
+                    break;
                 case FieldType.Email:
                     field = new EmailField();
                     break;
@@ -156,7 +169,7 @@ namespace StackErp.Core
             return field;
         }
 
-        private static FormControlType GetDefaultControl(FieldType type)
+        internal static FormControlType GetDefaultControl(FieldType type)
         {
             FormControlType t = FormControlType.TextBox;
             switch (type)
@@ -201,6 +214,9 @@ namespace StackErp.Core
                     break;
                 case FieldType.Html:
                     t = FormControlType.HtmlText;
+                    break;
+                case FieldType.Xml:
+                    t = FormControlType.LongText;
                     break;
                 case FieldType.Email:
                     t = FormControlType.Email;
