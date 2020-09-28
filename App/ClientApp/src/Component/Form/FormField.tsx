@@ -5,22 +5,19 @@ import { FormLabelAlign } from "antd/lib/form/interface";
 
 const FormItem = Form.Item;
 
-export default class FormField extends React.Component<WidgetInfoProps> {    
+export default class FormField extends React.Component<{widgetInfo: WidgetInfoProps, dataModel: any, api?: FormApi, otherProps?: any}> {    
 
     shouldComponentUpdate(nextProps: any) {
-      if (this.props.WidgetType === 100) {
+      if (this.props.widgetInfo.WidgetType === 100) {
         return true;
       }
       
-      return nextProps.Value !== this.props.Value 
-        || nextProps.HasError !== this.props.HasError 
-        || nextProps.Invisible !== this.props.Invisible 
-        || nextProps.IsReadOnly !== this.props.IsReadOnly 
-        || nextProps.VisibleOptions !== this.props.VisibleOptions;
+      return nextProps.widgetInfo !== this.props.widgetInfo || nextProps.dataModel !== this.props.dataModel;
     }
 
     render() {        
-        const { WidgetId, Caption, HasError, api, Invisible, IsHidden, CaptionPosition } = this.props;
+        const { WidgetId, Caption, IsHidden, CaptionPosition } = this.props.widgetInfo;
+        const { HasError, Invisible } = this.props.dataModel;
         
         const formItemLayout = {
             labelCol: {
@@ -43,8 +40,8 @@ export default class FormField extends React.Component<WidgetInfoProps> {
         }
 
         let validResult: any;
-        if (HasError) {
-          validResult = api.getErrorResult(WidgetId);
+        if (this.props.api && HasError) {
+          validResult = this.props.api.getErrorResult(WidgetId);
         }
         if (IsHidden || Invisible) {
           return <div>{this.props.children}</div>;

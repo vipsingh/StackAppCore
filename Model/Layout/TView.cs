@@ -13,23 +13,30 @@ namespace StackErp.Model.Layout
     {
         public TPage Header { set; get; }
         public int RenderingStyle { set; get; }
-        public List<TPage> Pages { set; get; }        
+        public List<TPage> Pages { set; get; }      
+
+        [JsonIgnore]
+        public List<TField> Fields { set; get; }  
         public List<TCommand> Commands { set; get; }
         public TView()
         {
             Pages = new List<TPage>();
         }
+
+        public TField GetField(string id) {
+            return Fields.Find(f => f.FieldId == id);
+        }
         public List<TField> GetAllFields()
         {
-            var fields = new List<TField>();
+            // var fields = new List<TField>();
             
-            ExtractPageFields(this.Header, ref fields);
+            // ExtractPageFields(this.Header, ref fields);
             
-            foreach (var p in this.Pages)
-            {
-                ExtractPageFields(p, ref fields);
-            }
-            return fields;
+            // foreach (var p in this.Pages)
+            // {
+            //     ExtractPageFields(p, ref fields);
+            // }
+            return Fields;
         }
         private void ExtractPageFields(TPage p, ref List<TField> fields)
         {
@@ -55,25 +62,33 @@ namespace StackErp.Model.Layout
         public TRow()
         {
             this.Fields = new List<TField>();
+            this.Cols = new List<TCol>();
         }
         public List<TField> Fields { set; get; }
+
+        public List<TCol> Cols { set; get; }
+    }
+
+    public class TCol {
+
+        public TCol(string id, string type = "FIELD") {
+            Id =id;
+            Type = type;
+        }   
+        public string Id { set; get; }
+        public string Type { set; get; }
+        public int Span { set; get; }
     }
     public class TField
     {
-        [JsonIgnore]
         public string ViewName { set; get; }
         public string FieldId { set; get; }
         public string Text { set; get; }
         public bool FullRow { set; get; }
-        [JsonIgnore]
         public string Invisible { set; get; }
-        [JsonIgnore]
         public string ReadOnly { set; get; }
-        [JsonIgnore]
         public string Domain { set; get; }
-        [JsonIgnore]
         public FormControlType Widget { set; get; }
-        [JsonIgnore]
         public int CaptionPosition { set; get; }
         public string Format { set; get; }
         public string Width { set; get; }

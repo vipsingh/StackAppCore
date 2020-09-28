@@ -13,7 +13,7 @@ namespace StackErp.Model.Entity
         string Text { get; }
         InvariantDictionary<BaseField> Fields {get;}
         
-        string TextField {get; set;}
+        string TextField {get;}
          string IDField {get;}
 
         List<IEntityRelation> Relations {get;}
@@ -45,6 +45,8 @@ namespace StackErp.Model.Entity
         IDBEntity GetEntity(EntityCode id);
 
         List<BaseField> GetLayoutFields(EntityLayoutType type);
+
+        Layout.TView GetDefaultLayoutView(EntityLayoutType layoutType);
         
     }
 

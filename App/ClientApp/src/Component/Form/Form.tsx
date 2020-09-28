@@ -94,10 +94,10 @@ export default class Form extends React.Component<FormProps, {
         if (!inputFieldComponent) return null;
         
         const cinfo = this.getField(ControlId);   
-        const dataModel = this.getDataModel(); 
-        const widgetModel = dataModel[ControlId];
+        const dataModel = this.getDataModel();
+        const widgetModel = dataModel[ControlId];     
 
-        return (<FormField {...cinfo} {...customProps} {...widgetModel} api={this.getFormAPI()}>
+        return (<FormField widgetInfo={cinfo} dataModel={widgetModel} api={this.getFormAPI()} otherProps={customProps}>
             {inputFieldComponent}
         </FormField>);
     }
@@ -132,7 +132,7 @@ export default class Form extends React.Component<FormProps, {
         const cErrors = this.setValidationResult(controlId, vRes);
         this.setState({errors: cErrors});
 
-        this.execAllFormFeature(controlId, model, entitySchema, ["INVISIBLE", "OPTIONS"], (m: IDictionary<IFieldData>) => {
+        this.execAllFormFeature(controlId, model, entitySchema, ["Invisible", "Options", "ReadOnly"], (m: IDictionary<IFieldData>) => {
             this.setDataModel(m, { updateBy: "WIDGET", param: controlId }, () => {
                 if (fieldInfo.Dependency) {
                     this.executeDependecy(controlId, this.getDataModel(), (m1: IDictionary<IFieldData>) => {
@@ -186,7 +186,7 @@ export default class Form extends React.Component<FormProps, {
 
     onBlur = (widgetId: string) => {
         const model = this.getDataModel();
-        this.execAllFormFeature(widgetId, model, this.getEntitySchema(), ["EVAL"], (m: IDictionary<IFieldData>) => {
+        this.execAllFormFeature(widgetId, model, this.getEntitySchema(), ["Eval"], (m: IDictionary<IFieldData>) => {
             this.setDataModel(m, { updateBy: "WIDGET", param: widgetId });
         });
     }
@@ -256,7 +256,7 @@ export default class Form extends React.Component<FormProps, {
             // if (onExecuteAction) {
             //     onExecuteAction(action);
             // } 
-            return LinkProcesser.processLink(action, {});
+            return LinkProcesser.processLink(action, {}, this.context.navigator);
         }        
     }
 

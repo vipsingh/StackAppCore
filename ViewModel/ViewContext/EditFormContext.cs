@@ -31,7 +31,8 @@ namespace StackErp.ViewModel.ViewContext
             if (IsNew)
             {
                 EntityModel = this.Entity.GetDefault();
-                EntityModel.SetValue("itemtype", this.EntityModelInfo.ItemType);
+                EntityModel.SetValue(ViewConstant.ItemType, this.EntityModelInfo.ItemType);
+                SetRelationShip();
             }
             else
                 EntityModel = this.Entity.GetSingle(this.EntityModelInfo.ObjectId);
@@ -51,6 +52,14 @@ namespace StackErp.ViewModel.ViewContext
                 }
 
                 this.AddParameter(ViewConstant.LinkedData, refrences);
+            }
+        }
+
+        private void SetRelationShip()
+        {
+            if (this.RequestQuery.RelatedEntityId.Code > 0 && this.RequestQuery.RelatedObjectId > 0)
+            {
+                EntityModel.SetRelationValue(this.RequestQuery.RelationField, this.RequestQuery.RelatedEntityId, this.RequestQuery.RelatedObjectId);
             }
         }
     }

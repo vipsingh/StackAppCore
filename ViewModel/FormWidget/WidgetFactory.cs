@@ -27,6 +27,8 @@ namespace StackErp.ViewModel.FormWidget
             Add(FormControlType.Password, (cntxt) => { return new PasswordWidget(cntxt); });      
             Add(FormControlType.Phone, (cntxt) => { return new PhoneWidget(cntxt); });    
             Add(FormControlType.Email, (cntxt) => { return new EmailWidget(cntxt); });     
+            Add(FormControlType.XmlEditor, (cntxt) => { return new XmlEditorWidget(cntxt); });    
+            Add(FormControlType.StackScriptEditor, (cntxt) => { return new StackScriptWidget(cntxt); });     
 
             Add(FormControlType.ListForm, GetListForm);
             Add(FormControlType.EntityListView, GetEntityList);

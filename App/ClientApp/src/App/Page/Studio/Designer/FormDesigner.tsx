@@ -1,23 +1,24 @@
 import React, { Component } from 'react';
-import { Tabs, Row, Col, Card, Button } from 'antd';
-import { Menu, Dropdown } from 'antd';
-import PageView from '../../../Component/Form/PageView';
-import FormField from '../../../Component/Form/FormField';
-import ViewPageInfo from '../../../Core/Models/ViewPageInfo';
-import { fieldTypes } from "./helper";
+import { Row, Col, Card, Button, Menu, Dropdown } from 'antd';
+import PageView from '../../../../Component/Form/PageView';
+import FormField from '../../../../Component/Form/FormField';
+import ViewPageInfo from '../../../../Core/Models/ViewPageInfo';
 import update from "immutability-helper";
-import { DndProvider, useDrag, DragSourceMonitor, useDrop } from 'react-dnd'
+import { DndProvider } from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
-import { DesignerContext } from '../../../Core/Studio';
+import { DesignerContext } from '../../../../Core/Studio';
 import { SettingOutlined } from '@ant-design/icons';
-import { getComponent } from '../../../Component/WidgetFactory';
+import { getComponent } from '../../../../Component/WidgetFactory';
 import DesignerFieldProp from "./DesignerFieldProp";
-import { openDialog } from "../../../Component/UI/Dialog";
+import { openDialog } from "../../../../Component/UI/Dialog";
+import ActionLink from '../../../../Component/ActionLink';
+import LinkProcesser from '../../../../Core/Utils/LinkProcesser';
+import { FieldPanel, DropBox, MoveBox } from "./FieldPanel";
 
 export default class DesignerPage extends Component<any,any> {
     designerContext: any
-    fields: Array<any>
+    
     _ix: number
     fieldPropDlg: any
     constructor(props: any) {
@@ -27,18 +28,17 @@ export default class DesignerPage extends Component<any,any> {
             Header: {
                 Id: "header",
                 Text: "",
-                Groups: [{ Id: "gh", Rows: [ { Fields: [ ] } ] }]
+                Groups: [{ Id: "gh", Rows: [ { Cols: [ ] } ] }]
             },
             Pages: [{ Id: "page1",
-                Groups: [{ Id: "g1", Rows: [ { Fields: [ ] }] }]
+                Groups: [{ Id: "g1", Rows: [ { Cols: [ ] }] }]
             }],
             fieldContainerLink: {
 
-            }
+            },
+
+          fields: []
         }
-        this.fields = [
-          {WidgetId: "Field1", WidgetType: 1}, {WidgetId: "Field2", WidgetType: 1}, {WidgetId: "Field3", WidgetType: 1}, {WidgetId: "Field4", WidgetType: 4}, {WidgetId: "Field5", WidgetType: 2}
-      ];
 
         this._ix = 0;
 
@@ -49,7 +49,12 @@ export default class DesignerPage extends Component<any,any> {
     }
 
     linkField = (fieldId: string, containerId: string) => {
-        this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldId } ) });
+        const { Fields: entityFields } = this.props.data;
+
+        const fieldInfo = _.find(entityFields, { Name: fieldId });
+        this.setState({ fields : update(this.state.fields, {$push: [{ WidgetId: fieldId, WidgetType: fieldInfo.WidgetType, FieldType: fieldInfo.Type }]}) }, () => {
+            this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldId } ) });
+        });        
     }
     moveField = (fieldId: string, containerId: string) => {        
         let lastCont = "";
@@ -66,7 +71,7 @@ export default class DesignerPage extends Component<any,any> {
         let IComponent: any;
         let wInfo: any = {};
         if (fieldId) {
-          wInfo =  _.find(this.fields, { WidgetId: fieldId }) as any;
+          wInfo =  _.find(this.state.fields, { WidgetId: fieldId }) as any;
           if (!wInfo.Caption) wInfo.Caption = wInfo.WidgetId;
         
           IComponent = getComponent(wInfo.WidgetType, false); 
@@ -79,13 +84,13 @@ export default class DesignerPage extends Component<any,any> {
                           }}>
                               <div>
                                   {this.renderFieldSettingIcon(fieldId)}
-                              <FormField WidgetId={fieldId} {...wInfo} >
+                                  <FormField widgetInfo={{ WidgetId: fieldId, ...wInfo }} dataModel={{}} >
                                     {!IComponent || <IComponent 
                                       {...wInfo}
                                       api={this.getFormAPI()}
                                       onChange={() => { }}
                                     />}
-                                </FormField>
+                                  </FormField>
                                 </div> 
                         </MoveBox>
                     }
@@ -107,11 +112,15 @@ export default class DesignerPage extends Component<any,any> {
     }
 
     renderFieldTypes() {
+        if (!this.props.data) return;
+
+        const { Fields } = this.props.data;
         return (
           <div>
-            {_.map(this.fields, (item) => {
-                const isReadOnly = _.values(this.state.fieldContainerLink).indexOf(item.WidgetId) >= 0;
-              return (<Box field={item} readOnly={isReadOnly} addField={(fieldId: string, boxId: string) => {
+            {_.map(Fields, (item) => {
+                const isReadOnly = _.values(this.state.fieldContainerLink).indexOf(item.Name) >= 0;
+
+                return (<DropBox field={item} readOnly={isReadOnly} addField={(fieldId: string, boxId: string) => {
                   this.linkField(fieldId, boxId);
                 }} />
               );
@@ -132,8 +141,14 @@ export default class DesignerPage extends Component<any,any> {
     renderGroupSetting = (pageid: string, group: any) => {
         var pageMenues = [];
         pageMenues.push(<Menu.Item>
-          <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group)}> Add Row</a>
-      </Menu.Item>);
+          <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group, 2)}> Add Row</a>
+       </Menu.Item>);
+        pageMenues.push(<Menu.Item>
+          <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group, 3)}> Add 3 Fields Row</a>
+       </Menu.Item>);
+        pageMenues.push(<Menu.Item>
+          <a href="javascript:void(0)" onClick={() => this.addgroupRow(pageid, group, 1)}> Add 1 Field Row</a>
+       </Menu.Item>);       
       if (pageid !== "header") {
         pageMenues.push(<Menu.Item>
           <a href="javascript:void(0)" onClick={() => this.editgroup(pageid, group)}> Edit Group</a>
@@ -159,7 +174,7 @@ export default class DesignerPage extends Component<any,any> {
     }
 
     onWidgetSelect = (widgetId: string) => {
-      const selectedF = _.find(this.fields, { WidgetId: widgetId });
+      const selectedF = _.find(this.state.fields, { WidgetId: widgetId });
 
       this.fieldPropDlg = openDialog("Field", () => { return <DesignerFieldProp
           selectedField={selectedF}
@@ -169,11 +184,27 @@ export default class DesignerPage extends Component<any,any> {
     }
 
     setWidgetProp = (toSaveModel: any) => {
+      const id = toSaveModel.Widgets["WidgetId"].Value;
+      const ix = _.findIndex(this.state.fields, { WidgetId: id });
+      const selectedF = this.state.fields[ix];
+      
+      const blankObj: any = {};
+      _.forIn(toSaveModel.Widgets, (v, k) => {
+        blankObj[k] = v.Value;
+      });
+
+      this.setState({ fields: update(this.state.fields, { [ix]: { $set: Object.assign({}, selectedF, blankObj) } }) });   
+
       this.fieldPropDlg.cleanup();
     }
 
-    addgroupRow = (pageid: string, group: any) => {
-        const newRow = { Fields: [ { FieldId: `id${this._ix++}` }, { FieldId: `id${this._ix++}` } ] };
+    addgroupRow = (pageid: string, group: any, fieldCount: number) => {
+        const newRow: any = { Cols: [] };
+        const span = 24/fieldCount;
+        for(let x=0;x<fieldCount;x++) {
+          newRow.Cols.push({ Id: `id${this._ix++}`, Span: span });
+        }
+
         if (pageid === "header") {
             const ix = _.findIndex(this.state.Header.Groups, { Id: group.Id });
             const g = this.state.Header.Groups[ix];
@@ -193,11 +224,30 @@ export default class DesignerPage extends Component<any,any> {
     }
 
     addgroup = (pageid: string) => {
-      const newRow = { Id: `g${this._ix++}`, Label: "Group", Rows: [ { Fields: [ ] } ] };
+      const newRow = { Id: `g${this._ix++}`, Label: "Group", Rows: [ { Cols: [ ] } ] };
       const pageix = _.findIndex(this.state.Pages, { Id: pageid });
 
       const h = update(this.state.Pages[pageix], { Groups: { $push: [newRow] } });
       this.setState({ Pages: update(this.state.Pages, { [pageix]: { $set: h } }) });      
+    }
+
+    executeAction = (action: ActionInfo) => {
+        const { ActionId } = action;
+        if (ActionId === "BTN_SAVE") {
+            const { Header, Pages, fields } = this.state;
+            const data = { Layouts: { Header, Pages }, Fields: fields };
+            //prepare data. adjust fieldContainerLink
+
+            LinkProcesser.processLink(action, data, this.context.navigator);
+        }
+    }
+
+    getFormActions = () => {
+        const { Actions } = this.props.data;
+
+        return  _.map(Actions, (c) => {
+                return <ActionLink key={c.ActionId} {...c} DisplayType={2} onClick={this.executeAction} />;
+            });        
     }
 
     render() {
@@ -205,7 +255,11 @@ export default class DesignerPage extends Component<any,any> {
 
         const entityModel = { Layout: { Header, Pages }, PageTitle: { PageTitle: "Form Name" } };
 
-        return (<DndProvider backend={Backend}>
+        return (<div>
+            {
+                this.getFormActions()
+            }
+            <DndProvider backend={Backend}>
             <DesignerContext.Provider value={this.designerContext}>
             <Row>
             <Col span={4}>
@@ -219,109 +273,7 @@ export default class DesignerPage extends Component<any,any> {
             </Row>
             </DesignerContext.Provider>
         </DndProvider>
+        </div>
         );
     }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const styleBox: React.CSSProperties = {
-    border: '1px dashed gray',
-    backgroundColor: 'white',
-    padding: '0.5rem',
-    marginRight: '1rem',
-    marginBottom: '0.5rem',
-    cursor: 'move',
-    float: 'left',
-  }
-  
-  interface BoxProps {
-    name: string
-  }
-  
-  const Box: React.FC<{
-    field: any,
-    addField: Function,
-    readOnly: boolean
-  }> = ({ field, addField, readOnly }) => {
-    const [{ isDragging }, drag] = useDrag({
-      item: { name: field.WidgetId, type: "FIELDBOX" },
-  
-      end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
-        const dropResult = monitor.getDropResult()
-        if (item && dropResult && !dropResult.fieldId) {
-          addField(item.name, dropResult.name);
-        }
-      },
-      
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-
-      canDrag: !readOnly
-    })
-    const opacity = isDragging || readOnly ? 0.4 : 1
-  
-    return (
-      <div ref={drag} style={{ ...styleBox, opacity }}>
-            {field.Caption || field.WidgetId}
-      </div>
-    )
-  }
-
-const style: React.CSSProperties = {
-    minHeight: '2.5rem',
-    width: '15rem',
-    margin: '0.5rem',
-    float: 'left',
-    border: "1px dashed gray"
-  }
-  
-  const FieldPanel: React.FC<any> = ({Id, FieldId, children}) => {
-    const [{ canDrop, isOver }, drop] = useDrop({
-      accept: "FIELDBOX",
-      drop: () => ({ name: Id, fieldId: FieldId }),
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-      }),
-    })
-  
-    const isActive = canDrop && isOver
-    let backgroundColor = '#fff'
-    if (isActive) {
-      backgroundColor = 'darkgreen'
-    } else if (canDrop) {
-      backgroundColor = 'darkkhaki'
-    }
-  
-    return (<div ref={drop} style={{ ...style, backgroundColor }}>{children}</div>);
-  }
-
-  const MoveBox: React.FC<{
-    item: any,
-    moveField: Function,
-    children: any
-  }> = ({ item, moveField, children }) => {
-    
-    const [{ isDragging }, drag] = useDrag({
-      item: { name: item.id.toString(), type: "FIELDBOX" },
-      
-      end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
-        const dropResult = monitor.getDropResult();
-        if (item && dropResult && !dropResult.fieldId) {
-          moveField(item.name, dropResult.name);
-        }
-      },
-      
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging(),
-      }),
-    })
-    const opacity = isDragging ? 0.4 : 1
-  
-    return (
-      <div ref={drag} style={{ opacity }}>
-        {children}
-      </div>
-    )
-  }

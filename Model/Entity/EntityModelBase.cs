@@ -72,10 +72,12 @@ namespace StackErp.Model
         public bool HasError { private set; get; }
         public string ErrorMessage { private set; get; }
         public bool IsChangeTrackOff { private set; get; }
+        public DynamicObj TempInfo { private set; get; }
 
 
         public EntityModelBase(IDBEntity entity): base(entity)
         {
+            TempInfo = new DynamicObj();
         }        
 
         public virtual void CreateDefault() {
@@ -134,6 +136,14 @@ namespace StackErp.Model
 
             return null;
         }
+
+        public virtual T GetValue<T>(string field, T defaultVal)
+        {
+            var v = GetValue(field);
+            if (v == null) return defaultVal;
+
+            return DataHelper.GetData(v, defaultVal);
+        }
         public virtual FieldData GetValueData(string field)
         {
             if (_attr.ContainsKey(field.ToUpper())) {
@@ -155,10 +165,10 @@ namespace StackErp.Model
 
         }
 
-        public virtual void Validate()
-        {
+        // public virtual void Validate()
+        // {
 
-        }
+        // }
 
         public virtual List<FieldData> GetInvalidFields()
         {
@@ -167,7 +177,24 @@ namespace StackErp.Model
         public void SetChangeTrack(bool isOff)
         {
             this.IsChangeTrackOff = isOff;
-        }               
+        }              
+
+        public void SetRelationValue(string relationField, EntityCode parentEntity, int parentId)
+        {
+            var res = this.Entity.GetEntity(parentEntity).Relations.Find(x => x.ChildName.Equals(this.EntityId) && x.ChildRefField.Name.ToLower() == relationField.ToLower());
+
+            if (res != null) {
+                this.SetValue(res.ChildRefField.Name, parentId);
+            }
+        }
+
+        public void SetTempInfo(string attrName, object data) {
+            TempInfo.Add(attrName, data);
+        }
+
+        public T GetTempInfo<T>(string attrName, T defValue) {
+            return TempInfo.Get(attrName, defValue);
+        }
 
     }
 }

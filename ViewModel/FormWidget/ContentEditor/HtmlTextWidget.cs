@@ -4,7 +4,7 @@ using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.ViewModel.FormWidget
 {
-    public class HtmlTextWidget: TextWidget
+    public class HtmlTextWidget: LongTextWidget
     {
         public override FormControlType WidgetType { get => FormControlType.HtmlText; }
         public HtmlTextWidget(WidgetContext cntxt): base(cntxt)

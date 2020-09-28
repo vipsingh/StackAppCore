@@ -16,6 +16,7 @@ namespace StackErp.Model.Entity
         public object DefaultValue { set; get; }
         public bool IsCustomField { set; get; }
         public short ViewId { set; get; }
+        public int Length { set; get; }
         public bool IsObjectListType { set; get; }
         public bool IsReadOnly { set; get; }
         public bool IsRequired { set; get; }
@@ -85,6 +86,11 @@ namespace StackErp.Model.Entity
                     this.RefObject = sch.RefObject;
                 }
             }
+
+            if (_TempSchemaData != null && _TempSchemaData.ContainsKey("collectioninfo"))
+            {
+                ControlInfo.CollectionInfo = _TempSchemaData.Get<CollectionInfo>("collectioninfo", null);
+            }
         }
 
         public void AddProperty(string key, object value)
@@ -117,6 +123,7 @@ namespace StackErp.Model.Entity
 
         public FieldAttribute FieldAttribute {set;get;}
         public int CollectionId  {set;get;}
+        public CollectionInfo CollectionInfo  {set;get;}
         public bool IsMultiSelect  {set;get;}
 
         public FormControlType WidgetType {set;get;}

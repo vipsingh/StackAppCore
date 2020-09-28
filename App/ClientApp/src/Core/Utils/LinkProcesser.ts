@@ -18,15 +18,14 @@ function handeleResponse(result: RequestResultInfo, navigator: any) {
 }
 
 const LinkProcesser = {
-    processLink: (action: ActionInfo, payload: {}) => {
+    processLink: (action: ActionInfo, payload: {}, navigator: any) => {
         _App.Request.getData({
             url: action.Url,
             body: payload
-        }).then((result: any) => {
-            _Debug.log(result);
-            //this.handeleSubmitResponse(result);
+        }).then((result: any) => {            
+            handeleResponse(result, navigator);
         }).catch((ex: any) => {
-            _Debug.error("Submit Error.");
+            _Debug.error(".processLink Error.");
             _Debug.error(ex);
         });
     },

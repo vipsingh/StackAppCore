@@ -23,7 +23,7 @@ namespace StackErp.ViewModel.FormWidget
         public string FormatedValue { protected set; get; }
         [JsonIgnore]
         public TypeCode BaseType { protected set; get; }
-        public string WidgetFormatInfo { protected set; get; }
+        public WidgetFormatInfo FormatInfo { protected set; get; }
         public bool IsViewMode { private set; get; }
         private DynamicObj _props;
         public DynamicObj Properties { get => _props; }
@@ -63,7 +63,11 @@ namespace StackErp.ViewModel.FormWidget
         public virtual void OnCompile()
         {
             if (_isCompiled) return;
-            this.BuildValidation();
+            if (!this.IsViewMode)
+            {
+                this.BuildFormatInfo();
+                this.BuildValidation();
+            }
             _isCompiled = true;
         }
         protected virtual bool OnSetData(object value)
@@ -88,7 +92,10 @@ namespace StackErp.ViewModel.FormWidget
                 FormatedValue = String.Join(",", ((List<SelectOption>)value).Select(x => x.Text));
             }
             else
-                FormatedValue = value.ToString();
+            {
+                var formatter = new Core.Entity.EntityDataFormatter(this.Context.AppContext);                
+                FormatedValue = formatter.FormatData(Context.FormatInfo, value).ToString();
+            }
 
             Value = value;
 
@@ -156,9 +163,7 @@ namespace StackErp.ViewModel.FormWidget
         #region Build Validation
 
         public virtual void BuildValidation()
-        {
-            if (this.IsViewMode) return;
-            
+        {                        
             if (this.IsRequired) 
             {
                 AddValidation(ValidationConstant.Required, ValidationHelper.GetRequiredValidation(Caption));
@@ -196,7 +201,12 @@ namespace StackErp.ViewModel.FormWidget
 
         protected virtual void BuildFormatInfo()
         {
-            //WidgetFormatInfo
+            if (Context.FormatInfo != null && !String.IsNullOrEmpty(Context.FormatInfo.FormatString))
+            {
+                FormatInfo = new WidgetFormatInfo();
+                FormatInfo.Type = Context.FormatInfo.GetTypeString();
+                FormatInfo.FormatString = Context.FormatInfo.FormatString;
+            }
         }
 
         public virtual void OnCompileComplete(FormContext formContext)
@@ -207,6 +217,7 @@ namespace StackErp.ViewModel.FormWidget
 
     public class WidgetFormatInfo
     {
+        public string Type { set; get; }
         public string FormatString { set; get; }
         public string ColorCode { set; get; }
         public string FontSize {set;get;}

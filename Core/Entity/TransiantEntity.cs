@@ -15,7 +15,7 @@ namespace StackErp.Core
     public class TransiantEntity : DBEntity
     {
         public bool IsShortTimeDbSave {private set; get;}
-        public TransiantEntity(int id, string name, Dictionary<string, BaseField> fields): base(id,name,fields, EntityType.Transiant, "")
+        public TransiantEntity(int id, string name, Dictionary<string, BaseField> fields): base(id,name,fields, EntityType.Transiant, new DbObject())
         {
             this.IsShortTimeDbSave = false;
         }

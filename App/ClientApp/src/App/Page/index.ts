@@ -5,6 +5,7 @@ import Desk from "./Desk";
 import EntityStudio from "./Studio/EntityPage";
 import ErrorPage from "./Error";
 import PageFactory from "../../Core/PageFactory";
+import FormDesigner from "./Studio/Designer/FormDesigner";
 
 
 
@@ -15,7 +16,8 @@ export default function() {
     PageFactory.addPage(PageType.Edit, NewEdit);
     PageFactory.addPage(PageType.Detail, Detail);
     PageFactory.addPage(PageType.AppStudio, EntityStudio);
-    PageFactory.addPage(PageType.Error, ErrorPage);
+    PageFactory.addPage(PageType.Designer, FormDesigner);
+    PageFactory.addPage(PageType.Error, ErrorPage);    
 }
 
 // const getPage = (type: number) => {

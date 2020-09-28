@@ -35,6 +35,12 @@ namespace StackErp.Model
         }
         public int ItemTypeId
         {
+            get { return GetInt("ItemTypeId"); }
+            set { this["ItemTypeId"] = value.ToString(); }
+        }
+
+        public int LayoutId
+        {
             get { return GetInt("LayoutId"); }
             set { this["LayoutId"] = value.ToString(); }
         }
@@ -253,5 +259,13 @@ namespace StackErp.Model
 
         static string _EncyKey = "stackapp_x";
 
+    }
+
+    internal static class ReqQueryKeyConstant {
+        internal const string ItemId = "a";
+        internal const string ViewType = "b";
+        internal const string EntityId = "c";
+        internal const string RelatedEntityId = "d";
+        internal const string ItemTypeId = "e";
     }
 }

@@ -15,6 +15,7 @@ Obj/
 App/wwwroot/dms/
 App/wwwroot/css/
 App/wwwroot/js/
+App/wwwroot/static/
 
 # dotenv environment variables file
 .env

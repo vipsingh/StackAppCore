@@ -129,12 +129,32 @@ CREATE TABLE t_entity_viewlayout
 	itemtype integer NOT NULL,
 	states character varying(100)  NOT NULL,	
 	viewtype integer default(0),
-	layoutxml xml,
+	--layoutxml xml,
+	layoutjson json,
 	createdon timestamp without time zone,	
     updatedon timestamp without time zone,
 	createdby integer,
 	updatedby integer,
 	CONSTRAINT t_entity_viewlayout_pkey PRIMARY KEY (id)
+);
+
+create table t_collection
+(
+	masterid integer NOT NULL,
+    id integer,	
+	name character varying(100) not null,
+	type integer  not null,
+	sourcetype integer  not null,
+	sourceexp character varying(1000),
+	valuefield character varying(100),
+	textfield character varying(100),
+	fieldid integer,
+	maxcount integer default(50),
+	createdby integer NOT NULL,
+    updatedby integer,
+    createdon timestamp without time zone NOT NULL,	
+    updatedon timestamp without time zone,
+    CONSTRAINT t_collection_pkey PRIMARY KEY (id)
 );
 
 create table t_collection_master(
@@ -380,8 +400,18 @@ CREATE TABLE t_entity_script
 
 
 ------------------------------------DATA----------------
+insert into t_collection(masterid,id,name,type,sourcetype,
+						sourceexp,valuefield,textfield,createdby,createdon)
+			values(0,1,'Gender',1,0,
+				  null,null,null,1,'2010-01-01');
+
 insert into t_collection_master values(0,1,1,'Male',null,'M',null,null);
 insert into t_collection_master values(0,1,2,'Female',null,'F',null,null);
+
+insert into t_collection(masterid,id,name,type,sourcetype,
+						sourceexp,valuefield,textfield,createdby,createdon)
+			values(0,3,'FieldType',1,6,
+				  'StackErp.Model.FieldType',null,null,1,'2010-01-01');
 
 insert into t_user values(10,1,'Vipin', null, 'vip',2, '',1,'9899013097','vip@stackerp.com',true,null,'2020-01-01', null,1,1);
 insert into t_role values(0,1,'System Admin', 0, 0, '2020-01-01',  '2020-01-01', 1,1);

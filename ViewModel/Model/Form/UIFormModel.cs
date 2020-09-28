@@ -24,7 +24,8 @@ namespace StackErp.ViewModel.Model
     {
         public int ObjectId {set { this.Add("ObjectId", value, true); } get => this.Get("ObjectId", -1);}
         public EntityCode EntityId {set { this.Add("EntityId", value.Code, true); } get => this.Get("EntityId", 0);}
-        public int ItemType {set { this.Add("ItemType", value, true); } get => this.Get("ItemType", 0);}
+        public int ItemType {set { this.Add(ViewConstant.ItemType, value, true); } get => this.Get(ViewConstant.ItemType, 0);}
+        public string OpenerQuery {set { this.Add(ViewConstant.OpenerQuery, value, true); } get => this.Get(ViewConstant.OpenerQuery, "");}
         public ObjectModelInfo()
         {
 

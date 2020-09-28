@@ -33,7 +33,7 @@ namespace StackErp.ViewModel.FormWidget
         string FormatedValue { get; }
         DynamicObj AdditionalValue {  get; }
         object Value { get; }
-        string WidgetFormatInfo { get; }
+        WidgetFormatInfo FormatInfo { get; }
         void ClearValue();
 
         void OnCompile();

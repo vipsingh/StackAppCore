@@ -118,6 +118,9 @@ namespace StackErp.Model.Entity
                 Value = v.Replace("@", "").Trim();
                 Exp = v;
             }
+            else {
+                PrepareValue();
+            }
             //todo: handle also expression "@x + 1"
         }
 
@@ -125,14 +128,29 @@ namespace StackErp.Model.Entity
         {
             this.Value = value;
             this.ValueType = FilterValueType.Value;            
+            PrepareValue();
         }
 
+        private void PrepareValue()
+        {
+            if (Value is string && (Op == FilterOperationType.In || Op == FilterOperationType.NotIn))
+            {
+                Value = GetValueSet(Value.ToString(), typeof(string));
+            }
+        }
         internal JObject ToJSONObj()
         {
             var jo = new JObject();
             var arr = new JArray();
             arr.Add((int)this.Op);
-            arr.Add(this.Value);
+            if (this.Value is Array)
+            {
+                arr.Add(new JArray(this.Value));
+            }
+            else {
+                arr.Add(this.Value);
+            }
+            
             jo.Add(this.FieldName, arr);
 
             return jo;

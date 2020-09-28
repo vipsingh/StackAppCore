@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace StackErp.Model.Form
@@ -20,6 +21,7 @@ namespace StackErp.Model.Form
         public ActionExecutionType ExecutionType { set; get; }
         private DynamicObj _attr;
         public DynamicObj Attributes { get => _attr; }
+        public List<ActionInfo> ChildActions {private set; get;} 
 
         public ActionInfo(string rawUrl, RequestQueryString qs, string id): this(rawUrl, qs)
         {
@@ -66,6 +68,15 @@ namespace StackErp.Model.Form
         public void ShowOnlyIcon()
         {
             this.AddAttribute("OnlyIcon", true);
+        }
+
+        public static ActionInfo CreateMultiLinkAction(string id, string title, List<ActionInfo> actions)
+        {
+            var info = new ActionInfo("", null, id) { Title = title };
+            info.ActionType = ActionType.None;
+            info.ChildActions = actions;
+            
+            return info;
         }
     }
 }

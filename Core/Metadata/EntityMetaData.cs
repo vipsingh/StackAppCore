@@ -34,7 +34,9 @@ namespace StackErp.Core
                     avlEntitiesName.Add(name.ToUpper());
 
                     var table = ent.Get("tablename", "");
+                    
                     Dictionary<string, BaseField> fields = new Dictionary<string, BaseField>();
+                    
                     var schemas = dbentitiesScbhemas.Where(x => x.Get("entityid", 0) == entid);
                     foreach (var sch in schemas)
                     {
@@ -94,7 +96,7 @@ namespace StackErp.Core
                         }); 
                     }
                     
-                    var dbEntity = GetDBEntity(entid, name, fields, entityType, table);
+                    var dbEntity = GetDBEntity(entid, name, fields, entityType, ent);
                     dbEntity.ParentEntity = parententity;
                     dbEntity.HasStages = hasstages;
                     if (hasstages)
@@ -148,17 +150,17 @@ namespace StackErp.Core
             return GetAs<IDBEntity>(id);
         }
 
-        private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields, EntityType entityType, string tableName)
+        private static DBEntity GetDBEntity(int entid, string name, Dictionary<string, BaseField> fields, EntityType entityType, DbObject entityDbo)
         {
             DBEntity e;
             if (entid == 101) {
-                e = new UserDbEntity(entid, name, fields,entityType,tableName);
+                e = new UserDbEntity(entid, name, fields,entityType, entityDbo);
             } 
             else if (entid == 102) {
-                e = new UserRoleEntity(entid, name, fields,entityType,tableName);
+                e = new UserRoleEntity(entid, name, fields,entityType, entityDbo);
             } 
             else {
-                e = new DBEntity(entid, name, fields, entityType,tableName);
+                e = new DBEntity(entid, name, fields, entityType, entityDbo);
             }
 
             return e;

@@ -12,7 +12,8 @@ public enum AppPageType
     Report = 4,
     Dashboard = 5,
     Error = 10,
-    AppStudio = 7
+    AppStudio = 7,
+    Designer = 8
 }
 public enum FormControlType {
     None = 0,
@@ -35,6 +36,8 @@ public enum FormControlType {
     Password=17, 
     FormattedText = 21,
     Avatar = 22,
+    XmlEditor = 23,
+    StackScriptEditor = 24,
     ListForm = 99,
     EntityListView = 100,
     EntityFilter=101

@@ -14,7 +14,6 @@ namespace StackErp.Model.DataList
         public string Name {set;get;}
         public string ItemIdField {set;get;}
         public TList Layout  {set;get;}
-        public TListInfo ListLayout  {set;get;}
         public int PageSize {set;get;}
         public string ItemViewField {set;get;}
         public List<string> OrderByField {set;get;}

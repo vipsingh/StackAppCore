@@ -30,6 +30,8 @@ namespace StackErp.ViewModel
 
             RecordModel = _formContext.EntityModel;
 
+            SetRelationShip();
+
             this.SetFieldsModelToRecord(model);
             Status = AnyStatus.Success;
 
@@ -59,6 +61,14 @@ namespace StackErp.ViewModel
         protected void ValidatrRequest()
         {
 
+        }
+
+        private void SetRelationShip()
+        {
+            if (_formContext.RequestQuery.RelatedEntityId.Code > 0 && _formContext.RequestQuery.RelatedObjectId > 0)
+            {
+                RecordModel.SetRelationValue(_formContext.RequestQuery.RelationField, _formContext.RequestQuery.RelatedEntityId, _formContext.RequestQuery.RelatedObjectId);
+            }
         }
     }
 }

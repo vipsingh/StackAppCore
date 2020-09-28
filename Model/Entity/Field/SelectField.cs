@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace StackErp.Model.Entity
 {
@@ -53,12 +54,30 @@ namespace StackErp.Model.Entity
                 return null;
             else
             {
+                if (this.ControlInfo.CollectionInfo.SourceType == DataSourceType.Enum)
+                {
+                    return GetEnumValue(v);
+                }
                 var option = new SelectOption();
                 option.Add("Value", v);
                 option.Add("Text", t);
 
                 return option;
             }
+        }
+
+        protected SelectOption GetEnumValue(int v)
+        {
+            Type enumType = System.Type.GetType(this.ControlInfo.CollectionInfo.SourceExp);
+            FieldInfo[] fields = enumType.GetFields();
+            var coll = fields.Where(x => !x.Name.Equals("value__") && (int)x.GetRawConstantValue() == v);
+            var option = new SelectOption();
+            option.Add("Value", v);
+            if (coll.Count() > 0){
+                option.Add("Text", coll.First().Name);
+            }
+
+            return option;
         }
     }
 
@@ -120,8 +139,14 @@ namespace StackErp.Model.Entity
                 for(int i=0;i<d.Length;i++)
                 {
                     var option = new SelectOption();
-                    option.Add("Value", d[i]);
-                    option.Add("Text", reldata[i]);
+                     if (this.ControlInfo.CollectionInfo.SourceType == DataSourceType.Enum)
+                    {
+                        option = GetEnumValue(d[i]);
+                    }
+                    else {             
+                        option.Add("Value", d[i]);
+                        option.Add("Text", reldata[i]);
+                    }
                     v.Add(option);
                 }
             }

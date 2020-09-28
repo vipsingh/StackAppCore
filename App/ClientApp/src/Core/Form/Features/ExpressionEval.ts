@@ -2,7 +2,7 @@ import update from "immutability-helper";
 
 function execute(toField: WidgetInfo, model: IDictionary<IFieldData>, formApi: FormApi): IDictionary<IFieldData> {    
     const feature = toField.Features ? toField.Features["Eval"] : {};
-    const { Expression: Exp, Depends: ExpFields } = feature;
+    const { Expression: { Exp }, Depends: ExpFields } = feature;
 
     try {
         const arrVar: any[] = [];

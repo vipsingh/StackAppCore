@@ -1,7 +1,7 @@
 import React from "react";
 import _ from "lodash";
 import { Row } from "antd";
-import { UIField } from ".";
+import { UIField } from "./UIView";
 // import { Paper } from "~/Core/Ui";
 
 export default class SimpleLayout extends React.Component<{
@@ -19,7 +19,7 @@ export default class SimpleLayout extends React.Component<{
                     if (!s.WidgetType) return;
                     
                     return (<Row>
-                            <UIField key={s.WidgetId} FieldId={s.WidgetId} getControl={getControl} FullRow />
+                            <UIField key={s.WidgetId} Id={s.WidgetId} getControl={getControl} FullRow />
                     </Row>);
                 })
             }

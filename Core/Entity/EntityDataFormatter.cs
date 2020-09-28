@@ -12,16 +12,20 @@ namespace StackErp.Core.Entity
         {
             _AppContext = appContext;
         }
-        public object FormatData(FormatInfo formatInfo, object value)
+        public string FormatData(FormatInfo formatInfo, object value)
         {
-            if (value == null) return value;
+            if (value == null) return null;
 
             if (formatInfo.FieldBaseType == TypeCode.DateTime)
             {
-                return this.FormatDate(value);
+                return this.FormatDate(value, formatInfo.FormatString);
+            }
+            else if (formatInfo.FieldBaseType == TypeCode.Decimal)
+            {
+                return this.FormatNumeric(value, formatInfo.FormatString, formatInfo.DecimalPlace);
             }
 
-            return value;
+            return value.ToString();
         }
 
         public string FormatDate(object value, string format = "")
@@ -44,11 +48,11 @@ namespace StackErp.Core.Entity
                 
         }
 
-        public string FormatNumeric(object value, int precesion = 2)
+        public string FormatNumeric(object value, string format = "{0:0.00}", int precesion = 2)
         {                                                   
             var v = Convert.ToDouble(value.ToString());
 
-            return String.Format(CultureInfo.InvariantCulture, "{0:0.00}", v);
+            return String.Format(CultureInfo.InvariantCulture, format, v);
         }
     }
 }

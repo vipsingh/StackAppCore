@@ -118,9 +118,18 @@ namespace StackErp.Model.Entity
             BaseType = TypeCode.Decimal;
         }
 
+        public override void OnInit()
+        {
+            base.OnInit();
+
+            FormatInfo.FormatString = "{0:0.00}";
+        }
+
         public override object ResolveSetValue(object value, out bool isValid)
         {
             isValid = true;
+
+            if (value == null) return value;
             
             if (value is decimal)
                     {
@@ -201,6 +210,13 @@ namespace StackErp.Model.Entity
             BaseType = TypeCode.DateTime;
         }
 
+        public override void OnInit()
+        {
+            base.OnInit();
+
+            FormatInfo.FormatString = "dt";
+        }
+
         public override object ResolveDbValue(DbObject db)
         {
             var v = db.Get<string>(this.DBName, null);
@@ -214,8 +230,16 @@ namespace StackErp.Model.Entity
 
     public class DateField: DateTimeField
     {
+        public bool IgnoreTimeZone {set;get;}
         public DateField(): base() {
             Type = FieldType.Date;
+        }
+
+        public override void OnInit()
+        {
+            base.OnInit();
+
+            FormatInfo.FormatString = "d";
         }
     }
 

@@ -31,7 +31,7 @@ export class EntityPicker extends React.Component<WidgetInfoProps, {
 
     handleOnChange = (value: any, opt: any) => {
         const {onChange} = this.props;        
-        _Debug.log("selected " + opt.id);
+        //_Debug.log("selected " + opt.id);
         
         onChange(opt.id);
     }
@@ -115,7 +115,7 @@ class EntityPickerView extends React.PureComponent<{
         super(props);
 
         this.state = {
-            IsFetching: false,
+            IsFetching: true,
             DataSource: null
         }
         this.gridRef = null;
@@ -134,7 +134,7 @@ class EntityPickerView extends React.PureComponent<{
         const { Url } = DataActionLink;
         const req = getFieldRequest(WidgetId);        
 
-        this.setState({ IsFetching: true });
+        //this.setState({ IsFetching: true });
 
         window._App.Request.getData({
             url: Url,

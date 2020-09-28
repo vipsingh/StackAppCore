@@ -47,19 +47,22 @@ export class ImageField extends React.Component<WidgetInfoProps, { loading: bool
     }
 
     render() {
-        const { UploadLink, IsViewMode} = this.props as any;
+        const { UploadLink, IsViewMode } = this.props as any;
         if (IsViewMode) return this.renderImageView();
-
-        let action =  `/${UploadLink.Url}&_ajax=1`;
-        if (action.indexOf("//") >= 0) {
-            action = action.replace("//", "/");
+        
+        let uploadButton, action;
+        if (UploadLink) {
+            action =  `/${UploadLink.Url}&_ajax=1`;
+            if (action.indexOf("//") >= 0) {
+                action = action.replace("//", "/");
+            }
+            uploadButton = (
+                <div>
+                    {this.state.loading ? <LoadingOutlined /> : <PlusOutlined />}
+                    <div className="ant-upload-text">Upload</div>
+                </div>
+            );
         }
-        const uploadButton = (
-            <div>
-                {this.state.loading ? <LoadingOutlined /> : <PlusOutlined />}
-                <div className="ant-upload-text">Upload</div>
-            </div>
-        );
         const { imageUrl } = this.state;
         return (
             <Upload

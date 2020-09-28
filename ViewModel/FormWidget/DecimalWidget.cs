@@ -10,6 +10,7 @@ namespace StackErp.ViewModel.FormWidget
         public int DecimalPlaces {set;get;}
         public DecimalWidget(WidgetContext cntxt): base(cntxt)
         {
+            DecimalPlaces = 2;
         }
 
         // protected override bool OnSetData(object value)
@@ -18,13 +19,5 @@ namespace StackErp.ViewModel.FormWidget
             
         //     return false;
         // }
-
-        protected override bool OnFormatSetData(object value)
-        {
-            var formatter = new Core.Entity.EntityDataFormatter(this.Context.AppContext);
-            var val =  formatter.FormatNumeric(value);
-
-            return base.OnFormatSetData(val);
-        }
     }
 }

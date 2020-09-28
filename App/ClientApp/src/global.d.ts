@@ -5,16 +5,7 @@ declare var _App: {
     Notify: any,
     FormatString: (str: string, data: any) => string
 };
-declare var _AppSetting: AppSetting;
-declare var _PAGE_DATA_: any;
-declare var _Debug: { error: Function, log: Function };
-declare var __L: (key: string, def?: string) => string
-
-interface IDictionary<T> {
-    [index: string]: T;
-}
-
-interface AppSetting {
+declare var _AppSetting: {
     UserId: number,
     RoleId: number,
     Language: string,
@@ -25,6 +16,13 @@ interface AppSetting {
     BaseCurrency: number,
     BaseCurrencySymbol: string,
     DecimalPlaces: number
+};
+declare var _PAGE_DATA_: any;
+declare var _Debug: { error: Function, log: Function };
+declare var __L: (key: string, def?: string) => string
+
+interface IDictionary<T> {
+    [index: string]: T;
 }
 
 interface IPageInfo {

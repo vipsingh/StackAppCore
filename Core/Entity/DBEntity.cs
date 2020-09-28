@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using StackErp.Core.Form;
+using StackErp.Core.Layout;
 using StackErp.DB;
 using StackErp.DB.DataList;
 using StackErp.Model;
@@ -23,7 +24,7 @@ namespace StackErp.Core
         public InvariantDictionary<BaseField> Fields { get; private set; }
 
         private string _fieldText;
-        public string TextField { set { _fieldText = value; } get { return String.IsNullOrWhiteSpace(_fieldText) ? "Name" : _fieldText; } }
+        public string TextField { protected set { _fieldText = value; } get { return String.IsNullOrWhiteSpace(_fieldText) ? "Name" : _fieldText; } }
 
         public string IDField { get; private set; }
         public List<IEntityRelation> Relations { private set; get; }
@@ -47,14 +48,16 @@ namespace StackErp.Core
             string name, 
             Dictionary<string, BaseField> fields, 
             EntityType entityType,
-            string dbName = "")
+            DbObject entityDbo)
         {
             this.EntityId = id;
             this.Name = name;
-            this.DBName = dbName; //t_{namespace}
+            this.DBName = entityDbo.Get("tablename", ""); //t_{namespace}
             this.IDField = "ID";
             this.Text = name;
             this.EntityType = entityType;
+
+            _fieldText = entityDbo.Get("namefield", "");
 
             this.Fields = new InvariantDictionary<BaseField>();
 
@@ -393,6 +396,11 @@ namespace StackErp.Core
             //check related data also
 
             throw new NotImplementedException();
+        }
+
+        public virtual Model.Layout.TView GetDefaultLayoutView(EntityLayoutType layoutType)
+        {
+            return EntityLayoutService.CreateDefault(this, layoutType);
         }
 
         //private Hooks

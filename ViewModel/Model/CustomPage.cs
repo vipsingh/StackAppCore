@@ -15,10 +15,13 @@ namespace StackErp.ViewModel
         private TPage page;
 
         public CustomPage() {
-            View = new ViewPage();
+            View = new ViewPage();            
             View.Layout = new TView();
+            View.Layout.Fields = new System.Collections.Generic.List<TField>();
+            
             page = new TPage();
             page.Groups.Add(new TGroup());
+            
             View.Layout.Pages.Add(page);
         }
 
@@ -39,11 +42,9 @@ namespace StackErp.ViewModel
             foreach(var f in fields) 
             {
                 if (AddField(f)) {
-                    var tField = new TField(){
-                        FieldId = f.WidgetId
-                    };
+                    var tCol = new TCol(f.WidgetId);
 
-                    TRow.Fields.Add(tField);
+                    TRow.Cols.Add(tCol);
                 }
             }
 

@@ -1,11 +1,15 @@
+import { getAsyncComponent } from "./Helper/asyncImport";
+
 import * as CTRL from "./Form/Control/input";
 import LabelField from "./Form/Control/LabelField";
 import ListView from "./ListView";
-import { Dictionary } from "lodash";
 import { FormControlType } from "../Constant";
 import FilterBox from "./Form/Control/FilterBox";
 import ListForm from "./Form/Control/ListForm";
-import HtmlTextBox from "./Form/Control/HtmlTextBox";
+import HtmlTextBox from "./Form/Control/ContentEditor/HtmlTextBox";
+
+import XmlEditor from "./Form/Control/ContentEditor/XmlEditor";
+//const XmlEditor = getAsyncComponent(() => import("./Form/Control/ContentEditor/XmlEditor"));
 
 
 export function getComponent(controlType: number, isViewMode?: boolean) {
@@ -45,6 +49,9 @@ export function getComponent(controlType: number, isViewMode?: boolean) {
         case FormControlType.HtmlText:
             editComponent = viewComponent = HtmlTextBox;
             break;
+        case FormControlType.XmlEditor:
+            editComponent = viewComponent = XmlEditor;
+            break;
         default:
             const w = widgets[controlType];
             if (w) {
@@ -64,7 +71,7 @@ export function getBasicValidation(controlInfo: any) {
 }
 
 
-const widgets: Dictionary<{edit: any, view: any}> = {};
+const widgets: IDictionary<{edit: any, view: any}> = {};
 
 export function registerWidget(type: number, editComponent: any, viewComponent: any = null, config: any = null) {
     widgets[type] = {

@@ -29,25 +29,33 @@ namespace StackErp.UI.View.Studio
         }
 
         public override ViewPage GetPage(RequestQueryString reqQuery) 
-        {
+        {            
+            int entityItemId = reqQuery.EntityId.Code;
             View.PageType = AppPageType.AppStudio;            
             View.CurrentQuery = reqQuery.ToQueryString();
-
-            View.Actions = new InvariantDictionary<Model.Form.ActionInfo>();
-            var qs = new RequestQueryString() { EntityId = EntityCode.EntitySchema, RelatedEntityId = EntityCode.EntityMaster, RelationField="layouts" };
-            View.Actions.Add("BTN_NEW", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs){ Title = "New Field", LinkTarget="POPUP" });
-
-            var qs1 = new RequestQueryString() { EntityId = EntityCode.EntityAction, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityactions" };
-            View.Actions.Add("BTN_NEW_ACTION", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs1){ Title = "New Action", LinkTarget="POPUP" });
-
-            var formContext = new DetailFormContext(_appContext, EntityCode.EntityMaster, new RequestQueryString(){ EntityId = EntityCode.EntityMaster, ItemId = reqQuery.EntityId.Code });
+           
+            var formContext = new DetailFormContext(_appContext, EntityCode.EntityMaster, new RequestQueryString(){ EntityId = EntityCode.EntityMaster, ItemId = entityItemId });
             formContext.Build();
 
+            AddHeaderActions(reqQuery, entityItemId);
+
+            AddFieldListField(formContext);
             AddLayoutListField(formContext);
             AddListListField(formContext);
             AddEntityActionsListField(formContext);
 
             return this.View;
+        }
+
+        private void AddFieldListField(DetailFormContext formContext) {
+            var widgetContext = WidgetContext.BuildContext(formContext, "FieldList"); 
+            widgetContext.WidgetType = FormControlType.EntityListView;
+
+            var widget = new EntityListWidget(widgetContext, "fields");
+            widget.OnCompile();
+            widget.SetValue(null);
+
+            AddFieldsInRow(new ViewModel.FormWidget.IWidget[]{ widget });
         }
 
         private void AddLayoutListField(DetailFormContext formContext) {
@@ -81,6 +89,20 @@ namespace StackErp.UI.View.Studio
             widget.SetValue(null);
 
             AddFieldsInRow(new ViewModel.FormWidget.IWidget[]{ widget });
+        }
+
+        private void AddHeaderActions(RequestQueryString reqQuery, int entityItemId)
+        {
+            View.Actions = new InvariantDictionary<Model.Form.ActionInfo>();
+            var qs = new RequestQueryString() { EntityId = EntityCode.EntitySchema, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId};
+            View.Actions.Add("BTN_NEW", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs){ Title = "New Field", LinkTarget="POPUP" });
+
+            var qs1 = new RequestQueryString() { EntityId = EntityCode.EntityAction, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
+            View.Actions.Add("BTN_NEW_ACTION", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs1){ Title = "New Action", LinkTarget="POPUP" });
+
+            var qs2 = new RequestQueryString() { EntityId = EntityCode.EntityLayout, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
+            View.Actions.Add("BTN_NEW_Layout", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs2){ Title = "New Layout", LinkTarget="POPUP" });
+
         }
     }
 }

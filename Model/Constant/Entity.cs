@@ -41,6 +41,7 @@ public enum FieldType {
     Phone=28,
     ObjectNumber=29,
     MultiSelect = 30,
+    StackScript = 31
 }
     
     public enum EntityRelationType 
@@ -96,11 +97,13 @@ public enum QueryType
 
    public enum DataSourceType
     {
+        None = 0,
         Entity = 1,
         StackScript = 2,
         Function = 3,
         Service = 4,
-        Table = 5 // table should be defined in t_customtables
+        Table = 5, // table should be defined in t_customtables
+        Enum=6
         
     }
 

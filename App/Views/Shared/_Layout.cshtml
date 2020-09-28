@@ -11,17 +11,17 @@
         <link rel="apple-touch-icon" sizes="180x180" href="~/img/favicon/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="~/img/favicon.png">
     <title>@ViewData["Title"] - App</title>
-    <link rel="stylesheet" href="~/css/sitex.css" />
+    @* <link rel="stylesheet" href="~/css/sitex.css" /> *@
 </head>
 <body>    
     <div class="container">        
         @RenderBody()
     </div>
-    <script src="~/js/sitex.js"></script>
-    @* <script src="http://localhost:3000/static/js/bundle.js" asp-append-version="true"></script>
+    @* <script src="~/js/sitex.js"></script> *@
+    <script src="http://localhost:3000/static/js/bundle.js" asp-append-version="true"></script>
     <script src="http://localhost:3000/static/js/0.chunk.js" asp-append-version="true"></script>
     <script src="http://localhost:3000/static/js/main.chunk.js" asp-append-version="true"></script>
-    <script src="http://localhost:3000/main.1adb33cd0541b2533c6b.hot-update.js"></script> *@
+    <script src="http://localhost:3000/main.1adb33cd0541b2533c6b.hot-update.js"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

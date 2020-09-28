@@ -11,7 +11,7 @@ namespace StackErp.Core.Entity
 {
     public class EntityLayoutEntity : DBEntity
     {
-        public EntityLayoutEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, string tableName) : base(id, name, fields,entityType, tableName)
+        public EntityLayoutEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(id, name, fields,entityType, entDbo)
         {
             // this.Fields.Add("ITEMTYPEID", new IntegerField()
             // {
@@ -47,20 +47,30 @@ namespace StackErp.Core.Entity
                 DefaultValue = 0
             });
 
-            this.Fields.Add("LAYOUTXML", new XmlField()
+            this.Fields.Add("LAYOUTJSON", new JsonField()
             {
-                Name = "layoutxml",
-                Text = "layoutxml",
-                DBName = "layoutxml",
+                Name = "layoutjson",
+                Text = "layoutjson",
+                DBName = "layoutjson",
                 IsRequired = true,
                 Copy = false,
                 IsDbStore = true,
                 ViewId = 0
             });
+
+            TextField = "id";
         }
 
         public override AnyStatus Save(StackAppContext appContext, EntityModelBase model)
         {
+            if (model.IsNew)
+            {
+                var entityId = model.GetValue<int>("entityid", 0);
+                var itemType = this.GetEntity(entityId).DefaultItemTypeId;
+                model.SetValue("itemType", itemType);
+                model.SetValue("viewType", 0);
+            }
+
             return base.Save(appContext, model);
         }
 
@@ -75,6 +85,21 @@ namespace StackErp.Core.Entity
                 }
             }
             return sts;
+        }
+
+        protected override bool Validate(EntityModelBase model)
+		{
+
+			return base.Validate(model);
+		}
+
+        public override Model.Layout.TView GetDefaultLayoutView(EntityLayoutType layoutType)
+        {
+           var view = base.GetDefaultLayoutView(layoutType);          
+           view.Commands = new List<Model.Layout.TCommand>();
+           view.Commands.Add(new Model.Layout.TCommand() { Id = 12, Text = "Designer" });
+            
+            return view;
         }
     }
 }

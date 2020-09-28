@@ -17,7 +17,7 @@ export default class LabelField extends React.Component<WidgetInfoProps> {
 
         if (typeof d === "object"){
             d = d.Text;
-        }    
+        }
 
         if (AdditionalValue && AdditionalValue.ViewLink) {
             const { ViewLink } = AdditionalValue;
@@ -25,7 +25,7 @@ export default class LabelField extends React.Component<WidgetInfoProps> {
             return (<ActionLink ActionId={"VIEW"} {...ViewLink} Title={d} />);
         }
 
-        if ([3,5].indexOf(WidgetType) >= 0) isRightAlign = true;
+        //if ([3,5].indexOf(WidgetType) >= 0) isRightAlign = true;
 
         return <Text style={{ textAlign: isRightAlign ? "right" : "left" }}>{d}</Text>;
     }

@@ -10,6 +10,8 @@ namespace StackErp.ViewModel
         public static readonly string Value = "Value";
         public static readonly string LinkedData = "LinkedData";
         public static readonly string Expression = "Expression";
+        public static readonly string OpenerQuery = "OpenerQuery";
+        public static readonly string ItemType = "ItemType";
     }
 
     public static class ValidationConstant

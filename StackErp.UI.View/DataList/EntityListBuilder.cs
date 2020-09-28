@@ -112,6 +112,8 @@ namespace StackErp.UI.View.DataList
                 actionContext.Query.ItemId = rowId;
                 
                 var ac = PageActionCreator.Create(actionContext);
+                ac.LinkTarget = "POPUP";
+                
                 actions.Add(ac);
             }
 

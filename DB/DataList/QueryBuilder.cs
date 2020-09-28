@@ -126,25 +126,30 @@ namespace StackErp.DB.DataList
 
         private void AddCollectionTable(BaseField fieldSchema)
         {
-            var collectionid = ((SelectField)fieldSchema).CollectionId;
-            var idf = "_" + idx;
+            var collectionInfo = ((SelectField)fieldSchema).ControlInfo.CollectionInfo;
+            var collId = collectionInfo.Id;
 
-            if (fieldSchema is MultiSelectField)
+            if ((int)collectionInfo.SourceType == 0)
             {
-                AddSelectField(fieldSchema.Name, $"get_collection_datatext({collectionid}, {_entTable}.{fieldSchema.DBName})", $"{fieldSchema.Name}__data");
-            }
-            else
-            {
-                AddSelectField(fieldSchema.Name, $"{idf}.datatext", $"{fieldSchema.Name}__name");
+                var idf = "_" + idx;
 
-                _toJoinTables.Add(fieldSchema.Name, 
-                    ("t_collection_master", idf.ToString(),
-                        new List<string>() { 
-                            $"{idf}.id = {collectionid}",
-                            $"{_entTable}.{fieldSchema.DBName} = {idf}.dataid"
-                        } 
-                ));
-                idx++;
+                if (fieldSchema is MultiSelectField)
+                {
+                    AddSelectField(fieldSchema.Name, $"get_collection_datatext({collId}, {_entTable}.{fieldSchema.DBName})", $"{fieldSchema.Name}__data");
+                }
+                else
+                {
+                    AddSelectField(fieldSchema.Name, $"{idf}.datatext", $"{fieldSchema.Name}__name");
+
+                    _toJoinTables.Add(fieldSchema.Name, 
+                        ("t_collection_master", idf.ToString(),
+                            new List<string>() { 
+                                $"{idf}.id = {collId}",
+                                $"{_entTable}.{fieldSchema.DBName} = {idf}.dataid"
+                            } 
+                    ));
+                    idx++;
+                }
             }
         }
 
@@ -223,12 +228,12 @@ namespace StackErp.DB.DataList
             if (filter.Op == FilterOperationType.In || filter.Op == FilterOperationType.NotIn)
             {
                 List<string> v1 = new List<string>();
-                if (filter.Value != null)
+                if (filter.Value != null && filter.Value is Array)
                 {
-                    String[] vals = filter.Value.ToString().Split(',');
-                    foreach(var d in vals)
+                    //String[] vals = filter.Value.ToString().Split(',');
+                    foreach(var d in (object[])filter.Value)
                     {
-                        v1.Add(GetSqlVal(dbField, d));
+                        v1.Add(GetSqlVal(dbField, d.ToString()));
                     }
                     val = "(" + string.Join(",", v1) + ")";
                 }

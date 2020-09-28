@@ -6,6 +6,7 @@ export const PageType = {
     Report : 4,
     Dashboard : 5,
     AppStudio: 7,
+    Designer: 8,
     Error : 10
 };
 
@@ -29,6 +30,7 @@ export const FormControlType = {
     Url: 16,  
     FormattedText: 21,
     Avatar: 22,
+    XmlEditor:23,
     ListForm : 99,
     EntityListView : 100,
     EntityFilter: 101

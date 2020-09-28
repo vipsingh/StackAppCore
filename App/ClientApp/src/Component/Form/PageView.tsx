@@ -1,5 +1,6 @@
 import React from "react";
-import UIView, { PageSheet } from "../Layout";
+import UIView from "../Layout";
+import { PageSheet } from "../Layout/UIView";
 //import { PlusCircleOutlined } from '@ant-design/icons';
 import { PageHeader } from "antd";
 

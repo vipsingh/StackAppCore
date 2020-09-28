@@ -85,7 +85,8 @@ namespace StackErp.ViewModel.ViewContext
 
         protected virtual void PrepareEntityContext() {
             var entityCntxt = new ObjectModelInfo(this.ObjectId, this.EntityId);
-            entityCntxt.ItemType = ItemTypeId;            
+            entityCntxt.ItemType = ItemTypeId; 
+            entityCntxt.OpenerQuery = RequestQuery.ToQueryString();
 
             this.EntityModelInfo = entityCntxt;
             // if (this.SubmitModel != null)

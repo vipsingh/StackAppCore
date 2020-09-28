@@ -69,7 +69,7 @@ export default class EntityPage extends Component<{ data: any }, {
 
             <Tabs style={{ marginBottom: 32 }}>
                 <TabPane tab="Fields" key="1">
-                    {this.renderFieldList()}
+                {props.getControl("FieldList")}
                 </TabPane>
                 <TabPane tab="Layout" key="2">
                     {props.getControl("LayoutList")}

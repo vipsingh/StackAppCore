@@ -28,7 +28,7 @@ namespace StackErp.Core
             field.IsDbStore = !String.IsNullOrEmpty(dbname);
             field.TableName = table;
             field._TempSchemaData = new DynamicObj();
-            field.DefaultValue = sch.Get("defaultvalue", String.Empty);
+            field.DefaultValue = sch.Get<object>("defaultvalue", null);
             field.ViewOrder = sch.Get("vieworder", 10000);
 
             field.IsRequired = sch.Get("isrequired", false);
@@ -49,18 +49,20 @@ namespace StackErp.Core
 
             if (field.Type == FieldType.ObjectLink || field.Type == FieldType.MultiObjectLink)
             {   
-                if (dbentities ==null)
-                {
-                    field.RefObject = linkEnt;
-                }
-                else
-                {             
-                    var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
-                    if (linkDbEnt.Count() > 0)
-                    {
-                        field.RefObject = linkEnt;
-                    }
-                }
+                field.RefObject = linkEnt;
+
+                // if (dbentities ==null)
+                // {
+                //     field.RefObject = linkEnt;
+                // }
+                // else
+                // {             
+                //     var linkDbEnt = dbentities.Where(x => x.Get("id", 0) == linkEnt);
+                //     if (linkDbEnt.Count() > 0)
+                //     {
+                //         field.RefObject = linkEnt;
+                //     }
+                // }
 
                 field._TempSchemaData.Add("linkentity_domain", sch.Get("linkentity_domain", ""));                             
             }            
@@ -69,6 +71,12 @@ namespace StackErp.Core
             {
                 var collectionid = sch.Get("collectionid", 0);
                 ((SelectField)field).CollectionId = collectionid;
+
+                if (collectionid > 0)
+                {
+                    var info = StackErp.Core.Entity.CollectionService.GetCollectionInfo(collectionid);
+                    field._TempSchemaData.Add("collectioninfo", info);
+                }
             }
 
             if (field is OneToManyField)
@@ -215,14 +223,17 @@ namespace StackErp.Core
                 case FieldType.Html:
                     t = FormControlType.HtmlText;
                     break;
-                case FieldType.Xml:
-                    t = FormControlType.LongText;
-                    break;
                 case FieldType.Email:
                     t = FormControlType.Email;
                     break;
                 case FieldType.Phone:
                     t = FormControlType.Phone;
+                    break;
+                case FieldType.Xml:
+                    t = FormControlType.XmlEditor;
+                    break;
+                case FieldType.StackScript:
+                    t = FormControlType.StackScriptEditor;
                     break;
                 case FieldType.FilterField:
                     t = FormControlType.EntityFilter;

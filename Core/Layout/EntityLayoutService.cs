@@ -10,6 +10,7 @@ using StackErp.Model.Entity;
 using StackErp.Model.Utils;
 using StackErp.Model.Layout;
 using System.Xml.Serialization;
+using Newtonsoft.Json.Serialization;
 
 namespace StackErp.Core.Layout
 {
@@ -23,70 +24,86 @@ namespace StackErp.Core.Layout
 
         public TView PrepareView(int itemTypeId, EntityLayoutType layoutType)
         {
-            string layoutXml = "";
+            string layoutJson = "";
             if (itemTypeId != 0)
             {
                 var layout = LayoutDbService.GetItemTypeLayout(_EntityId.Code, itemTypeId, (int)layoutType);
                 if (layout == null)
                     throw new EntityException("ItemType is not defined.");
 
-                layoutXml = layout.Get("layoutxml", string.Empty);
+                //layoutXml = layout.Get("layoutxml", string.Empty);
+                layoutJson = layout.Get("layoutjson", string.Empty);
             }
 
-            if (string.IsNullOrWhiteSpace(layoutXml))
-                return CreateDefault();
+            if (string.IsNullOrWhiteSpace(layoutJson))
+            {
+                var _Entity = Core.EntityMetaData.Get(_EntityId);            
+                var lview =  _Entity.GetDefaultLayoutView(layoutType);
+                return lview;
+            }
 
-            return TView.ParseFromXml(layoutXml);
+            //return JSONUtil.DeserializeObject<TView>(layoutJson);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<TView>(
+                layoutJson, 
+                new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new LayoutJsonContractResolver() });
+
+            //return TView.ParseFromXml(layoutXml);
         }       
 
-        private TView CreateDefault()
+        public static TView CreateDefault(IDBEntity Entity, EntityLayoutType layoutType)
         {
+
             var view = new TView();
+            view.Fields = new List<TField>();
+
             var page = new TPage();
             view.Pages.Add(page);
             var group = new TGroup();
-            page.Groups.Add(group);
-
-            var _Entity = Core.EntityMetaData.Get(_EntityId);
+            page.Groups.Add(group);            
 
             var start_new_r = true;
-            List<TField> col_r = new List<TField>();
-            var layoutF = _Entity.GetLayoutFields(EntityLayoutType.Edit);
+            List<TCol> col_r = new List<TCol>();
+            var layoutF = Entity.GetLayoutFields(EntityLayoutType.Edit);
             int idx = 0;
             foreach (var f in layoutF)
             {
-                var field = new TField();
-                field.FieldId = f.Name;
+                var col = new TCol(f.Name);                
+
+                view.Fields.Add(new TField() { FieldId = f.Name, Text = f.Text });
 
                 if (col_r.Count == 1)
                     start_new_r = true;
                 else
                     start_new_r = false;
 
-                if (IsWidgetOnFullRow(f.Type))
+                if (IsWidgetOnFullRow(f.ControlType))
                 {
                     start_new_r = true;
+                    
                     var row = new TRow();
-                    field.FullRow = true;
-                    row.Fields = new List<TField>() { field };
+                    col.Span = 24;
+                    row.Cols = new List<TCol>() { col };
+                    
                     group.Rows.Add(row);
                 }
                 else {
-                    col_r.Add(field);
+                    col_r.Add(col);
                 } 
                 
 
                 if (start_new_r)
                 {
                     var row = new TRow();
-                    row.Fields = col_r;
+                    row.Cols = col_r;
                     group.Rows.Add(row);
-                    col_r = new List<TField>();
+
+                    col_r = new List<TCol>();
                 }
                 else if (layoutF.Count - 1 == idx)
                 {
                     var row = new TRow();
-                    row.Fields = col_r;
+                    row.Cols = col_r;
+
                     group.Rows.Add(row);
                 }
                 idx++;
@@ -95,12 +112,27 @@ namespace StackErp.Core.Layout
             return view;
         }
 
-        private bool IsWidgetOnFullRow(FieldType fieldType)
+        public static bool IsWidgetOnFullRow(FormControlType ctrlType)
         {
-            if (fieldType == FieldType.OneToMany || fieldType == FieldType.OneToOne)
-                return true;
+            switch(ctrlType) {
+                case FormControlType.XmlEditor:
+                case FormControlType.ListForm:
+                case FormControlType.EntityListView:
+                case FormControlType.HtmlText:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
 
-            return false;
+    public class LayoutJsonContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+    {
+        protected override JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+            property.Ignored = false; // Here is the magic
+            return property;
         }
     }
 }

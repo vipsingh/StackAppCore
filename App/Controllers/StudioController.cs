@@ -9,8 +9,10 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using StackErp.App.Models;
 using StackErp.Model;
+using StackErp.Model.Layout;
 using StackErp.UI.Controllers;
 using StackErp.UI.View.DataList;
+using StackErp.UI.View.Desginer;
 using StackErp.UI.View.Studio;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
@@ -30,23 +32,23 @@ namespace StackErp.App.Controllers
             return CreatePageResult(page.GetPage(this.RequestQuery));
         }
 
-        public IActionResult GetFieldList([FromBody] ListRequestinfo request)
-        {
-            var qs =  new RequestQueryString();
-            qs.EntityId = EntityCode.EntitySchema;
-            if (request.GridRequest == null)
-            {
-                request.GridRequest = new Model.DataList.QueryRequest();
-                var filter = JObject.Parse("{\"$and\":[{\"entityid\":[0," + RequestQuery.EntityId.Code + "]}]}");
-                request.GridRequest.DataFilter = filter;
-            }
+        public IActionResult LayoutDesigner() {
+            var desinerPage = LayoutDesignerBuilder.BuildPage(StackAppContext, RequestQuery);
 
-            var context = new DataListContext(this.StackAppContext, qs, request);
-            var builder = new EntityListBuilder();
-            builder.Build(context);
-            var res = builder.GetResponse(context);
-            
-            return CreateResult(res);
+            return CreatePageResult(desinerPage);
+        }        
+
+        [HttpPost]
+        public IActionResult SaveDesigner([FromBody]JObject data) 
+        {
+            if (data != null) {
+                var view = data["Layout"].ToObject<TView>();
+                var res = LayoutDesignerBuilder.SaveLayout(StackAppContext, RequestQuery, view);
+
+                return CreateResult(res);
+            }            
+
+            return CreateResult(new ErrorResponse("Invalid data."));
         }
 
         #region page designer

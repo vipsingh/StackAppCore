@@ -123,6 +123,16 @@ namespace StackErp.DB
             }
         }
 
+        public static int ExecuteDMLQuery(string query, object param, IDbTransaction trans = null)
+        {
+            using (IDbConnection dbConnection = Connection)
+            {
+                var affectedRows = dbConnection.Execute(query, param);
+
+                return affectedRows;
+            }
+        }
+
         public static DbType GetDbType(FieldType fieldType, TypeCode type)
         {
             if (fieldType == FieldType.Xml)

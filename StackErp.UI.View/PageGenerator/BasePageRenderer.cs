@@ -10,6 +10,7 @@ using StackErp.Model.Layout;
 using StackErp.ViewModel;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
+using StackErp.ViewModel.Services;
 using StackErp.ViewModel.ViewContext;
 
 namespace StackErp.UI.View.PageGenerator
@@ -76,7 +77,8 @@ namespace StackErp.UI.View.PageGenerator
                     var fieldSchema = this.FormContext.GetField(control.Value.WidgetId);
                     if (fieldSchema != null)
                     {
-                        ViewModel.Services.FilterDependencyBuilder.Build(this.FormContext, fieldSchema, ((BaseWidget)control.Value));
+                        FilterDependencyBuilder.Build(this.FormContext, fieldSchema, ((BaseWidget)control.Value));
+                        RelatedFieldDependencyBuilder.Build(this.FormContext, fieldSchema, ((BaseWidget)control.Value));
                     }
                 }
             }

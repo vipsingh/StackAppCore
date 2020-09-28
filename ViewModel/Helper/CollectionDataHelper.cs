@@ -12,6 +12,13 @@ namespace StackErp.ViewModel.Helper
         {
             if (context.ControlDefinition != null && context.ControlDefinition.CollectionId > 0)
             {
+                var collInfo = context.ControlDefinition.CollectionInfo;
+
+                if (collInfo.SourceType == DataSourceType.Enum)
+                {
+                    return CollectionService.GetCollectionDataEnum(collInfo, values);
+                }
+
                 var data = CollectionService.GetCollectionData(context.ControlDefinition.CollectionId, values);
                 var list = new List<SelectOption>();
                 foreach(var o in data)

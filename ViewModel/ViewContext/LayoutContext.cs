@@ -34,7 +34,7 @@ namespace StackErp.ViewModel.ViewContext
         }
         public override TView Build()
         {
-            var view = new TView();
+            var view = new TView() { Fields = new List<TField>() };
             var rows = new List<TRow>();
 
             var f = new TField(){
@@ -42,7 +42,9 @@ namespace StackErp.ViewModel.ViewContext
                 Widget = FormControlType.EntityListView,
                 FullRow = true
             };
-            rows.Add(new TRow(){ Fields= new List<TField>() { f } });
+            view.Fields.Add(f);
+
+            rows.Add(new TRow(){ Cols= new List<TCol>() { new TCol(f.FieldId) { Span = 24 } } });
 
             view.Pages.Add(new TPage() { Groups = new List<TGroup>() { new TGroup() { Rows = rows } } });
             view.Header = PrepareHeader();

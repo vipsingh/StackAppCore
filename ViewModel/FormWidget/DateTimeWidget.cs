@@ -30,13 +30,5 @@ namespace StackErp.ViewModel.FormWidget
             
             return false;
         }
-
-        protected override bool OnFormatSetData(object value)
-        {
-            var formatter = new Core.Entity.EntityDataFormatter(this.Context.AppContext);
-            var val =  formatter.FormatDate(value);
-
-            return base.OnFormatSetData(val);
-        }
     }
 }

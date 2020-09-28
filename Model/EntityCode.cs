@@ -20,6 +20,8 @@ namespace StackErp.Model
 
         public override bool Equals(object obj)
         {
+            if (obj is EntityCode) return ((EntityCode)obj).Code == Code;
+            
             return (int)obj == Code;
         }
         public override int GetHashCode()
