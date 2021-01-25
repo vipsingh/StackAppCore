@@ -42,8 +42,8 @@ class GridView extends React.Component<{
             return result;
         }, []);
 
-        cols.push({key: "RowActions", 
-            dataIndex: "RowActions",
+        cols.push({key: "_RowActions", 
+            dataIndex: "_RowActions",
             fixed: "right",
             width: 30,
             render: (col: any) => { 
@@ -78,7 +78,7 @@ class GridView extends React.Component<{
             <Table 
                 columns={columns}
                 dataSource={Data}
-                rowKey={"RowId"}
+                rowKey={"_RowId"}
                 bordered
                 size="small"
                 rowSelection={this.props.rowSelection}

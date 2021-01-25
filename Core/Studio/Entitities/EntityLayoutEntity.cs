@@ -4,8 +4,10 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using StackErp.DB;
 using StackErp.Model;
 using StackErp.Model.Entity;
+using StackErp.Model.Layout;
 
 namespace StackErp.Core.Entity
 {
@@ -13,16 +15,16 @@ namespace StackErp.Core.Entity
     {
         public EntityLayoutEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(id, name, fields,entityType, entDbo)
         {
-            // this.Fields.Add("ITEMTYPEID", new IntegerField()
-            // {
-            //     Name = "itemtypeid",
-            //     Text = "ItemType",
-            //     DBName = "itemtype",
-            //     IsRequired = true,
-            //     Copy = false,
-            //     IsDbStore = true,
-            //     ViewId = -1
-            // });
+            this.Fields.Add("ITEMTYPE", new IntegerField()
+            {
+                Name = "itemtype",
+                Text = "ItemType",
+                DBName = "itemtype",
+                IsRequired = true,
+                Copy = false,
+                IsDbStore = true,
+                ViewId = -1
+            });
 
             this.Fields.Add("ENTITYID", new IntegerField()
             {
@@ -59,6 +61,25 @@ namespace StackErp.Core.Entity
             });
 
             TextField = "id";
+        }
+
+        protected override void BuildDefaultQueries()
+        {
+            var qBuilder = new EntityQueryBuilder(this);
+            
+            _detailQry = qBuilder.BuildDetailQry(true);
+
+            BuildRelatedFIeldQueries(qBuilder);
+        }
+
+        public AnyStatus SaveLayoutData(StackAppContext appContext, RequestQueryString requestQuery, TView view)
+        {
+            var layoutModel = GetSingle(appContext, requestQuery.ItemId);
+
+            var json = view.ToStoreJSON();
+            layoutModel.SetValue("layoutjson", json);
+
+            return Save(appContext, layoutModel);
         }
 
         public override AnyStatus Save(StackAppContext appContext, EntityModelBase model)
@@ -100,6 +121,14 @@ namespace StackErp.Core.Entity
            view.Commands.Add(new Model.Layout.TCommand() { Id = 12, Text = "Designer" });
             
             return view;
+        }
+
+        public override Model.DataList.EntityListDefinition CreateDefaultListDefn(StackAppContext appContext)
+        {
+            var defn = base.CreateDefaultListDefn(appContext);
+            defn.IncludeGlobalMasterId = true;
+            
+            return defn;
         }
     }
 }

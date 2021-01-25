@@ -8,13 +8,14 @@ import { DndProvider } from 'react-dnd'
 import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
 import { DesignerContext } from '../../../../Core/Studio';
-import { SettingOutlined } from '@ant-design/icons';
+import { SettingOutlined, DeleteOutlined } from '@ant-design/icons';
 import { getComponent } from '../../../../Component/WidgetFactory';
 import DesignerFieldProp from "./DesignerFieldProp";
 import { openDialog } from "../../../../Component/UI/Dialog";
 import ActionLink from '../../../../Component/ActionLink';
 import LinkProcesser from '../../../../Core/Utils/LinkProcesser';
-import { FieldPanel, DropBox, MoveBox } from "./FieldPanel";
+import { FieldPanel, MoveBox } from "./FieldPanel";
+import Pallet from "./Pallet";
 
 export default class DesignerPage extends Component<any,any> {
     designerContext: any
@@ -23,24 +24,9 @@ export default class DesignerPage extends Component<any,any> {
     fieldPropDlg: any
     constructor(props: any) {
         super(props);
-
-        this.state = {
-            Header: {
-                Id: "header",
-                Text: "",
-                Groups: [{ Id: "gh", Rows: [ { Cols: [ ] } ] }]
-            },
-            Pages: [{ Id: "page1",
-                Groups: [{ Id: "g1", Rows: [ { Cols: [ ] }] }]
-            }],
-            fieldContainerLink: {
-
-            },
-
-          fields: []
-        }
-
         this._ix = 0;
+
+        this.state = this.prepareState(props);                
 
         this.designerContext = {
             renderGroupSetting: this.renderGroupSetting
@@ -48,21 +34,74 @@ export default class DesignerPage extends Component<any,any> {
 
     }
 
-    linkField = (fieldId: string, containerId: string) => {
-        const { Fields: entityFields } = this.props.data;
+    prepareState(props: any) {
+      const { LayoutInfo, LayoutFields } = props.data;
+      const d = _.cloneDeep(LayoutInfo);
+      if (!d.Header) d.Header = {Id: "header", Groups: [{ Id: "gh", Rows: []}]};
+      if (!d.Pages || d.Pages.length === 0) d.Pages = [{Id: "p1", Groups: [{ Id: "g1", Rows: []}]}];
+      d.Fields = !LayoutFields ? [] : LayoutFields;
 
-        const fieldInfo = _.find(entityFields, { Name: fieldId });
-        this.setState({ fields : update(this.state.fields, {$push: [{ WidgetId: fieldId, WidgetType: fieldInfo.WidgetType, FieldType: fieldInfo.Type }]}) }, () => {
-            this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldId } ) });
-        });        
+      d.fieldContainerLink = {};
+      _.each(d.Header.Groups, (g) => {
+        this.initFieldContainerLink(g, d.fieldContainerLink);
+      });
+
+      _.each(d.Pages, (p) => {
+        if (!p.Id) p.Id = `p${this._ix++}`;
+        _.each(p.Groups, (g) => {
+          this.initFieldContainerLink(g, d.fieldContainerLink);
+        });
+      });
+
+      return d;
     }
-    moveField = (fieldId: string, containerId: string) => {        
+
+    initFieldContainerLink(g: any, fieldContainerLink: any) {
+      if(!g || !g.Rows) return;
+      if (!g.Id) g.Id = `g${this._ix++}`;
+      
+      _.each(g.Rows, (r) => {
+        if(!r.Cols) return;
+        _.each(r.Cols, (c) => {
+          if (c.Id) fieldContainerLink[c.Id] = c.Id;
+          else {
+            c.Id = `id${this._ix++}`;
+            fieldContainerLink[c.Id] = null;
+          }
+        });
+      });
+    }
+
+    linkField = (fieldInfo: any, containerId: string) => {
+        if (_.find(this.state.Fields, { FieldId: fieldInfo.Name })) {
+          this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldInfo.Name } ) });
+        } else {
+          this.setState({ Fields : update(this.state.Fields, {$push: [{ FieldId: fieldInfo.Name, WidgetType: fieldInfo.WidgetType, FieldType: fieldInfo.Type }]}) }, () => {
+              this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldInfo.Name } ) });
+          });     
+        }   
+    }
+    moveField = (fieldId: string, containerId: string | null) => {        
         let lastCont = "";
         _.forIn(this.state.fieldContainerLink, function(value, key) {
             if (value === fieldId) lastCont = key;
         });
+        if (containerId) {
+          this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldId, [lastCont]: undefined } ) });
+        } else {
+          this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [lastCont]: undefined } ) });
+        }
+    }
 
-        this.setState({ fieldContainerLink: Object.assign({}, this.state.fieldContainerLink, { [containerId]: fieldId, [lastCont]: undefined } ) });
+    isReadonlyPalletItem = (type: string, id: string) => {
+      if (type === "FIELD") {
+        return _.values(this.state.fieldContainerLink).indexOf(id) >= 0;
+      }
+      else if (type === "BUTTON") {
+        return !!_.find(this.state.Commands, { Id: id });
+      }
+
+      return false;
     }
     
     getControl = (container: string) => {
@@ -71,20 +110,20 @@ export default class DesignerPage extends Component<any,any> {
         let IComponent: any;
         let wInfo: any = {};
         if (fieldId) {
-          wInfo =  _.find(this.state.fields, { WidgetId: fieldId }) as any;
-          if (!wInfo.Caption) wInfo.Caption = wInfo.WidgetId;
+          wInfo =  _.find(this.state.Fields, { FieldId: fieldId }) as any;
+          if (!wInfo.Text) wInfo.Text = wInfo.FieldId;
         
           IComponent = getComponent(wInfo.WidgetType, false); 
         }
         
-        return (<FieldPanel Id={container} FieldId={fieldId}>
+        return (<FieldPanel panelType="FIELDBOX" Id={container} FieldId={fieldId}>
                     {!fieldId || 
                         <MoveBox item={{ id: fieldId }} moveField={(id: string, fieldBoxId: string) => { 
                             this.moveField(id, fieldBoxId);
                           }}>
                               <div>
                                   {this.renderFieldSettingIcon(fieldId)}
-                                  <FormField widgetInfo={{ WidgetId: fieldId, ...wInfo }} dataModel={{}} >
+                                  <FormField widgetInfo={{ WidgetId: fieldId, Caption: wInfo.Text, ...wInfo }} dataModel={{}} >
                                     {!IComponent || <IComponent 
                                       {...wInfo}
                                       api={this.getFormAPI()}
@@ -111,23 +150,31 @@ export default class DesignerPage extends Component<any,any> {
         };
     }
 
-    renderFieldTypes() {
-        if (!this.props.data) return;
-
-        const { Fields } = this.props.data;
-        return (
-          <div>
-            {_.map(Fields, (item) => {
-                const isReadOnly = _.values(this.state.fieldContainerLink).indexOf(item.Name) >= 0;
-
-                return (<DropBox field={item} readOnly={isReadOnly} addField={(fieldId: string, boxId: string) => {
-                  this.linkField(fieldId, boxId);
-                }} />
+    getLayoutActions = () => {
+      const { Commands } = this.state;
+      let cmds: any[] = [];
+      if (Commands) {
+        cmds =  _.map(Commands, (c: any) => {
+              return (
+                  <ActionLink key={c.Id} Title={c.Text} {...c} DisplayType={2} />
               );
-            })}
-          </div>
-        );
+          });        
+      }
+
+      cmds.push(<FieldPanel panelType="BUTTONBOX" Id={"buttonContainer"}></FieldPanel>);
+
+      return cmds;
+      
+  }
+
+  linkButton = (buttonInfo: any, containerId: string) => {
+
+    if (this.state.Commands) {
+      this.setState({ Commands: update(this.state.Commands, {$push: [buttonInfo]}) });
+    } else {
+      this.setState({ Commands: [buttonInfo] });
     }
+  }
 
     renderFieldSettingIcon = (fieldId: string) => {
       if (!fieldId) return;
@@ -135,7 +182,11 @@ export default class DesignerPage extends Component<any,any> {
       return (<div style={{ position: "absolute", zIndex: 1 }}>
                 <a href="javascript:void(0)" className="ant-dropdown-link" onClick={e => this.onWidgetSelect(fieldId)}>
                     <SettingOutlined />
-                </a></div>)
+                </a>
+                <a href="javascript:void(0)" className="ant-dropdown-link" onClick={e => this.onFieldRemove(fieldId)}>
+                    <DeleteOutlined />
+                </a>
+                </div>)
     }
 
     renderGroupSetting = (pageid: string, group: any) => {
@@ -173,8 +224,8 @@ export default class DesignerPage extends Component<any,any> {
         </div>)
     }
 
-    onWidgetSelect = (widgetId: string) => {
-      const selectedF = _.find(this.state.fields, { WidgetId: widgetId });
+    onWidgetSelect = (fieldId: string) => {
+      const selectedF = _.find(this.state.Fields, { FieldId: fieldId });
 
       this.fieldPropDlg = openDialog("Field", () => { return <DesignerFieldProp
           selectedField={selectedF}
@@ -183,17 +234,26 @@ export default class DesignerPage extends Component<any,any> {
       }, { hideCommands: true, size: "lg" });
     }
 
+    onFieldRemove = (fieldId: string) => {
+      const { Fields } = this.state;
+      
+      this.moveField(fieldId, null);
+      const ix = _.findIndex(Fields, { FieldId: fieldId });
+      
+      this.setState({ Fields : update(Fields, {$splice: [[ix, 1]] })});
+    }
+
     setWidgetProp = (toSaveModel: any) => {
-      const id = toSaveModel.Widgets["WidgetId"].Value;
-      const ix = _.findIndex(this.state.fields, { WidgetId: id });
-      const selectedF = this.state.fields[ix];
+      const id = toSaveModel.Widgets["FieldId"].Value;
+      const ix = _.findIndex(this.state.Fields, { FieldId: id });
+      const selectedF = this.state.Fields[ix];
       
       const blankObj: any = {};
       _.forIn(toSaveModel.Widgets, (v, k) => {
         blankObj[k] = v.Value;
       });
 
-      this.setState({ fields: update(this.state.fields, { [ix]: { $set: Object.assign({}, selectedF, blankObj) } }) });   
+      this.setState({ Fields: update(this.state.Fields, { [ix]: { $set: Object.assign({}, selectedF, blankObj) } }) });   
 
       this.fieldPropDlg.cleanup();
     }
@@ -201,7 +261,7 @@ export default class DesignerPage extends Component<any,any> {
     addgroupRow = (pageid: string, group: any, fieldCount: number) => {
         const newRow: any = { Cols: [] };
         const span = 24/fieldCount;
-        for(let x=0;x<fieldCount;x++) {
+        for(let x=0; x < fieldCount; x++) {
           newRow.Cols.push({ Id: `id${this._ix++}`, Span: span });
         }
 
@@ -234,12 +294,43 @@ export default class DesignerPage extends Component<any,any> {
     executeAction = (action: ActionInfo) => {
         const { ActionId } = action;
         if (ActionId === "BTN_SAVE") {
-            const { Header, Pages, fields } = this.state;
-            const data = { Layouts: { Header, Pages }, Fields: fields };
-            //prepare data. adjust fieldContainerLink
+            const { Fields } = this.state;
+
+            const data = { Layout: this.rectifyDataForSave(), Fields };            
 
             LinkProcesser.processLink(action, data, this.context.navigator);
         }
+    }
+
+    rectifyDataForSave() {
+      const { Header, Pages, Commands, fieldContainerLink } = this.state;
+      const cHeader = _.cloneDeep(Header);
+      const cPages = _.cloneDeep(Pages);
+
+      const setFieldId = (groups: Array<any>) => {
+        _.each(groups, (g) => {
+          if  (!g.Rows) return;
+          _.each(g.Rows, (r) => {
+            _.each(r.Cols, (c) => {
+              if (c.Id) {
+                c.Id = fieldContainerLink[c.Id];
+              }
+            });
+          });
+        });
+      };
+
+      if (cHeader && cHeader.Groups) {
+        setFieldId(cHeader.Groups);
+      }
+
+      if (cPages) {
+        _.each(cPages, (p) => {
+          setFieldId(p.Groups);
+        });        
+      }
+
+      return  { Header: cHeader, Pages: cPages, Commands };
     }
 
     getFormActions = () => {
@@ -252,6 +343,7 @@ export default class DesignerPage extends Component<any,any> {
 
     render() {
         const { Header, Pages} = this.state;
+        const { Pallet: pallet } = this.props.data;
 
         const entityModel = { Layout: { Header, Pages }, PageTitle: { PageTitle: "Form Name" } };
 
@@ -263,12 +355,12 @@ export default class DesignerPage extends Component<any,any> {
             <DesignerContext.Provider value={this.designerContext}>
             <Row>
             <Col span={4}>
-              <Card size="small" title={"Fields"}>
-                {this.renderFieldTypes()}
+              <Card size="small" title={"Pallet"}>
+                <Pallet {...pallet} linkField={this.linkField} linkButton={this.linkButton} isReadonly={this.isReadonlyPalletItem} />
               </Card>
             </Col>
             <Col span={20}>
-                <PageView getControl={this.getControl} entityModel={entityModel} getFormActions={() => { }} />
+                <PageView getControl={this.getControl} entityModel={entityModel} getFormActions={this.getLayoutActions} />
             </Col>
             </Row>
             </DesignerContext.Provider>

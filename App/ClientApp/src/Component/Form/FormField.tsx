@@ -15,8 +15,9 @@ export default class FormField extends React.Component<{widgetInfo: WidgetInfoPr
       return nextProps.widgetInfo !== this.props.widgetInfo || nextProps.dataModel !== this.props.dataModel;
     }
 
-    render() {        
-        const { WidgetId, Caption, IsHidden, CaptionPosition } = this.props.widgetInfo;
+    render() { 
+        const properies = { ...this.props.widgetInfo, ...this.props.otherProps };
+        const { WidgetId, Caption, IsHidden, CaptionPosition } = properies;
         const { HasError, Invisible } = this.props.dataModel;
         
         const formItemLayout = {

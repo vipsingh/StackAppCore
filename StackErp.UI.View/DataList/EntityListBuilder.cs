@@ -16,10 +16,8 @@ namespace StackErp.UI.View.DataList
     public class EntityListBuilder: DataListBuilder
     {
         protected override DataListDefinition GetSourceDefinition(DataListContext context)
-        {
-            EntityListService service = new EntityListService();
-             
-            return service.GetEntityListDefn(context.SourceEntityId);
+        {             
+            return EntityListService.GetEntityListDefn(context.Context, context.SourceEntityId);
         }
 
         protected override void Compile(DataListContext context, DataListDefinition defn)
@@ -47,7 +45,7 @@ namespace StackErp.UI.View.DataList
 
                 if (field != null && !context.Fields.ContainsKey(tField.FieldId))
                 {
-                    var w = BuildWidget(formContext, field);
+                    var w = BuildWidget(formContext, field, tField);
                     w.IsHidden = isHidden;
                     context.Fields.Add(tField.FieldId.ToUpper(), w);
                 }
@@ -57,10 +55,10 @@ namespace StackErp.UI.View.DataList
                 }
         }
 
-        public BaseWidget BuildWidget(FormContext formContext, BaseField field)
+        private BaseWidget BuildWidget(FormContext formContext, BaseField field, TField tField)
         {   
             var widgetContext = new WidgetContext(formContext);
-            widgetContext.Build(field, null);
+            widgetContext.Build(field, tField);
 
             var widget = WidgetFactory.Create(widgetContext);
             widget.OnCompile();
@@ -101,7 +99,7 @@ namespace StackErp.UI.View.DataList
 
         protected override void BuildDataRowActions(DataListContext context, DynamicObj row)
         {            
-            var rowId = row.Get("RowId", 0);
+            var rowId = row.Get(ViewConstant.RowId, 0);
             var actions = new List<ActionInfo>();
 
             if (context.Context.UserInfo.HasAccess(context.SourceEntityId, AccessType.Update))
@@ -117,7 +115,7 @@ namespace StackErp.UI.View.DataList
                 actions.Add(ac);
             }
 
-            row.Add("RowActions", actions);
+            row.Add("_RowActions", actions);
         }
     }
 }

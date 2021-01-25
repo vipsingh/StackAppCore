@@ -39,7 +39,7 @@ namespace StackErp.Core.Entity
                     {
                         return v.ToString(format);
                     }
-                    return null;
+                    return "";
                 } 
                 else 
                 {

@@ -5,7 +5,7 @@ namespace StackErp.ViewModel
     {
         public static readonly string PageTitle = "PageTitle";
         public static readonly string ViewLink = "ViewLink";
-        public static readonly string RowId = "RowId";
+        public static readonly string RowId = "_RowId";
         public static readonly string Text = "Text";
         public static readonly string Value = "Value";
         public static readonly string LinkedData = "LinkedData";

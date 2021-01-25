@@ -71,7 +71,7 @@ export default function(ListComp: React.ComponentClass<any,any>) {
             const { Data } = this.getListInfo();
 
             return _.filter(Data, k => {
-                return  selectedRowKeys.indexOf(k.RowId) >= 0;
+                return  selectedRowKeys.indexOf(k._RowId) >= 0;
             });
         }
 
@@ -89,12 +89,12 @@ export default function(ListComp: React.ComponentClass<any,any>) {
             return {
                 type: (SelectionConfig.IsMultiSelect ? "checkbox" : "radio"),
                 onChange: (selectedRowKeys: any, selectedRows: any) => {                
-                    this.setState({ selectedRowKeys: _.map(selectedRows, x => x.RowId) });
+                    this.setState({ selectedRowKeys: _.map(selectedRows, x => x._RowId) });
                 },
                 getCheckboxProps: (record: any) => {
                     return {
                         //disabled: record.name === 'Disabled User'
-                        name: record.RowId,
+                        name: record._RowId,
                     };
                 },
                 selectedRowKeys: this.state.selectedRowKeys
@@ -109,13 +109,11 @@ export default function(ListComp: React.ComponentClass<any,any>) {
 
         render() {
             const ListData = this.getListInfo();
-            const { Pager } = this.state;
+            const { Pager, IsFetching } = this.state;
             
-            if(this.state.IsFetching){
+            if(IsFetching){
                 return (<label>loading..</label>);
-            } else if (!ListData) {
-                return (<label>something went wrong..</label>);
-            } else {
+            } else if (ListData) {
                 return (
                     <div>
                         {
@@ -129,6 +127,8 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                         />
                     </div>
                 );
+            } else {
+                return (<label></label>);
             }
         }
     }

@@ -39,7 +39,7 @@ namespace StackErp.ViewModel.ViewContext
 
             var f = new TField(){
                 FieldId = "entitylist_" + this.EntityId.Code,
-                Widget = FormControlType.EntityListView,
+                WidgetType = FormControlType.EntityListView,
                 FullRow = true
             };
             view.Fields.Add(f);

@@ -14,7 +14,7 @@ namespace StackErp.Core
 {
     public partial class DBEntity : IDBEntity
     {        
-        public EntityModelBase GetDefault()
+        public EntityModelBase GetDefault(StackAppContext appContext)
         {
             EntityRecordModel model = new EntityRecordModel(this);
             model.CreateDefault();
@@ -23,10 +23,10 @@ namespace StackErp.Core
         }
 
         #region Data Fetch
-        public virtual EntityModelBase GetSingle(int id)
+        public virtual EntityModelBase GetSingle(StackAppContext appContext, int id)
         {
             var sql = _detailQry;
-            var arr = DBService.Query(sql, new { ItemId = new int[] {id} });
+            var arr = DBService.Query(sql, new { MasterId = appContext.MasterId, ItemId = new int[] {id} });
             //var relatedFieldData = DBService.Query(_relatedFieldDataQryList, new { ItemId = new int[] {id} });
             if (arr.Count() > 0)
             {
@@ -48,12 +48,12 @@ namespace StackErp.Core
             return model;
         }
 
-        public List<EntityModelBase> GetAll(FilterExpression filter)
+        public List<EntityModelBase> GetAll(StackAppContext appContext,FilterExpression filter)
         {
             throw new NotImplementedException();
         }
 
-        public List<EntityModelBase> GetAll(int[] ids)
+        public List<EntityModelBase> GetAll(StackAppContext appContext, int[] ids)
         {
             var sql = _detailQry;
             var arr = DBService.Query(sql, new { ItemId = ids });
@@ -71,19 +71,19 @@ namespace StackErp.Core
             return list;
         }
 
-        public DBModelBase Read(int id, List<string> fields)
+        public DBModelBase Read(StackAppContext appContext, int id, List<string> fields)
         {
             var exp = new FilterExpression(this.EntityId);
             exp.Add(new FilterExpField(this.IDField, FilterOperationType.Equal, id));
 
-            var d = ReadAll(fields, exp);
+            var d = ReadAll(appContext, fields, exp);
             if (d.Count > 0)
                 return d.First();
 
             throw new UserException("Record is not available with id: " + id.ToString());
         }
 
-        public List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter)
+        public List<DBModelBase> ReadAll(StackAppContext appContext, List<string> fields, FilterExpression filter)
         {
             var q = new DbQuery(this);
             foreach(var f in fields)
@@ -94,7 +94,7 @@ namespace StackErp.Core
             
             q.SetFixedFilter(filter);
 
-            var data = QueryDbService.ExecuteEntityQuery(q);   
+            var data = QueryDbService.ExecuteEntityQuery(appContext, q);   
             var models = new List<DBModelBase>();
             foreach(var d in data)
             {
@@ -107,17 +107,17 @@ namespace StackErp.Core
         }
 
         //used in script
-        public List<DBModelBase> ReadAll(List<string> fields, string filter)
+        public List<DBModelBase> ReadAll(StackAppContext appContext, List<string> fields, string filter)
         {
-            return ReadAll(fields, FilterExpression.BuildFromJson(this.EntityId, filter));
+            return ReadAll(appContext, fields, FilterExpression.BuildFromJson(this.EntityId, filter));
         }
 
-        public List<int> ReadIds(FilterExpression filter)
+        public List<int> ReadIds(StackAppContext appContext, FilterExpression filter)
         {
             var q = new DbQuery(this);
             q.AddField(this.IDField, true);
             q.SetFixedFilter(filter);
-            var data = QueryDbService.ExecuteEntityQuery(q);            
+            var data = QueryDbService.ExecuteEntityQuery(appContext, q);            
             var list = new List<int>();
             if (data.Count() > 0)
             {

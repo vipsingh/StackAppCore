@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using StackErp.Core;
 using StackErp.Core.Entity;
 using StackErp.Model;
+using StackErp.UI.View;
 
 namespace StackErp.Web
 {
@@ -60,9 +61,10 @@ namespace StackErp.Web
             context.Session.Clear();
         }
 
-        public StackAppContext GetAppContext(AppKeySetting appSettings, HttpContext context)
+        public WebAppContext GetAppContext(AppKeySetting appSettings, HttpContext context)
         {
-            var stackAppContext = new StackAppContext();
+            var sessionHelper = new SessionHelper(context);
+            var stackAppContext = new WebAppContext(sessionHelper);
             stackAppContext.Init(appSettings); 
             var str = context.Session.GetString("USER_CONTEXT");
 

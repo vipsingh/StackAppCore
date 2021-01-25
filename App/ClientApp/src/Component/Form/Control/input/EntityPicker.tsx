@@ -142,10 +142,6 @@ class EntityPickerView extends React.PureComponent<{
             body: {RequestType: 0, RequestInfo: req}
         }).then((res: any) => {
             if (res.Data) {
-                // if dropdown type
-                // const ds = _.map(res.Data, d => {
-                //     return { Value: d.RowId, Text: d[res.ItemViewField].FormatedValue }
-                // })
                 this.setState({DataSource: res});
             }
             
@@ -163,7 +159,7 @@ class EntityPickerView extends React.PureComponent<{
         if (!rows || rows.length === 0) this.props.onSelect();
 
         const vals = _.map(rows, r => {
-            return { Text: r[ItemViewField].FormatedValue, Value: r.RowId };
+            return { Text: r[ItemViewField].FormatedValue, Value: r._RowId };
         })
 
         if (this.props.SelectionConfig.IsMultiSelect) {

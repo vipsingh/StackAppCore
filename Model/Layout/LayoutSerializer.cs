@@ -97,29 +97,29 @@ namespace StackErp.Model.Layout
             return g;
         }
 
-        internal TList SerializeTList(string xml)
-        {
-            XmlDocument document = new XmlDocument();
-            document.LoadXml(xml);
+        // internal TList SerializeTList(string xml)
+        // {
+        //     XmlDocument document = new XmlDocument();
+        //     document.LoadXml(xml);
 
-            return CreateListView(document);
-        }
+        //     return CreateListView(document);
+        // }
 
-        private TList CreateListView(XmlDocument document)
-        {
-            var view = new TList();
+        // private TList CreateListView(XmlDocument document)
+        // {
+        //     var view = new TList();
 
-            XmlNode root = document.FirstChild;
-            var v = root.SelectSingleNode("/tlist");
+        //     XmlNode root = document.FirstChild;
+        //     var v = root.SelectSingleNode("/tlist");
 
-            var fList = root.SelectNodes("/tlist/template/row/field");
-            foreach (XmlNode page in fList)
-            {
-                view.Fields.Add(TField.FromXmlNode(page));
-            }
+        //     var fList = root.SelectNodes("/tlist/template/row/field");
+        //     foreach (XmlNode page in fList)
+        //     {
+        //         view.Fields.Add(TField.FromXmlNode(page));
+        //     }
 
-            return view;
-        }
+        //     return view;
+        // }
 
     }
 }

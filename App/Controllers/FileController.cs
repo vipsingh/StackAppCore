@@ -28,7 +28,7 @@ namespace StackErp.App.Controllers
                 return Json(new { Status = "error", Message = "Error in uploading" }); 
             
             string randomFileName = Path.GetRandomFileName();
-            var path = Path.Combine(this.StackAppContext.ImageStorePath, "temp", randomFileName);
+            var path = Path.Combine(this.WebAppContext.ImageStorePath, "temp", randomFileName);
   
             using (var stream = System.IO.File.Create(path))
             {
@@ -41,7 +41,7 @@ namespace StackErp.App.Controllers
         public IActionResult ObjectImage()
         {
             var fileName = RequestQuery.Name;
-            var path = Path.Combine(this.StackAppContext.ImageStorePath, "store_" + StackAppContext.MasterId, fileName);
+            var path = Path.Combine(this.WebAppContext.ImageStorePath, "store_" + WebAppContext.MasterId, fileName);
 
             if (System.IO.File.Exists(path))
             {

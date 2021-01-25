@@ -24,7 +24,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult GetPickerData([FromBody] ListRequestinfo request)
         {  
-            var context = new PickerListContext(this.StackAppContext, RequestQuery, request);
+            var context = new PickerListContext(this.WebAppContext, RequestQuery, request);
             var builder = new PickerListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);
@@ -34,14 +34,14 @@ namespace StackErp.App.Controllers
     
         public IActionResult GetListFormData()
         {  
-            var pages =  StackErp.UI.View.CustomWidgetBuilder.ListFormDataProcesser.GetData(this.StackAppContext, this.RequestQuery);
+            var pages =  StackErp.UI.View.CustomWidgetBuilder.ListFormDataProcesser.GetData(this.WebAppContext, this.RequestQuery);
             
             return CreateResult(pages);
         }
 
         public IActionResult GetRelatedListData([FromBody] ListRequestinfo request)
         {
-            var context = new DataListContext(this.StackAppContext, RequestQuery, request);
+            var context = new DataListContext(this.WebAppContext, RequestQuery, request);
             var builder = new EntityListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);
@@ -52,7 +52,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult ProcessFieldEvent([FromQuery]string type, [FromBody]CustomRequestInfo requestInfo)
         {
-            var res = FormEventProcesser.ProcessFieldEvent(StackAppContext, type, requestInfo);
+            var res = FormEventProcesser.ProcessFieldEvent(WebAppContext, type, requestInfo);
 
             return CreateResult(res);
         }

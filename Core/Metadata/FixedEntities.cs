@@ -225,11 +225,11 @@ namespace StackErp.Core.Metadata
             int entId = 6;
             var fs = new Dictionary<string, BaseField>();                       
 
-            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""text"",""isrequired"": true,""dbname"": ""name""}");
+            var dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""text"",""isrequired"": true,""dbname"": ""text""}");
             var f = EntityMetaData.BuildField(entityName, entityName, dbo, null);        
             fs.Add("TEXT", f);
 
-            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true,""dbname"": ""idfield"",""viewtype"":-1}");
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""entityid"",""isrequired"": true,""dbname"": ""entityid"",""viewtype"":-1}");
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
             fs.Add("ENTITYID", f);
 

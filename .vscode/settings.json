@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/a80ba16a-d9d3-4232-9b27-1a0d464389c7/resourceGroups/Default-Web-EastAsia/providers/Microsoft.Web/sites/stackerp2",
+    "appService.deploySubpath": "./App/bin/Debug/netcoreapp3.1/publish"
+}

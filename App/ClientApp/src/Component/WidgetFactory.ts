@@ -10,6 +10,8 @@ import HtmlTextBox from "./Form/Control/ContentEditor/HtmlTextBox";
 
 import XmlEditor from "./Form/Control/ContentEditor/XmlEditor";
 //const XmlEditor = getAsyncComponent(() => import("./Form/Control/ContentEditor/XmlEditor"));
+import JsonEditor from "./Form/Control/ContentEditor/JsonEditor";
+import StackScriptEditor from "./Form/Control/ContentEditor/StackScriptEditor";
 
 
 export function getComponent(controlType: number, isViewMode?: boolean) {
@@ -51,6 +53,12 @@ export function getComponent(controlType: number, isViewMode?: boolean) {
             break;
         case FormControlType.XmlEditor:
             editComponent = viewComponent = XmlEditor;
+            break;
+        case FormControlType.JsonEditor:
+            editComponent = viewComponent = JsonEditor;
+            break;
+        case FormControlType.StackScriptEditor:
+            editComponent = viewComponent = StackScriptEditor;
             break;
         default:
             const w = widgets[controlType];

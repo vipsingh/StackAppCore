@@ -26,8 +26,8 @@ namespace StackErp.UI.View.PageGenerator
             }
             if (LayoutField != null)
             {
-                if (LayoutField.Widget == FormControlType.None && field != null)
-                    LayoutField.Widget = field.ControlType;
+                if (LayoutField.WidgetType == FormControlType.None && field != null)
+                    LayoutField.WidgetType = field.ControlType;
             }
 
             if (!this.FormContext.Widgets.ContainsKey(LayoutField.FieldId))
@@ -44,9 +44,9 @@ namespace StackErp.UI.View.PageGenerator
             widgetContext.Build(field, LayoutField);
 
             IWidget widget;
-            if (CustomWidgetFactory.HasKey(LayoutField.Widget))
+            if (CustomWidgetFactory.HasKey(LayoutField.WidgetType))
             {
-                widget = CustomWidgetFactory.Get(LayoutField.Widget).Invoke(widgetContext, LayoutField);
+                widget = CustomWidgetFactory.Get(LayoutField.WidgetType).Invoke(widgetContext, LayoutField);
             }
             else
             {

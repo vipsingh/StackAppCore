@@ -57,7 +57,7 @@ namespace StackErp.App.Controllers
 
             /////////////////////////////////////////////////////////////////////
 
-            var d = StackErp.Core.EntityMetaData.Get(99).GetSingle(id);
+            var d = StackErp.Core.EntityMetaData.Get(99).GetSingle(appContext, id);
             args.Add("model", d);
 
             DynamicObj output = new DynamicObj();

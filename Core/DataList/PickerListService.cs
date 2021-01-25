@@ -50,10 +50,10 @@ namespace StackErp.Core.DataList
         {
             var fields = new String[] { ds.ItemIdField, ds.ItemViewField };
             var tList = new TList();
-            tList.Fields = new List<TField>();
+            tList.Fields = new List<TListField>();
             foreach(var f in fields)
             {
-                var tfield = new TField()
+                var tfield = new TListField()
                 {
                     FieldId = f
                 };

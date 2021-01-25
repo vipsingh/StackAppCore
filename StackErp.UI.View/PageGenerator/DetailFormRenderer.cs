@@ -1,5 +1,7 @@
 using System;
+using StackErp.Core.Form;
 using StackErp.Model;
+using StackErp.Model.Layout;
 using StackErp.ViewModel.FormWidget;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
@@ -15,8 +17,7 @@ namespace StackErp.UI.View.PageGenerator
 
         protected override void Compile(LayoutContext layoutContext)
         {
-            base.Compile(layoutContext);
-            BuildActions();            
+            base.Compile(layoutContext);                    
         }
 
         protected override void OnRenderComplete()
@@ -25,13 +26,26 @@ namespace StackErp.UI.View.PageGenerator
             
             base.OnRenderComplete();
         }
-        private void BuildActions()
+
+        protected override void CompileActions(TView view)
         {
-            if (this.FormContext.Context.UserInfo.HasAccess(FormContext.Entity.EntityId, AccessType.Update))
+             if (this.FormContext.Context.UserInfo.HasAccess(FormContext.Entity.EntityId, AccessType.Update))
             {
                 var actionContext = new ActionContext(FormContext, ActionType.Edit, "BTN_EDIT");
                 actionContext.Query = FormContext.RequestQuery.Clone();
                 FormContext.Actions.Add(PageActionCreator.Create(actionContext));
+            }
+            
+            if(view.Commands != null) 
+            {
+                foreach(var command in view.Commands)
+                {
+                    var c = EntityActionService.GetViewAction(this.FormContext.Context, this.FormContext.Entity.EntityId, FormContext.EntityLayoutType, command.Id);
+                    if(c!= null)
+                    {
+                        this.FormContext.Actions.Add(PageActionCreator.BuildActionFromDefinition(c, this.FormContext));
+                    }
+                }
             }
         }
         public void FillWidgetsData()

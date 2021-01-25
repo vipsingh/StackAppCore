@@ -32,7 +32,7 @@ namespace StackErp.App.Controllers
         public IActionResult New()
         {            
 
-            var context = new EditFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            var context = new EditFormContext(this.WebAppContext, this.RequestQuery.EntityId, this.RequestQuery);
             context.Build();
 
             var builder = new EntityPageBuilder();
@@ -43,7 +43,7 @@ namespace StackErp.App.Controllers
 
         public IActionResult Edit()
         {
-            var context = new EditFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            var context = new EditFormContext(this.WebAppContext, this.RequestQuery.EntityId, this.RequestQuery);
             context.Build();
 
             var builder = new EntityPageBuilder();
@@ -54,7 +54,7 @@ namespace StackErp.App.Controllers
 
         public IActionResult Detail()
         {
-            var context = new DetailFormContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            var context = new DetailFormContext(this.WebAppContext, this.RequestQuery.EntityId, this.RequestQuery);
             context.Build();
 
             var builder = new EntityPageBuilder();
@@ -67,7 +67,7 @@ namespace StackErp.App.Controllers
         public IActionResult Save([FromBody]UIFormModel model)
         {
             var s = ModelState;
-            var pageAction = new EntityPageAction(this.StackAppContext);
+            var pageAction = new EntityPageAction(this.WebAppContext);
             var actionRes = pageAction.GetSaveAction(this.RequestQuery, model);
 
             // var ent = Core.EntityMetaData.Get(EntityCode.UserRole);
@@ -85,10 +85,10 @@ namespace StackErp.App.Controllers
             DataListContext context = null;
             if (!string.IsNullOrEmpty(this.RequestQuery.RelationField))
             {
-                context = new RelatedEntityListContext(this.StackAppContext, RequestQuery, request);
+                context = new RelatedEntityListContext(this.WebAppContext, RequestQuery, request);
             }
             else
-                context = new DataListContext(this.StackAppContext, RequestQuery, request);
+                context = new DataListContext(this.WebAppContext, RequestQuery, request);
             var builder = new EntityListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);
@@ -102,7 +102,7 @@ namespace StackErp.App.Controllers
                 this.RequestQuery.EntityId = EntityCode.Get(id);
             }
 
-            var context = new DeskPageContext(this.StackAppContext, this.RequestQuery.EntityId, this.RequestQuery);
+            var context = new DeskPageContext(this.WebAppContext, this.RequestQuery.EntityId, this.RequestQuery);
             context.Build();
 
             var builder = new EntityPageBuilder();
@@ -121,7 +121,7 @@ namespace StackErp.App.Controllers
         public IActionResult Testx([FromBody]CustomRequestInfo requestInfo)
         {
             var ent = Core.EntityMetaData.Get(EntityCode.User);
-            var m = ent.GetDefault();
+            var m = ent.GetDefault(WebAppContext);
             
             m.SetValue("SubmitAmount", 200);
             //m.ResolveComputedFields();

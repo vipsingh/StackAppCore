@@ -30,12 +30,12 @@ namespace StackErp.ViewModel.ViewContext
             
             if (IsNew)
             {
-                EntityModel = this.Entity.GetDefault();
+                EntityModel = this.Entity.GetDefault(this.Context);
                 EntityModel.SetValue(ViewConstant.ItemType, this.EntityModelInfo.ItemType);
                 SetRelationShip();
             }
             else
-                EntityModel = this.Entity.GetSingle(this.EntityModelInfo.ObjectId);
+                EntityModel = this.Entity.GetSingle(this.Context, this.EntityModelInfo.ObjectId);
         }
 
         public void PrepareLinkedData(CustomRequestInfo requestInfo)

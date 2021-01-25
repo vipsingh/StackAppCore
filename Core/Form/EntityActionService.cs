@@ -47,5 +47,10 @@ namespace StackErp.Core.Form
         {
             return _Links.Find(x => x.Id == actionId && x.Viewtype == layoutType);
         }
+
+        public static List<ActionLinkDefinition> GetActions(StackAppContext appContext, EntityCode entity, EntityLayoutType layoutType)
+        {
+            return _Links.Where(x => (x.EntityId.Code == 0 || x.EntityId.Equals(entity)) && x.Viewtype == layoutType).ToList();
+        }
     }
 }

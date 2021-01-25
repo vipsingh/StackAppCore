@@ -59,3 +59,10 @@ values(0,10007,102,10007,'','0', null);
 
 insert into autoid values(102, 1);
 --------------------------------------------------------------------------------------------
+
+--Drop all
+
+select 'drop table "' || tablename || '" cascade;' from pg_tables where schemaname = 'public';
+
+drop function get_collection_datatext;
+drop function get_related_data;

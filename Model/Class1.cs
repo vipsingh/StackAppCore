@@ -183,4 +183,10 @@ namespace StackErp.Model
             return def;
         }
     }
+
+    public class ScriptType<T> {
+        public T Value {get;}
+        public bool IsScript { get;}
+        public string Script { get;}
+    }
 }

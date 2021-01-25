@@ -24,9 +24,9 @@ namespace StackErp.ViewModel.ViewContext
             //Add all data related info in this function
             
             if (IsNew)
-                EntityModel = this.Entity.GetDefault();
+                EntityModel = this.Entity.GetDefault(this.Context);
             else
-                EntityModel = this.Entity.GetSingle(this.EntityModelInfo.ObjectId);
+                EntityModel = this.Entity.GetSingle(this.Context, this.EntityModelInfo.ObjectId);
         }
     }
 }

@@ -6,6 +6,7 @@ import { openDialog } from "./UI/Dialog";
 import { openDrawer } from "./UI/Drawer";
 import PageComponent from "./PageComponent";
 import PageContext from "../Core/PageContext";
+import fIcon from "./UI/Icon";
 
 export default class ActionLink extends React.Component<ActionInfo> {
     static contextType = PageContext;
@@ -33,21 +34,22 @@ export default class ActionLink extends React.Component<ActionInfo> {
 
     navigate = (event: any) => {
         event.preventDefault();
+        const { LinkTarget } = this.props;
+        if (LinkTarget) {
+            this.openInTarget();
+        }
+
         this.context.navigator.navigate(this.props.Url);
     }
     
     renderLink() {
-        const { Title, ActionId, ExecutionType, Url, Attributes, LinkTarget } = this.props;
+        const { Title, ActionId, Url, Attributes, Icon, DisplayType } = this.props;
         const title = Title || ActionId;
         let caption = Attributes && Attributes.OnlyIcon ? "" : title;
 
-        if ((!ExecutionType || ExecutionType === 4) && Url) {
+        if (DisplayType !== 2) {
             let u = `/${Url}`;
             u = u.replace("//", "/");
-
-            if (LinkTarget) {
-                return <Button type="link" onClick={this.openInTarget} style={{ height:0, padding:0 }}>{caption}</Button>;
-            }
 
             return <a title={title} href={u} onClick={this.navigate}>{caption}</a>;
         }
@@ -81,9 +83,10 @@ export default class ActionLink extends React.Component<ActionInfo> {
             return (
                 <Button 
                     key={prop.ActionId}
-                    onClick={prop.ExecutionType === 4 ? undefined : this.onCommandClick}
+                    onClick={prop.ExecutionType === 4 ? this.navigate : this.onCommandClick}
                     type={type.type}
                     danger={type.isDanger}
+                    icon={fIcon(prop.Icon)}
                     >
                         {
                             this.renderLink()

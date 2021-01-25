@@ -25,15 +25,25 @@ namespace StackErp.App.Controllers
         {
 
         }
+        public IActionResult Index()
+        {
+            var context = new DeskPageContext(this.WebAppContext, EntityCode.EntityMaster, this.RequestQuery);
+            context.Build();
+
+            var builder = new UI.View.PageBuilder.EntityPageBuilder();            
+
+            return CreatePageResult(builder.CreateDeskPage(context));
+        }
+
         public IActionResult Studio()
         {
-            var page = new StudioPage(StackAppContext);
+            var page = new StudioPage(WebAppContext);
 
             return CreatePageResult(page.GetPage(this.RequestQuery));
         }
 
         public IActionResult LayoutDesigner() {
-            var desinerPage = LayoutDesignerBuilder.BuildPage(StackAppContext, RequestQuery);
+            var desinerPage = LayoutDesignerBuilder.BuildPage(WebAppContext, RequestQuery);
 
             return CreatePageResult(desinerPage);
         }        
@@ -41,9 +51,8 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult SaveDesigner([FromBody]JObject data) 
         {
-            if (data != null) {
-                var view = data["Layout"].ToObject<TView>();
-                var res = LayoutDesignerBuilder.SaveLayout(StackAppContext, RequestQuery, view);
+            if (data != null) {                
+                var res = LayoutDesignerBuilder.SaveLayout(WebAppContext, RequestQuery, data);
 
                 return CreateResult(res);
             }            

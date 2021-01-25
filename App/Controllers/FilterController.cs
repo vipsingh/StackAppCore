@@ -23,7 +23,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult GetFilterPickerData([FromBody] ListRequestinfo request)
         {  
-            var context = new PickerListContext(this.StackAppContext, RequestQuery, request);
+            var context = new PickerListContext(this.WebAppContext, RequestQuery, request);
             var builder = new PickerListBuilder();
             builder.Build(context);
             var res = builder.GetResponse(context);
@@ -34,7 +34,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult GetFilterFieldForms([FromBody] CustomRequestInfo request)
         {  
-            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
+            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.WebAppContext);
             var page = form.Generate(request, this.RequestQuery);
             
             return CreatePageResult(page);
@@ -43,7 +43,7 @@ namespace StackErp.App.Controllers
         [HttpPost]
         public IActionResult GetFilterFieldData([FromBody] CustomRequestInfo request)
         {  
-            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.StackAppContext);
+            var form = new UI.View.CustomWidgetBuilder.FilterFormBuilder(this.WebAppContext);
             var page = form.BuildWithData(request, this.RequestQuery);
             
             return CreateResult(page);

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackErp.App.Controllers;
 using StackErp.Model;
+using StackErp.UI.View;
 using StackErp.ViewModel.Model;
 
 namespace StackErp.UI.Controllers
@@ -22,7 +23,7 @@ namespace StackErp.UI.Controllers
     {
         private readonly ILogger<BaseController> _logger;    
         private AppKeySetting _appSetting;
-        public StackAppContext StackAppContext {private set; get;}
+        public WebAppContext WebAppContext {private set; get;}
         public RequestQueryString RequestQuery {protected set; get;}
         public BaseController(ILogger<BaseController> logger, IOptions<AppKeySetting> appSettings)
         {
@@ -42,11 +43,11 @@ namespace StackErp.UI.Controllers
                         (new Web.AuthService()).PrepareUserSession(int.Parse(cl.First().Value), HttpContext);
 
                         if (HttpContext.Session.IsAvailable)
-                            StackAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
+                            WebAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
 
                         RequestQuery = GetQuery(); 
                         
-                        StackAppContext.RequestQuery = RequestQuery;
+                        WebAppContext.RequestQuery = RequestQuery;
                     }
                     else 
                     {
@@ -63,11 +64,11 @@ namespace StackErp.UI.Controllers
             else 
             {
                 if (HttpContext.Session.IsAvailable)
-                    StackAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
+                    WebAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
 
                 RequestQuery = GetQuery(); 
                     
-                StackAppContext.RequestQuery = RequestQuery;
+                WebAppContext.RequestQuery = RequestQuery;
             }
         }
 
@@ -110,7 +111,7 @@ namespace StackErp.UI.Controllers
         [AllowAnonymous]
         public IActionResult SPAApp()
         {
-             var page = new App.PageLayout(this.StackAppContext);
+             var page = new App.PageLayout(this.WebAppContext);
             var m = page.Build();
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(m);
 

@@ -40,10 +40,10 @@ namespace StackErp.DB.DataList
                     l.AdditionalFields = additional.Split(',').ToList();
                 }
 
-                var layoutxml = db.Get("layoutxml", "");
-                if (!string.IsNullOrEmpty(layoutxml))
+                var layoutjson = db.Get("layoutjson", "");
+                if (!string.IsNullOrEmpty(layoutjson))
                 {
-                    var tlist = TList.ParseFromXml(layoutxml);
+                    var tlist = TList.ParseFromJSON(layoutjson);
                     l.Layout = tlist;
                 }
                 

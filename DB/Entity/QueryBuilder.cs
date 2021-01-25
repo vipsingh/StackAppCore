@@ -15,9 +15,9 @@ namespace StackErp.DB
             _Entity = entity;
         }
 
-        public string BuildDetailQry()
+        public string BuildDetailQry(bool includeGlobalMasterId = false)
         {
-            var q = new DbQuery(_Entity);            
+            var q = new DbQuery(_Entity, includeGlobalMasterId);
 
             bool hasItemTypeFiled = _Entity.DefaultItemTypeId > 0;
             List<string> ignoreFields = new List<string>();

@@ -1,13 +1,13 @@
 import React from "react";
-import CodeMirror  from "react-codemirror";
+import {UnControlled as CodeMirror}  from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 import "codemirror/mode/xml/xml";
 import "codemirror/mode/javascript/javascript";
 
 export default class CodeMirrorBox extends React.Component<{mode: string, code: string, onChange: Function}> {
 
-    updateCode = (newCode: string) => {
-		this.props.onChange(newCode);
+    updateCode = (editor: any, data: any, value: string) => {
+		this.props.onChange(value);
     }
     
     render() {

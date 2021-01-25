@@ -19,6 +19,15 @@ namespace StackErp.Core.Entity
             
         }
 
+		protected override void BuildDefaultQueries()
+        {
+            var qBuilder = new EntityQueryBuilder(this);
+            
+            _detailQry = qBuilder.BuildDetailQry(true);
+
+            BuildRelatedFIeldQueries(qBuilder);
+        }
+
         public override AnyStatus Save(StackAppContext appContext, EntityModelBase model)
         {
 			if (model.IsNew)
@@ -163,51 +172,23 @@ namespace StackErp.Core.Entity
 			});
 
             return view1;
-        }
-        private const string _LayoutXml1 = @"<view entity=""entityschema"">
-	<header>
-		<group>
-		    <row>
-				<field text=""Entity"" id=""entityid"" readonly=""1""/>
-			</row>
-			<row>
-				<field text=""Name"" id=""fieldname"" readonly=""2"" />
-				<field text=""Type"" id=""fieldtype"" readonly=""2"" />
-			</row>
-		</group>
-	</header>
-	<pages display=""TAB"">
-		<page text=""general"">
-			<group text=""section 1"">
-				<row>
-					<field id=""label"" />
-					<field id=""isrequired""/>
-				</row>
-				<row>
-					<field id=""defaultvalue"" />
-					<field id=""ismultiselect"" readonly=""2"" />
-				</row>
+        }        
+    
+		public override Model.DataList.EntityListDefinition CreateDefaultListDefn(StackAppContext appContext)
+        {
+            var defn = PrepareEntityListDefin();
+            
+            var layoutF = new List<string>() { "fieldname", "entityid", "fieldtype", "linkentity", "collectionid" };
+            var tlist = new TList();
+            foreach (var f in layoutF)
+            {
+                tlist.Fields.Add(new TListField() { FieldId = f });
+            }
+            defn.Layout = tlist;
 
-				<row>
-					<field id=""computeexpression"" />
-					<field id=""uisetting"" />
-				</row>
-			</group>
-			<group text=""Relation"">
-				<row>
-					<field id=""linkentity"" invisible=""[{&quot;fieldtype&quot;:[8, &quot;10,11,20,21&quot;]}]"" readonly=""2"" />
-					<field id=""linkentity_domain"" invisible=""[{&quot;fieldtype&quot;:[8, &quot;10,11,20,21&quot;]}]"" />
-				</row>			    
-				<row>
-					<field id=""linkentity_field"" invisible=""[{&quot;fieldtype&quot;:[8, &quot;10,11,20,21&quot;]}]"" readonly=""2""/>
-					<field id=""relatedexp"" readonly=""2"" />
-				</row>			    
-				<row>
-				    <field id=""collectionid"" invisible=""[{&quot;fieldtype&quot;:[8, &quot;9,30&quot;]}]"" readonly=""2""/>
-				</row>
-			</group>
-		</page>
-	</pages>
-</view>";
-    }
+            defn.IncludeGlobalMasterId = true;
+            
+            return defn;
+        }
+	}
 }

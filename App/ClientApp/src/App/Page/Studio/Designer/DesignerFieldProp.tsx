@@ -14,8 +14,8 @@ export default class DesignerFieldProp extends Component<{
         super(props);
         this.schema = {
             Widgets: {
-                WidgetId: { WidgetId: "WidgetId", WidgetType: FormControlType.Label, Caption: "WidgetId", IsHidden: true },
-                Caption: { WidgetId: "Caption", WidgetType: FormControlType.TextBox, Caption: "Caption" },
+                FieldId: { WidgetId: "FieldId", WidgetType: FormControlType.Label, Caption: "FieldId", IsHidden: true },
+                Text: { WidgetId: "Text", WidgetType: FormControlType.TextBox, Caption: "Caption" },
                 IsMandatory: { WidgetId: "IsMandatory", WidgetType: FormControlType.CheckBox, Caption: "IsMandatory" },
                 WidgetStyle: { WidgetId: "WidgetStyle", WidgetType: FormControlType.LongText, Caption: "WidgetStyle" }
             },

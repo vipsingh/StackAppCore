@@ -146,6 +146,9 @@ namespace StackErp.Core
                 case FieldType.Xml:
                     field = new XmlField();
                     break;
+                case FieldType.Json:
+                    field = new JsonField();
+                    break;
                 case FieldType.Email:
                     field = new EmailField();
                     break;
@@ -232,6 +235,9 @@ namespace StackErp.Core
                 case FieldType.Xml:
                     t = FormControlType.XmlEditor;
                     break;
+                case FieldType.Json:
+                    t = FormControlType.JsonEditor;
+                    break;                    
                 case FieldType.StackScript:
                     t = FormControlType.StackScriptEditor;
                     break;

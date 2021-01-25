@@ -25,18 +25,20 @@ window._Debug = DebugTrace;
 window.__L = getResource;
 
 //Default for dev
-window._AppSetting = {
-  UserId: 1,
-  RoleId: 1,
-  Language: "en-us",
-  DateFormat: "DD-MM-YYYY",
-  BaseUrl: "/",
-  ApiUrl: "@ViewBag.Host",
-  AssetUrl: "@ViewBag.Host",
-  BaseCurrency: 1,
-  BaseCurrencySymbol: "$",
-  DecimalPlaces: 2
-};
+if (!window._AppSetting) {
+  window._AppSetting = {
+    UserId: 1,
+    RoleId: 1,
+    Language: "en-us",
+    DateFormat: "DD-MM-YYYY",
+    BaseUrl: "/",
+    ApiUrl: "@ViewBag.Host",
+    AssetUrl: "@ViewBag.Host",
+    BaseCurrency: 1,
+    BaseCurrencySymbol: "$",
+    DecimalPlaces: 2
+  };
+}
 //
 
 registerPages();

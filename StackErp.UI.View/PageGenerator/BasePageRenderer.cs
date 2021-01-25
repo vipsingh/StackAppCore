@@ -86,17 +86,6 @@ namespace StackErp.UI.View.PageGenerator
 
         protected virtual void CompileActions(TView view)
         {
-            if(view.Commands != null) 
-            {
-                foreach(var command in view.Commands)
-                {
-                    var c = EntityActionService.GetViewAction(this.FormContext.Context, this.FormContext.Entity.EntityId, FormContext.EntityLayoutType, command.Id);
-                    if(c!= null)
-                    {
-                        this.FormContext.Actions.Add(PageActionCreator.BuildActionFromDefinition(c, this.FormContext));
-                    }
-                }
-            }
         }
 
         protected virtual void OnRenderComplete()

@@ -53,7 +53,7 @@ namespace StackErp.UI.View.DataList
                     mapping.Add(c.Key, dataRow.Get<object>(c.Value.ToString(), null));
                 }                
 
-                row.Add("ModelMapping", mapping);
+                row.Add("_ModelMapping", mapping);
             }
         }
     }

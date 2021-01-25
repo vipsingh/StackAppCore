@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Linq;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using StackErp.Model.Entity;
 using StackErp.Model.Utils;
+using Newtonsoft.Json.Serialization;
 
 namespace StackErp.Model.Layout
 {
@@ -38,6 +40,42 @@ namespace StackErp.Model.Layout
             // }
             return Fields;
         }
+
+        public void ClearBlankRows()
+        {
+            if (Header != null && Header.Groups != null) {
+                foreach(var g in Header.Groups)
+                {
+                    ClearBlankRowsFromGroup(g);
+                }
+            }
+
+            foreach(var p in Pages)
+            {
+                if (p.Groups != null) {
+                    foreach(var g in p.Groups)
+                    {
+                        ClearBlankRowsFromGroup(g);
+                    }
+                }
+            }
+        }
+
+        private void ClearBlankRowsFromGroup(TGroup group)
+        {
+            if (group == null || group.Rows.Count == 0) return;
+
+            var list = new List<int>();
+            for(int i=0; i<group.Rows.Count; i++)
+            {
+                var r = group.Rows[i];
+                if (r.Cols.Count == 0 || r.Cols.Where(c => string.IsNullOrEmpty(c.Id)).Count() == r.Cols.Count)
+                    list.Add(i);
+            }
+
+            foreach(var i in list)
+                group.Rows.RemoveAt(i);            
+        }
         private void ExtractPageFields(TPage p, ref List<TField> fields)
         {
             if (p == null) return;
@@ -55,6 +93,23 @@ namespace StackErp.Model.Layout
         {
             var ser = new LayoutViewSerialzer();
             return ser.SerializeTView(xml);
+        }
+
+        public static TView ParseFromJSON(string json) {
+            if (string.IsNullOrEmpty(json)) return null;
+            
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<TView>(
+                json, 
+                new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new LayoutJsonContractResolver() });
+
+        }
+
+        public string ToStoreJSON() {
+
+            return Newtonsoft.Json.JsonConvert.SerializeObject(
+                this, 
+                new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new LayoutJsonContractResolver() });
+
         }
     }
     public class TRow
@@ -86,9 +141,10 @@ namespace StackErp.Model.Layout
         public string Text { set; get; }
         public bool FullRow { set; get; }
         public string Invisible { set; get; }
+        public string IsMandatory { set; get; } //ScriptType<bool>
         public string ReadOnly { set; get; }
         public string Domain { set; get; }
-        public FormControlType Widget { set; get; }
+        public FormControlType WidgetType { set; get; }
         public int CaptionPosition { set; get; }
         public string Format { set; get; }
         public string Width { set; get; }
@@ -112,7 +168,7 @@ namespace StackErp.Model.Layout
 
             f.FullRow = GetXmlAttrValue(attrs, "fullrow", false);
             f.Text = GetXmlAttrValue(attrs, "text", "");
-            f.Widget = GetXmlAttrValue(attrs, "widget", FormControlType.None);
+            f.WidgetType = GetXmlAttrValue(attrs, "widget", FormControlType.None);
             f.Format = GetXmlAttrValue(attrs, "format", "");
 
             return f;
@@ -129,6 +185,7 @@ namespace StackErp.Model.Layout
 
     public class TGroup
     {
+        public string Id { set; get; }
         public string Text { set; get; }
         public string Style { set; get; }
         public List<TRow> Rows { set; get; }
@@ -140,6 +197,7 @@ namespace StackErp.Model.Layout
 
     public class TPage
     {
+        public string Id { set; get; }
         public string Text { set; get; }
         public List<TGroup> Groups { set; get; }
         public TPage()
@@ -152,6 +210,7 @@ namespace StackErp.Model.Layout
     {
         public string Type {set;get;}
         public string Criteria {set;get;}
+        public string Style {set;get;}
         public List<string> Fields {set;get;}
     }
     
@@ -164,4 +223,14 @@ namespace StackErp.Model.Layout
         [XmlAttribute]
         public string Position {set;get;}
     }    
+
+    public class LayoutJsonContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+    {
+        protected override JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization)
+        {
+            var property = base.CreateProperty(member, memberSerialization);
+            property.Ignored = false; // Here is the magic
+            return property;
+        }
+    }
 }

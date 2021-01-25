@@ -9,6 +9,7 @@ namespace StackErp.Model.Entity
     {
         public EntityCode EntityId {get;}
         public IDBEntity Entity {get;}
+        public bool IncludeGlobalMasterId {private set; get;}
         public QueryType QueryType {private set;get;}
         public DbQueryFieldCollection Fields {get;}
         public string WhereInjectKeyword {set;get;}
@@ -23,14 +24,15 @@ namespace StackErp.Model.Entity
         public string QrySql {private set;get;}
         public List<IEntityRelation> Relations {get;}
 
-        public DbQuery(IDBEntity entity) {
+        public DbQuery(IDBEntity entity, bool includeGlobalMasterId = false) {
             Entity = entity;
             EntityId = entity.EntityId;
             Fields =  new DbQueryFieldCollection();            
             Relations  = Entity.Relations;
+            IncludeGlobalMasterId = includeGlobalMasterId;
         }
 
-        public void BuildListDefn(DataListDefinition defn)
+        public void BuildWithListDefn(DataListDefinition defn)
         {
             ItemIdField = defn.ItemIdField;
             
@@ -44,6 +46,11 @@ namespace StackErp.Model.Entity
 
             if (defn.FixedFilter != null)
                 FixedFilter = defn.FixedFilter.DeepClone();
+            
+            if (defn is EntityListDefinition)
+            {
+                IncludeGlobalMasterId = ((EntityListDefinition)defn).IncludeGlobalMasterId;
+            }
         }
 
         // public void BuildWithListInfo(TListInfo view)

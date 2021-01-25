@@ -12,53 +12,24 @@ namespace StackErp.Core.DataList
 {
     public class EntityListService
     {
-        public DataListDefinition GetEntityListDefn(EntityCode entityId, int queryId = 0)
+        public static DataListDefinition GetEntityListDefn(StackAppContext appContext, EntityCode entityId, int queryId = 0)
         {
             var deff = ListDbService.GetEntityList(entityId);
             var _Entity = Core.EntityMetaData.Get(entityId);
             if (deff == null) 
             {
-                deff = CreateDefaultListDefn(_Entity, entityId);
+                deff = _Entity.CreateDefaultListDefn(appContext);
             }
             deff.Id = entityId.Code.ToString() + "_" + queryId.ToString();
             if (deff.PageSize <= 0)
                 deff.PageSize = 50;
 
             return deff;
-        }
+        }        
 
-        private EntityListDefinition CreateDefaultListDefn(IDBEntity entity, EntityCode entityId)
+        public static IEnumerable<DbObject> ExecuteData(StackAppContext appContext, DbQuery query)
         {
-            var defn = new EntityListDefinition()
-            {
-                EntityId = entityId.Code,
-                Name = "Default",
-                ItemIdField = entity.IDField,
-                ItemViewField = entity.TextField,
-                OrderByField  = new List<string>() { entity.TextField },
-            };
-
-            defn.DataSource = new FieldDataSource() 
-            {
-                Type = DataSourceType.Entity,
-                Entity = entityId
-            };
-
-            List<TField> col_r = new List<TField>();
-            var layoutF = entity.GetLayoutFields(EntityLayoutType.View);
-            var tlist = new TList();
-            foreach (var f in layoutF)
-            {
-                tlist.Fields.Add(new TField() { FieldId = f.Name });
-            }
-            defn.Layout = tlist;
-
-            return defn;
-        }
-
-        public IEnumerable<DbObject> ExecuteData(DbQuery query)
-        {
-            var data = QueryDbService.ExecuteEntityQuery(query);
+            var data = QueryDbService.ExecuteEntityQuery(appContext, query);
             return data;
         }
     }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using StackErp.DB.Entity;
 using StackErp.Model;
 using StackErp.Model.Entity;
 
@@ -87,20 +88,20 @@ namespace StackErp.Core.Entity
         {
             var exp = new FilterExpression(this.EntityId);
             exp.Add(new FilterExpField("loginid", FilterOperationType.Equal, loginId));
-            var data = ReadAll(new List<string>(){ "password", "emailid" }, exp);
+            var data = UserDbService.GetUserInfoForAuth(loginId);
 
             email = null;
             
-            if (data.Count > 0)
+            if (data.Count() > 0)
             {
                 var d = data.First();                
-                email = d.GetValue("emailid").ToString();
+                email = d.Get("emailid", "");
 
-                var userpwd = Decrypt(d.GetValue("Password").ToString());
+                var userpwd = Decrypt(d.Get("Password", ""));
 
                 if (pwd == userpwd)
                 {
-                    return d.ID;
+                    return d.Get("id", 0);
                 }
             }
 

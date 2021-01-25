@@ -31,6 +31,8 @@ export const FormControlType = {
     FormattedText: 21,
     Avatar: 22,
     XmlEditor:23,
+    StackScriptEditor: 24,
+    JsonEditor:25,
     ListForm : 99,
     EntityListView : 100,
     EntityFilter: 101

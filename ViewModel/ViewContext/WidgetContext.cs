@@ -66,7 +66,7 @@ namespace StackErp.ViewModel.ViewContext
                 if (!String.IsNullOrEmpty(layoutField.Text))
                     Caption = layoutField.Text;
                 if (WidgetType == FormControlType.None)
-                    WidgetType = layoutField.Widget;
+                    WidgetType = layoutField.WidgetType;
             }
         }
 

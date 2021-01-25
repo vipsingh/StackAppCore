@@ -5,6 +5,7 @@ using StackErp.Core.DataList;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
+using StackErp.ViewModel;
 using StackErp.ViewModel.Model;
 using StackErp.ViewModel.ViewContext;
 
@@ -78,9 +79,8 @@ namespace StackErp.UI.View.DataList
         protected virtual void ExecutePrepareData(DataListContext context, DataListDefinition defn)
         {
             this.BeforePrepareData(context, defn);
-
-            EntityListService service = new EntityListService();
-            var data = service.ExecuteData(context.DbQuery);
+            
+            var data = EntityListService.ExecuteData(context.Context, context.DbQuery);
 
             var records = new List<DynamicObj>();
             foreach(var dataRow in data)
@@ -94,21 +94,20 @@ namespace StackErp.UI.View.DataList
         protected DynamicObj PrepareRowData(DbObject dataRow, DataListContext context, DataListDefinition defn)
         {
             var row = new DynamicObj();
-            row.Add("RowId", dataRow.Get(context.DbQuery.ItemIdField, 0));
+            row.Add(ViewConstant.RowId, dataRow.Get(context.DbQuery.ItemIdField, 0));
             foreach(var field in context.DbQuery.Fields)
             {
                 var val = field.Field.ResolveDbValue(dataRow);
                 if (context.Fields.Keys.Contains(field.FieldName))
                 {
-                    row.Add(field.FieldName, OnPrepareCell(context, defn, field.FieldName, val, row), true);
+                    row.Add(context.Fields[field.FieldName].WidgetId, OnPrepareCell(context, defn, field.FieldName, val, row), true);
                 } 
                 else 
                 {
                     row.Add(field.FieldName, val);
-                }
-
-                OnPrepareRow(context, defn, row, dataRow);
+                }                
             }
+            OnPrepareRow(context, defn, row, dataRow);
 
             return row;
         }

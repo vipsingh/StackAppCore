@@ -13,12 +13,12 @@ namespace StackErp.DB.DataList
 {
     public class QueryDbService
     {
-        public static IEnumerable<DbObject> ExecuteEntityQuery(DbQuery query)
+        public static IEnumerable<DbObject> ExecuteEntityQuery(StackAppContext appContext, DbQuery query)
         {
             query.ResolveFields();
             
             var builder = new QueryBuilder(query);
-            var data = DBService.Query(builder.BuildSql(), new {});
+            var data = DBService.Query(builder.BuildSql(), new { MasterId = appContext.MasterId });
 
             return data;
         }
@@ -84,11 +84,11 @@ namespace StackErp.DB.DataList
             }
 
             var selectSql = PrepareSelectQuery();
-            var where = PrepareWhereExp(_QueryInfo, _QueryInfo.FixedFilter, _QueryInfo.Filters);
+            var where = PrepareWhereExp(_QueryInfo, _entTable, _QueryInfo.FixedFilter, _QueryInfo.Filters);
 
             if (!String.IsNullOrEmpty(_QueryInfo.WhereInjectKeyword))
             {
-                where = _QueryInfo.WhereInjectKeyword + " " + where;
+                where = _QueryInfo.WhereInjectKeyword + (string.IsNullOrEmpty(where)? "": " AND " + where);
             }
 
             var q = selectSql + (String.IsNullOrEmpty(where)? "" : " WHERE " + where);
@@ -195,16 +195,17 @@ namespace StackErp.DB.DataList
             return param;
         }
 
-        public static string PrepareWhereExp(DbQuery qInfo, FilterExpression fixedFilter, FilterExpression filters)
+        public static string PrepareWhereExp(DbQuery qInfo, string entTable, FilterExpression fixedFilter, FilterExpression filters)
         {
+            var commonexp = qInfo.IncludeGlobalMasterId ? $"{entTable}.masterid in (@MasterId, 0)": $"{entTable}.masterid = @MasterId";
             var whereFix = PrepareFilterSql(qInfo, fixedFilter);
 
             var whereQ = PrepareFilterSql(qInfo, filters);
 
             if (string.IsNullOrEmpty(whereFix))
-                return whereQ;
+                return commonexp + (string.IsNullOrEmpty(whereFix) ? "" : " AND " + whereQ);
 
-            return whereFix + (String.IsNullOrEmpty(whereQ) ? "": $" AND ({whereQ})"); 
+            return commonexp + " AND " +  whereFix + (String.IsNullOrEmpty(whereQ) ? "": $" AND ({whereQ})"); 
         }
         public static string PrepareFilterSql(DbQuery qInfo, FilterExpression filterExp)
         {

@@ -169,3 +169,9 @@ h1 small, h2 small, h3 small, h4 small {
   margin-bottom: 0;
   font-size: 0.875rem;
 }
+
+/* ant-ui-override */
+
+.ant-form-item-label {
+  font-weight: 600;
+}

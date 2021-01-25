@@ -28,25 +28,27 @@ namespace StackErp.Model.Entity
         BaseField GetFieldSchema(string fieldName);
         BaseField GetFieldSchema(int fieldId);
         //BaseField GetFieldSchemaByViewName(string fieldViewName);
-        EntityModelBase GetSingle(int id);
-        EntityModelBase GetDefault();
-        List<EntityModelBase> GetAll(FilterExpression filter);
-        List<EntityModelBase> GetAll(int[] ids);
+        EntityModelBase GetSingle(StackAppContext appContext, int id);
+        EntityModelBase GetDefault(StackAppContext appContext);
+        List<EntityModelBase> GetAll(StackAppContext appContext, FilterExpression filter);
+        List<EntityModelBase> GetAll(StackAppContext appContext, int[] ids);
         AnyStatus Save(StackAppContext appContext, EntityModelBase model);
         AnyStatus Save(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
         AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
         AnyStatus OnBeforeDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction);
         
-        AnyStatus DeleteRecord(int id);
-        DBModelBase Read(int id, List<string> fields);
-        List<DBModelBase> ReadAll(List<string> fields, FilterExpression filter);
-        List<int> ReadIds(FilterExpression filter);
+        AnyStatus DeleteRecord(StackAppContext appContext, int id);
+        DBModelBase Read(StackAppContext appContext, int id, List<string> fields);
+        List<DBModelBase> ReadAll(StackAppContext appContext, List<string> fields, FilterExpression filter);
+        List<int> ReadIds(StackAppContext appContext, FilterExpression filter);
 
         IDBEntity GetEntity(EntityCode id);
 
         List<BaseField> GetLayoutFields(EntityLayoutType type);
 
         Layout.TView GetDefaultLayoutView(EntityLayoutType layoutType);
+
+        EntityListDefinition CreateDefaultListDefn(StackAppContext appContext);
         
     }
 

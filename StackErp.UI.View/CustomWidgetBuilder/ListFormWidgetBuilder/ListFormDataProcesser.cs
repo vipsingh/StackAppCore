@@ -22,7 +22,7 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             var baseField = baseEntity.GetFieldSchema(requestQuery.FieldName);
             var childEntity = EntityMetaData.Get(baseField.RefObject);
 
-            var ids = FetchDataModel(requestQuery.ItemId, baseField, childEntity);
+            var ids = FetchDataModel(appContext, requestQuery.ItemId, baseField, childEntity);
             var pages = new List<ViewPageDataOnly>();
                         
             var lConext = new LayoutContext(appContext, 0, baseField.RefObject);
@@ -47,12 +47,12 @@ namespace StackErp.UI.View.CustomWidgetBuilder
             return pages;
         }
 
-        private static List<int> FetchDataModel(int parentId, BaseField parentField, IDBEntity entity)
+        private static List<int> FetchDataModel(StackAppContext appContext, int parentId, BaseField parentField, IDBEntity entity)
         {
             var filterExp = new FilterExpression(entity.EntityId);
             var relField = (OneToManyField)parentField;
             filterExp.Add(new FilterExpField(relField.RefFieldName, FilterOperationType.Equal, parentId));
-            var ids = entity.ReadIds(filterExp);
+            var ids = entity.ReadIds(appContext, filterExp);
 
             return ids;
         }

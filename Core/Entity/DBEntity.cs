@@ -10,6 +10,7 @@ using StackErp.DB.DataList;
 using StackErp.Model;
 using StackErp.Model.DataList;
 using StackErp.Model.Entity;
+using StackErp.Model.Layout;
 
 namespace StackErp.Core
 {
@@ -41,7 +42,7 @@ namespace StackErp.Core
         public int StageGroupId {set;get;}
         public string EntityFeatures {set;get;}
 
-        private string _detailQry;
+        protected string _detailQry;
         private InvariantDictionary<string> _relatedFieldDataQryList;
         #endregion
         public DBEntity(int id, 
@@ -147,18 +148,32 @@ namespace StackErp.Core
         }
 
         private bool _isInit = false;
-        public void Init(DynamicObj dataParam)
+        public virtual void Init(DynamicObj dataParam)
         {
             if (_isInit)
                 return;
 
             InitRelations();
             
-            DefaultItemTypeId = dataParam.Get("DEFAULTLAYOUT", 0);
+            DefaultItemTypeId = dataParam.Get("DEFAULTLAYOUT", 0);       
 
+            BuildDefaultQueries();
+            PrepareComputeOrderSeq();
+
+            _isInit = true;
+        }
+
+        protected virtual void BuildDefaultQueries()
+        {
             var qBuilder = new EntityQueryBuilder(this);
             
             _detailQry = qBuilder.BuildDetailQry();
+
+            BuildRelatedFIeldQueries(qBuilder);
+        }
+
+        protected void BuildRelatedFIeldQueries(EntityQueryBuilder qBuilder)
+        {
             _relatedFieldDataQryList = new InvariantDictionary<string>();
             foreach(var rel in this.Relations)
             {
@@ -168,10 +183,6 @@ namespace StackErp.Core
                     _relatedFieldDataQryList.Add(rel.ParentRefField.Name, qBuilder.PrepareRelatedFieldDataQueries(rel, childE));
                 }
             }
-
-            PrepareComputeOrderSeq();
-
-            _isInit = true;
         }
 
         private void InitRelations()
@@ -276,122 +287,9 @@ namespace StackErp.Core
         public IDBEntity GetEntity(EntityCode id)
         {
             return Core.EntityMetaData.Get(id);
-        }
+        }        
 
-        public virtual AnyStatus Save(StackAppContext appContext, EntityModelBase model)
-        {
-            return Save(appContext, model, null, null);
-        }
-
-        public AnyStatus Save(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
-        {
-            AnyStatus status = AnyStatus.NotInitialized;
-            try
-            {
-                if (model.IsNew)
-                {
-                    model.SetValue("CREATEDON", DateTime.Now.ToUniversalTime());
-                    model.SetValue("CREATEDBY", appContext.UserInfo.UserId);
-                    model.SetMasterId(appContext.MasterId);
-                }
-                model.SetValue("UPDATEDON", DateTime.Now.ToUniversalTime());
-                model.SetValue("UPDATEDBY", appContext.UserInfo.UserId);
-            
-                if (this.Validate(model))
-                {
-                    if (model is EntityRecordModel)
-                    {
-                        ((EntityRecordModel)model).ResolveComputedFields();
-                    }
-                    status = EntityDBService.SaveEntity(appContext, this, model, connection, transaction);
-                }
-                else 
-                {
-                    status = AnyStatus.InvalidData;                    
-                }
-            }
-            catch (AppException ex)
-            {
-                status = AnyStatus.SaveFailure;
-                status.Message = ex.Message;
-            }
-            return status;
-        }
-        
-        protected virtual bool Validate(EntityModelBase model)
-        {
-            //check concurrency based on LastModifiedOn
-            bool IsValid = true;            
-            var validator = new DataValidator();
-            foreach (var f in model.Attributes)
-            {
-                var field = f.Value;
-                if(model.IsNew || field.IsChanged)
-                {
-                    if(field.Field.IsRequired && !validator.HasValue(field.Field, field.Value))
-                    {
-                        field.ErrorMessage = $"Field {field.Field.Text} is required";
-                        field.IsValid = false;
-                    }
-                }
-
-                if(!field.IsValid)
-                    IsValid = false;
-            }
-
-            return IsValid;
-        }
-
-        public virtual AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
-        {
-            AnyStatus sts = AnyStatus.Success;
-            
-            sts = SaveRelatedData(appContext, model, connection, transaction);
-            
-            return sts;
-        }
-        
-        private AnyStatus SaveRelatedData(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
-        {
-            AnyStatus sts = AnyStatus.Success;
-            //save child entities
-            foreach (var f in model.Attributes)
-            {               
-                var val = f.Value;
-                if (val.Field.Type == FieldType.OneToMany && val.IsChanged && val.Value != null && (val.Value as IList).Count > 0)
-                {
-                    var itemColl = (List<EntityModelBase>)val.Value;
-                    var field = val.Field;
-                    var entity = GetEntity(field.RefObject);
-                    foreach (var localModel in itemColl)
-                    {
-                        SetRelationshipValue(model.ID, field.Name, localModel);
-                        sts = entity.Save(appContext, localModel, connection, transaction);
-                        if (sts != AnyStatus.Success)
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-
-            return sts;
-        }
-        private void SetRelationshipValue(int parentId, string parentFieldName, EntityModelBase childModel)
-        {
-            var rel = this.Relations.Find(x => x.ParentRefField.Name == parentFieldName);
-            childModel.SetValue(rel.ChildRefField.Name, parentId);
-        }
-
-        public virtual AnyStatus OnBeforeDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
-        {
-            var sts = AnyStatus.Success;
-            if (model is EntityRecordModel)
-                ((EntityRecordModel)model).PrepareSaveImageField(appContext);
-            return sts;
-        }
-
-        public virtual AnyStatus DeleteRecord(int id)
+        public virtual AnyStatus DeleteRecord(StackAppContext appContext, int id)
         {
             //check related data also
 
@@ -401,6 +299,41 @@ namespace StackErp.Core
         public virtual Model.Layout.TView GetDefaultLayoutView(EntityLayoutType layoutType)
         {
             return EntityLayoutService.CreateDefault(this, layoutType);
+        }
+
+        public virtual EntityListDefinition CreateDefaultListDefn(StackAppContext appContext)
+        {         
+            var defn = PrepareEntityListDefin();
+                           
+            var layoutF = this.GetLayoutFields(EntityLayoutType.View);
+            var tlist = new TList();
+            foreach (var f in layoutF)
+            {
+                tlist.Fields.Add(new TListField() { FieldId = f.Name });
+            }
+            defn.Layout = tlist;
+
+            return defn;
+        }
+
+        protected EntityListDefinition PrepareEntityListDefin()
+        {
+            var defn = new EntityListDefinition()
+            {
+                EntityId = this.EntityId,
+                Name = "Default",
+                ItemIdField = this.IDField,
+                ItemViewField = this.TextField,
+                OrderByField  = new List<string>() { this.TextField },
+            };
+
+            defn.DataSource = new FieldDataSource() 
+            {
+                Type = DataSourceType.Entity,
+                Entity = this.EntityId
+            };
+
+            return defn;
         }
 
         //private Hooks

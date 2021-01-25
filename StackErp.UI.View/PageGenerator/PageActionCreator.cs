@@ -39,12 +39,15 @@ namespace StackErp.UI.View.PageGenerator
             string url = "entity/save";
             var info = CreateDefault(url, cntxt);
             info.ExecutionType = ActionExecutionType.Submit;
+            info.Icon = IconConstant.Save;
+
             return info;
         }
         private static ActionInfo New(ActionContext cntxt)
         {
             var info = CreateDefault(AppLinkProvider.NEW_ENTITY_URL, cntxt);
             info.ExecutionType = ActionExecutionType.Redirect;
+            info.Icon = IconConstant.Add;
             
             return info;
         }
@@ -53,6 +56,7 @@ namespace StackErp.UI.View.PageGenerator
         {
             var info = CreateDefault(AppLinkProvider.EDIT_ENTITY_URL, cntxt);
             info.ExecutionType = ActionExecutionType.Redirect;
+            info.Icon = IconConstant.Edit;
             
             return info;
         }

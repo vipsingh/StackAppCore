@@ -62,7 +62,7 @@ namespace StackErp.ViewModel.ViewContext
         {
             var entity = Core.EntityMetaData.Get(defn.DataSource.Entity);
             this.DbQuery = new DbQuery(entity);
-            this.DbQuery.BuildListDefn(defn);
+            this.DbQuery.BuildWithListDefn(defn);
             this.IdColumn = this.DbQuery.ItemIdField;
             this.ItemViewField = defn.ItemViewField;
             

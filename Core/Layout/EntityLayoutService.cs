@@ -9,17 +9,17 @@ using StackErp.Model;
 using StackErp.Model.Entity;
 using StackErp.Model.Utils;
 using StackErp.Model.Layout;
-using System.Xml.Serialization;
-using Newtonsoft.Json.Serialization;
 
 namespace StackErp.Core.Layout
 {
     public class EntityLayoutService
     {
         private EntityCode _EntityId;
+        private StackAppContext _AppContext;
         public EntityLayoutService(StackAppContext appContext, EntityCode entityId)
         {
             _EntityId = entityId;
+            _AppContext = appContext;
         }
 
         public TView PrepareView(int itemTypeId, EntityLayoutType layoutType)
@@ -27,7 +27,7 @@ namespace StackErp.Core.Layout
             string layoutJson = "";
             if (itemTypeId != 0)
             {
-                var layout = LayoutDbService.GetItemTypeLayout(_EntityId.Code, itemTypeId, (int)layoutType);
+                var layout = LayoutDbService.GetItemTypeLayout(_AppContext.MasterId, _EntityId.Code, itemTypeId, (int)layoutType);
                 if (layout == null)
                     throw new EntityException("ItemType is not defined.");
 
@@ -41,13 +41,8 @@ namespace StackErp.Core.Layout
                 var lview =  _Entity.GetDefaultLayoutView(layoutType);
                 return lview;
             }
-
-            //return JSONUtil.DeserializeObject<TView>(layoutJson);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<TView>(
-                layoutJson, 
-                new Newtonsoft.Json.JsonSerializerSettings { ContractResolver = new LayoutJsonContractResolver() });
-
-            //return TView.ParseFromXml(layoutXml);
+            
+            return TView.ParseFromJSON(layoutJson);
         }       
 
         public static TView CreateDefault(IDBEntity Entity, EntityLayoutType layoutType)
@@ -124,15 +119,5 @@ namespace StackErp.Core.Layout
                     return false;
             }
         }
-    }
-
-    public class LayoutJsonContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
-    {
-        protected override JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization)
-        {
-            var property = base.CreateProperty(member, memberSerialization);
-            property.Ignored = false; // Here is the magic
-            return property;
-        }
-    }
+    }    
 }

@@ -64,7 +64,7 @@ namespace StackErp.ViewModel.FormWidget
             editFormContext.Build();
 
             var cntxt = new WidgetContext(editFormContext);
-            cntxt.Build(null, new StackErp.Model.Layout.TField(){ FieldId = "FilterBox", Widget = FormControlType.EntityFilter });
+            cntxt.Build(null, new StackErp.Model.Layout.TField(){ FieldId = "FilterBox", WidgetType = FormControlType.EntityFilter });
             cntxt.ControlDefinition = new StackErp.Model.Entity.ControlDefinition()
             {
                 DataSource = new StackErp.Model.Entity.FieldDataSource

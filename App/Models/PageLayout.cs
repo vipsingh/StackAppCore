@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using StackErp.Model;
 using StackErp.Model.Form;
+using StackErp.UI.View;
 
 namespace StackErp.App
 {
     public class PageLayout
     {
-        private StackAppContext _context;
-        public PageLayout(StackAppContext context)
+        private WebAppContext _context;
+        public PageLayout(WebAppContext context)
         {
             _context = context;
         }

@@ -16,17 +16,19 @@ const styleBox: React.CSSProperties = {
   }
   
   export const DropBox: React.FC<{
+    type: string,
     field: any,
     addField: Function,
     readOnly: boolean
-  }> = ({ field, addField, readOnly }) => {
+  }> = ({ field, addField, readOnly, type }) => {
+
     const [{ isDragging }, drag] = useDrag({
-      item: { name: field.Name, type: "FIELDBOX" },
+      item: { name: field.Name, type },
   
       end: (item: { name: string } | undefined, monitor: DragSourceMonitor) => {
         const dropResult = monitor.getDropResult()
         if (item && dropResult && !dropResult.fieldId) {
-          addField(item.name, dropResult.name);
+          addField(field, dropResult.name);
         }
       },
       
@@ -53,9 +55,9 @@ const style: React.CSSProperties = {
     border: "1px dashed gray"
   }
   
-  export const FieldPanel: React.FC<any> = ({Id, FieldId, children}) => {
+  export const FieldPanel: React.FC<any> = ({panelType, Id, FieldId, children}) => {
     const [{ canDrop, isOver }, drop] = useDrop({
-      accept: "FIELDBOX",
+      accept: panelType,
       drop: () => ({ name: Id, fieldId: FieldId }),
       collect: (monitor) => ({
         isOver: monitor.isOver(),
@@ -71,7 +73,7 @@ const style: React.CSSProperties = {
       backgroundColor = 'darkkhaki'
     }
   
-    return (<div ref={drop} style={{ ...style, backgroundColor }}>{children}</div>);
+    return (<div ref={drop} style={{ ...style, backgroundColor, width: panelType === "BUTTONBOX"? "6rem" : "15rem" }}>{children}</div>);
   }
 
   export const MoveBox: React.FC<{

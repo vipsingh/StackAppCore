@@ -20,10 +20,12 @@ namespace StackErp.Model.DataList
         public List<string> AdditionalFields {set;get;}
         public FilterExpression FixedFilter {set;get;}
         public FilterExpression FilterPolicy {set;get;}
+
     }
 
     public class EntityListDefinition: DataListDefinition
     {
         public EntityCode EntityId {set;get;}
+        public bool IncludeGlobalMasterId {set;get;}
     }
 }
