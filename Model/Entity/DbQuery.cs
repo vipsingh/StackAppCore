@@ -51,6 +51,9 @@ namespace StackErp.Model.Entity
             {
                 IncludeGlobalMasterId = ((EntityListDefinition)defn).IncludeGlobalMasterId;
             }
+            else if (defn.DataSource != null) {
+                IncludeGlobalMasterId = defn.DataSource.IncludeGlobalMasterId;
+            }
         }
 
         // public void BuildWithListInfo(TListInfo view)

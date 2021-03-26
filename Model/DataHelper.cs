@@ -73,6 +73,9 @@ namespace StackErp.Model
                 return defaultValue;
 
             var typeCode = Type.GetTypeCode(typeof(T));
+            if (value.GetType() == typeof(JValue)) {
+                value = ((JValue)value).Value;
+            }
 
             if (typeof(T) == value.GetType())
                 return (T)value;

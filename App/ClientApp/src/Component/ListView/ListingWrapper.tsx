@@ -12,7 +12,8 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                     Page: number,
                     Size: number
                 },
-                selectedRowKeys: Array<any>
+                selectedRowKeys: Array<any>,
+                Filters: Array<any>
         }> {
     
         constructor(props: any) {
@@ -26,7 +27,8 @@ export default function(ListComp: React.ComponentClass<any,any>) {
                     Page: 1,
                     Size: 25
                 },
-                selectedRowKeys: []
+                selectedRowKeys: [],
+                Filters: []
             };
             
             this.loadData();
@@ -103,8 +105,13 @@ export default function(ListComp: React.ComponentClass<any,any>) {
 
         renderFilterPanel() {
             const { FilterBox: filterInfo } = this.props;
+            const { Filters } = this.state;
 
-            return (<FilterBox {...filterInfo} />);
+            return (<FilterBox {...filterInfo} onChange={this.onFilterValueChange} Value= {Filters} />);
+        }
+
+        onFilterValueChange = (filters: Array<any>) => {
+            this.setState({ Filters: filters });
         }
 
         render() {

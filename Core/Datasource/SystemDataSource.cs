@@ -18,7 +18,8 @@ namespace StackErp.Core.Datasource
             _PickerSource.Add("SYSTEM_2", new FieldDataSource() {
                 Type = DataSourceType.Entity,
                 Entity = EntityCode.EntitySchema,
-                Domain = FilterExpression.BuildFromJson(EntityCode.EntitySchema, "[{\"entityid\": [0,\"@$params.EntityId\"]}]")
+                Domain = FilterExpression.BuildFromJson(EntityCode.EntitySchema, "[{\"entityid\": [0,\"@$params.EntityId\"]}]"),
+                IncludeGlobalMasterId = true
             });
         }
 

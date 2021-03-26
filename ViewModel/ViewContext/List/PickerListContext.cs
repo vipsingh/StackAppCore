@@ -26,7 +26,7 @@ namespace StackErp.ViewModel.ViewContext
             RelatedEntityId = RequestQuery.EntityId;    
             var RefEntity = Core.EntityMetaData.Get(RelatedEntityId);
                     
-            Field = RefEntity.GetFieldSchema(RequestQuery.WidgetId);
+            Field = RefEntity.GetFieldSchema(RequestQuery.FieldName);
             FieldDataSource dataSource = null;
             if (Field == null)
             {

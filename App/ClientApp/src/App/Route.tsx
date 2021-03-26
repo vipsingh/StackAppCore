@@ -9,6 +9,7 @@ function AppRoutes() {
   return (
     <Switch>
       <Route exact path="/PageDesigner" component={PageDesigner} />
+      <Route exact path="/PageX" component={PageX} />
       <Route path="/:controller/:action/:param?" component={RouteComponent} />      
       <Route component={NotFound} />
     </Switch>

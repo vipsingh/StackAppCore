@@ -59,7 +59,7 @@ const validator: IDictionary<Function> = {
     REQUIRED: (widgetInfo: WidgetInfoProps, validationInfo: any = {}) => {
         const value: any = widgetInfo.Value;
         if (!value || (_.isArray(value) && value.length === 0) || (_.has(value, "Value") && !value.Value)) {
-            let msg = validationInfo.Msg || "${caption} is required.";
+            let msg = validationInfo.Msg || `${widgetInfo.Caption} is required.`;
             return {
                 IsValid: false,
                 Message: _App.FormatString(msg, { caption: widgetInfo.Caption })

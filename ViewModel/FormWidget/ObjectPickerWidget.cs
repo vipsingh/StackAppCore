@@ -24,15 +24,18 @@ namespace StackErp.ViewModel.FormWidget
 
             if (!IsViewMode) 
             {
-                this.DataActionLink = PreparePickerLink();
+                this.DataActionLink = PreparePickerLink(this.Context);
             }
         }
 
-        private ActionInfo PreparePickerLink()
+        private ActionInfo PreparePickerLink(WidgetContext cntxt)
         {            
             var q = new RequestQueryString();
             q.WidgetId = this.WidgetId;
-            q.EntityId = this.Context.FormContext.RequestQuery.EntityId;
+            q.EntityId = cntxt.FormContext.RequestQuery.EntityId;
+            if (cntxt.FieldSchema != null) {
+                q.FieldName = cntxt.FieldSchema.Name;
+            }
             
             var link = new ActionInfo("widget/GetPickerData", q);
             link.ActionType = ActionType.Custom;

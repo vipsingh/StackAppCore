@@ -1,6 +1,8 @@
+import React from "react";
 import { getAsyncComponent } from "./Helper/asyncImport";
 
 import * as CTRL from "./Form/Control/input";
+import * as HField from "./Form/Control/HiddenField";
 import LabelField from "./Form/Control/LabelField";
 import ListView from "./ListView";
 import { FormControlType } from "../Constant";
@@ -78,6 +80,9 @@ export function getBasicValidation(controlInfo: any) {
 
 }
 
+export const HiddenField = HField.default;
+
+export const BlockElement = (props: any) => { return React.createElement("div", props) }
 
 const widgets: IDictionary<{edit: any, view: any}> = {};
 

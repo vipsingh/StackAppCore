@@ -6,6 +6,10 @@ import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
 //import { openDialog } from "../../../Component/UI/Dialog";
 import { LayoutView } from "../../../Component/Layout/LayoutView";
+import { useForm } from "../../../Core/Form/index";
+import * as widgetFactory  from "../../../Component/WidgetFactory";
+import ViewPageInfo from '../../../Core/Models/ViewPageInfo';
+import { fieldTypes } from "./helper";
 
 const _layout = {
     id: "div_1",
@@ -72,28 +76,45 @@ export default class DesignerPage extends Component<any,any> {
 }
 
 export const PageX: React.FC<any> = () => {
-    const [name, setName] = useState("");
-    const [years, setYears] = useState<Array<string>>([]);
+  const schema = {
+    Widgets: {
+        Id: { WidgetId: "Id", WidgetType: 10, Caption: "Id" },
+        FieldName: { WidgetId: "FieldName", WidgetType: 1, Caption: "Name", IsRequired: true },
+        Label: { WidgetId: "Label", WidgetType: 1, Caption: "Label" },
+        FieldType: { WidgetId: "FieldType", WidgetType: 6, Caption: "Type", Options: fieldTypes, RuleToFire: [1] },
+        Length: { WidgetId: "Length", WidgetType: 1, Caption: "Length" },
+        IsRequired: { WidgetId: "IsRequired", WidgetType: 4, Caption: "IsRequired" },
+        LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity", Hidden_Exp: { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] } },
+        OtherSetting: { WidgetId: "OtherSetting", WidgetType: 1, Caption: "OtherSetting" }
+    },
+    FormRules: [
+        { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] },
+    ],
+    Actions: {
+        SAVE: {
+            ActionId: "SAVE",
+            DisplayType: 2,
+            ExecutionType: 1,
+            Title: "Save"
+        }
+    },
+    EntityInfo: { ObjectId: 0 }
+};
 
+  var entitySchema = new ViewPageInfo(schema);
 
-    const addYear = () => {
-        setYears([...years, name]);
-    }
-
-    useEffect(() => {
-        document.title = `You clicked ${years.length} times`;
-    }, [years.length]);
+    const { getControl, dataModel } = useForm({ 
+                      entitySchema, 
+                      formData: entitySchema.getDataModel(), 
+                      controlFactory: widgetFactory 
+                    });
 
     return (<div>
-        <input type="text" onChange={(ev) => { setName(ev.target.value) }} value={name} />
-        <ul>
-        {
-            _.map(years, (y) => {
-                return <li>{y}</li>
-            })
-        }
-        </ul>
-        <button onClick={addYear}>click</button>
+      <div>{getControl("FieldName")}</div>
+      <div>{getControl("FieldType")}</div>
+      <div>{getControl("LinkEntity")}</div>
+        {/* <button onClick={addYear}>click</button> */}
+        <div>{JSON.stringify(dataModel)}</div>
     </div>);
 }
 

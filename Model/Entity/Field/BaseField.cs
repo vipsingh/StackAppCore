@@ -161,6 +161,7 @@ namespace StackErp.Model.Entity
         public string FunctionName {set;get;}
         public List<EvalParam> ParamMappings {set;get;}
         public FilterExpression Domain {set;get;}
+        public bool IncludeGlobalMasterId {set;get;}
     }
 
     public class DummyField: BaseField
