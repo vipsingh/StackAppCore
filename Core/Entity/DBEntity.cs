@@ -17,6 +17,7 @@ namespace StackErp.Core
     public partial class DBEntity : IDBEntity
     {
         #region Properties
+        public int MasterId {get;}
         public EntityCode EntityId { get; }
         public AppModuleCode AppModule { get; }
         public string Name { get; }
@@ -45,12 +46,14 @@ namespace StackErp.Core
         protected string _detailQry;
         private InvariantDictionary<string> _relatedFieldDataQryList;
         #endregion
-        public DBEntity(int id, 
+        public DBEntity(int masterId,
+            int id, 
             string name, 
             Dictionary<string, BaseField> fields, 
             EntityType entityType,
             DbObject entityDbo)
         {
+            this.MasterId = masterId;
             this.EntityId = id;
             this.Name = name;
             this.DBName = entityDbo.Get("tablename", ""); //t_{namespace}

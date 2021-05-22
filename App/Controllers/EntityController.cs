@@ -22,7 +22,7 @@ namespace StackErp.App.Controllers
     {
         public EntityController(ILogger<EntityController> logger, IOptions<AppKeySetting> appSettings): base(logger,appSettings)
         {
-            logger.LogDebug(1, "NLog injected into EntityController");
+            //logger.LogDebug(1, "NLog injected into EntityController");
         }
 
         public IActionResult Index()

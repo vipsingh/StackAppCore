@@ -157,7 +157,7 @@ namespace StackErp.Core.Metadata
             
             var entDbo = new DbObject();
             entDbo.Add("tablename", "t_entity_itemtype");
-            var d = new DBEntity(entId, entityName, fs, EntityType.MetadataEntity, entDbo);            
+            var d = new DBEntity(0, entId, entityName, fs, EntityType.MetadataEntity, entDbo);            
             
             EntityCode.AllEntities.Add(entityName.ToUpper(), entId);  
             entities.Add(entId, d);

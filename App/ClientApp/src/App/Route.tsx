@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
 import PageFactory from "../Core/PageFactory";
-import PageDesigner, {PageX} from "./Page/Studio/PageDesigner";
+import PageDesigner, {PageX} from "../StudioApp/Pages/Studio/PageDesigner";
 import PageContext, { createPageContext } from "../Core/PageContext";
 import { closeAll } from "../Component/UI/Dialog";
 

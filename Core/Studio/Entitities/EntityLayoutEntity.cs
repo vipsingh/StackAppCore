@@ -13,7 +13,7 @@ namespace StackErp.Core.Entity
 {
     public class EntityLayoutEntity : DBEntity
     {
-        public EntityLayoutEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(id, name, fields,entityType, entDbo)
+        public EntityLayoutEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(0, id, name, fields,entityType, entDbo)
         {
             this.Fields.Add("ITEMTYPE", new IntegerField()
             {

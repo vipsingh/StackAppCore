@@ -2,12 +2,10 @@ import { PageType } from "../../Constant";
 import NewEdit from "./Edit";
 import Detail from "./Detail";
 import Desk from "./Desk";
-import EntityStudio from "./Studio/EntityPage";
+import EntityStudio from "../../StudioApp/Pages/Studio/EntityPage";
 import ErrorPage from "./Error";
 import PageFactory from "../../Core/PageFactory";
-import FormDesigner from "./Studio/Designer/FormDesigner";
-
-
+import FormDesigner from "../../StudioApp/Pages/Studio/Designer/FormDesigner";
 
 export default function() {
     PageFactory.errorPage = ErrorPage;
@@ -19,28 +17,3 @@ export default function() {
     PageFactory.addPage(PageType.Designer, FormDesigner);
     PageFactory.addPage(PageType.Error, ErrorPage);    
 }
-
-// const getPage = (type: number) => {
-//     let Component = null;
-//     switch(type) {
-//         case PageType.Edit:
-//             Component = NewEdit;
-//             break;
-//         case PageType.Detail:
-//             Component = Detail;
-//             break;
-//         case PageType.Desk:
-//             Component = Desk;
-//             break;
-//         default:
-//             Component = ErrorPage;
-//             break;
-
-//     }
-
-//     return Component;
-// };
-
-// export default {
-//     getPage
-// };

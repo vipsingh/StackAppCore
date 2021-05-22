@@ -12,7 +12,7 @@ namespace StackErp.Core.Entity
 {
     public class UserRoleEntity : DBEntity
     {
-        public UserRoleEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entityDbo) : base(id, name, fields, entityType, entityDbo)
+        public UserRoleEntity(int masterId, int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entityDbo) : base(masterId, id, name, fields, entityType, entityDbo)
         {
             this.Fields.Add("NAME", new StringField()
             {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -358,6 +360,137 @@ namespace StackErp.Model
             else {
                 return DataHelper.GetDataValue(postValue, tCode);
             }
+        }
+
+        public static string EnsureNumericOnly(string str)
+        {
+            return string.IsNullOrEmpty(str) ? string.Empty : new string(str.Where(char.IsDigit).ToArray());
+        }
+
+        public static bool ArraysEqual<T>(T[] a1, T[] a2)
+        {
+            //also see Enumerable.SequenceEqual(a1, a2);
+            if (ReferenceEquals(a1, a2))
+                return true;
+
+            if (a1 == null || a2 == null)
+                return false;
+
+            if (a1.Length != a2.Length)
+                return false;
+
+            var comparer = EqualityComparer<T>.Default;
+            return !a1.Where((t, i) => !comparer.Equals(t, a2[i])).Any();
+        }
+
+        /// <summary>
+        /// Sets a property on an object to a value.
+        /// </summary>
+        /// <param name="instance">The object whose property to set.</param>
+        /// <param name="propertyName">The name of the property to set.</param>
+        /// <param name="value">The value to set the property to.</param>
+        public static void SetProperty(object instance, string propertyName, object value)
+        {
+            if (instance == null) throw new ArgumentNullException(nameof(instance));
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+
+            var instanceType = instance.GetType();
+            var pi = instanceType.GetProperty(propertyName);
+            if (pi == null)
+                throw new Exception(string.Format("No property '{0}' found on the instance of type '{1}'.", propertyName, instanceType));
+            if (!pi.CanWrite)
+                throw new Exception(string.Format("The property '{0}' on the instance of type '{1}' does not have a setter.", propertyName, instanceType));
+            if (value != null && !value.GetType().IsAssignableFrom(pi.PropertyType))
+                value = To(value, pi.PropertyType);
+            pi.SetValue(instance, value, Array.Empty<object>());
+        }
+
+        /// <summary>
+        /// Converts a value to a destination type.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="destinationType">The type to convert the value to.</param>
+        /// <returns>The converted value.</returns>
+        public static object To(object value, Type destinationType)
+        {
+            return To(value, destinationType, CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Converts a value to a destination type.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="destinationType">The type to convert the value to.</param>
+        /// <param name="culture">Culture</param>
+        /// <returns>The converted value.</returns>
+        public static object To(object value, Type destinationType, CultureInfo culture)
+        {
+            if (value == null) 
+                return null;
+
+            var sourceType = value.GetType();
+
+            var destinationConverter = TypeDescriptor.GetConverter(destinationType);
+            if (destinationConverter.CanConvertFrom(value.GetType()))
+                return destinationConverter.ConvertFrom(null, culture, value);
+
+            var sourceConverter = TypeDescriptor.GetConverter(sourceType);
+            if (sourceConverter.CanConvertTo(destinationType))
+                return sourceConverter.ConvertTo(null, culture, value, destinationType);
+
+            if (destinationType.IsEnum && value is int)
+                return Enum.ToObject(destinationType, (int)value);
+
+            if (!destinationType.IsInstanceOfType(value))
+                return Convert.ChangeType(value, destinationType, culture);
+
+            return value;
+        }
+
+        /// <summary>
+        /// Converts a value to a destination type.
+        /// </summary>
+        /// <param name="value">The value to convert.</param>
+        /// <typeparam name="T">The type to convert the value to.</typeparam>
+        /// <returns>The converted value.</returns>
+        public static T To<T>(object value)
+        {
+            //return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
+            return (T)To(value, typeof(T));
+        }
+
+        /// <summary>
+        /// Convert enum for front-end
+        /// </summary>
+        /// <param name="str">Input string</param>
+        /// <returns>Converted string</returns>
+        public static string ConvertEnum(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return string.Empty;
+            var result = string.Empty;
+            foreach (var c in str)
+                if (c.ToString() != c.ToString().ToLower())
+                    result += " " + c.ToString();
+                else
+                    result += c.ToString();
+
+            //ensure no spaces (e.g. when the first letter is upper case)
+            result = result.TrimStart();
+            return result;
+        }
+
+        /// <summary>
+        /// Get difference in years
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="endDate"></param>
+        /// <returns></returns>
+        public static int GetDifferenceInYears(DateTime startDate, DateTime endDate)
+        {
+            var age = endDate.Year - startDate.Year;
+            if (startDate > endDate.AddYears(-age))
+                age--;
+            return age;
         }
     }
 }

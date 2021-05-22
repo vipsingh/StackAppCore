@@ -7,6 +7,7 @@ namespace StackErp.Model.Entity
 {
     public interface IDBEntity
     {
+        int MasterId {get;}
         EntityCode EntityId {get;}
         string Name {get;}
         string DBName {get;}

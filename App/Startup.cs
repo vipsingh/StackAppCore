@@ -93,6 +93,8 @@ namespace StackErp.App
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
+
+            services.AddScoped<IWebHelper, WebHelper>();
         
         }
 

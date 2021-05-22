@@ -14,7 +14,7 @@ namespace StackErp.Core.Entity
 {
     public class EntitySchemaEntity : DBEntity
     {
-        public EntitySchemaEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(id, name, fields, entityType, entDbo)
+        public EntitySchemaEntity(int id, string name, Dictionary<string, BaseField> fields,EntityType entityType, DbObject entDbo) : base(0, id, name, fields, entityType, entDbo)
         {
             
         }
