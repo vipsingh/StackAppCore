@@ -6,10 +6,11 @@ import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
 //import { openDialog } from "../../../Component/UI/Dialog";
 import { LayoutView } from "../../../Component/Layout/LayoutView";
-import { useForm } from "../../../Core/Form/index";
-import * as widgetFactory  from "../../../Component/WidgetFactory";
+import { useForm, FormX, FormXField } from "../../../Core/Form";
 import ViewPageInfo from '../../../Core/Models/ViewPageInfo';
 import { fieldTypes } from "./helper";
+import Form from '../../../Component/Form/Form';
+import SimpleLayout from '../../../Component/Layout/SimpleLayout';
 
 const _layout = {
     id: "div_1",
@@ -76,6 +77,7 @@ export default class DesignerPage extends Component<any,any> {
 }
 
 export const PageX: React.FC<any> = () => {
+
   const schema = {
     Widgets: {
         Id: { WidgetId: "Id", WidgetType: 10, Caption: "Id" },
@@ -84,7 +86,16 @@ export const PageX: React.FC<any> = () => {
         FieldType: { WidgetId: "FieldType", WidgetType: 6, Caption: "Type", Options: fieldTypes, RuleToFire: [1] },
         Length: { WidgetId: "Length", WidgetType: 1, Caption: "Length" },
         IsRequired: { WidgetId: "IsRequired", WidgetType: 4, Caption: "IsRequired" },
-        LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity", Hidden_Exp: { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] } },
+        LinkEntity: { WidgetId: "LinkEntity", WidgetType: 1, Caption: "LinkEntity", Features: {
+          "Invisible": {
+              "Criteria": {
+                  "$and": [
+                      {"FieldType": [8, [10,20]]}
+                  ]
+              },
+              "Depends": ["FieldType"]
+          }
+      }, Hidden_Exp: { Index: 1, Type: "HIDDEN", Criteria: [{ FieldName: "FieldType", Op: 8, Value: [10,20] }], Fields: ["LinkEntity"] } },
         OtherSetting: { WidgetId: "OtherSetting", WidgetType: 1, Caption: "OtherSetting" }
     },
     FormRules: [
@@ -102,20 +113,26 @@ export const PageX: React.FC<any> = () => {
 };
 
   var entitySchema = new ViewPageInfo(schema);
+  const [state, setState] = React.useState({ dataModel: entitySchema.getDataModel() });
+  const onSubmit = (data: any) => {
 
-    const { getControl, dataModel } = useForm({ 
-                      entitySchema, 
-                      formData: entitySchema.getDataModel(), 
-                      controlFactory: widgetFactory 
-                    });
+  }
 
-    return (<div>
-      <div>{getControl("FieldName")}</div>
-      <div>{getControl("FieldType")}</div>
-      <div>{getControl("LinkEntity")}</div>
-        {/* <button onClick={addYear}>click</button> */}
-        <div>{JSON.stringify(dataModel)}</div>
-    </div>);
+  return <FormX 
+          entitySchema={entitySchema} 
+          formData={state.dataModel}
+          onSubmit={onSubmit}
+          render={
+            (formO: any) => {
+                return (<div>
+                  <div><FormXField id="FieldType" /></div>
+                  <div><FormXField id="LinkEntity" /></div>
+                  {/* <button title="Submit" onClick={formO.handleSubmit(onSubmit)} /> */}
+                  {JSON.stringify(formO.dataModel)}
+                </div>);
+            }
+          } 
+          />
 }
 
 const useFormX = () => {

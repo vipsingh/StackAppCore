@@ -37,6 +37,7 @@ namespace StackErp.App.Controllers
         public IActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            ViewBag.AppRoot = Url.Content("~/");
             return View();
         }
 

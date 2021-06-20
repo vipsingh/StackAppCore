@@ -8,7 +8,11 @@ import PageComponent from "./PageComponent";
 import PageContext from "../Core/PageContext";
 import fIcon from "./UI/Icon";
 
-export default class ActionLink extends React.Component<ActionInfo> {
+interface ActionLinkProps extends ActionInfo {
+    overrideProps?: any
+}
+
+export default class ActionLink extends React.Component<ActionLinkProps> {
     static contextType = PageContext;
     
     onCommandClick = () => {
@@ -21,25 +25,35 @@ export default class ActionLink extends React.Component<ActionInfo> {
     }
 
     openInTarget = () => {
-        const { Url, LinkTarget } = this.props;
+        const { Url: url, LinkTarget } = this.props;
+        if (!url) return;
+
+        const asurl = new URL(url.toLowerCase().indexOf("http") === 0 ? url: `http:/${url}`);
+        let target = LinkTarget;
+        if (asurl.searchParams) {
+            const t = asurl.searchParams.get('target');
+            if (t) target = t;
+        }
         
-        if (LinkTarget === "POPUP") {
+        if (target === "POPUP") {
             openDialog("<>", (dlgProps: any) => {
-                return <PageComponent url={Url} openerNavigator={this.context.navigator} popup={dlgProps} /> 
+                return <PageComponent url={url} openerNavigator={this.context.navigator} popup={dlgProps} overrideProps={this.props.overrideProps} />
             }, { hideCommands: true, size: "lg" });
-        } else if (LinkTarget === "DRAWER") {
-            openDrawer("<>", <PageComponent url={Url} openerNavigator={this.context.navigator} popup />, { hideCommands: true });
-         }
+        } else if (target === "DRAWER") {
+            openDrawer("<>", <PageComponent url={url} openerNavigator={this.context.navigator} popup overrideProps={this.props.overrideProps} />, { hideCommands: true });
+        } else {
+            this.context.navigator.navigate(url);
+        }
     }
 
     navigate = (event: any) => {
         event.preventDefault();
-        const { LinkTarget } = this.props;
-        if (LinkTarget) {
-            this.openInTarget();
-        }
-
-        this.context.navigator.navigate(this.props.Url);
+        //const { LinkTarget } = this.props;
+        //if (LinkTarget) {
+        //    this.openInTarget();
+        //}
+        this.openInTarget();
+        //this.context.navigator.navigate(this.props.Url);
     }
     
     renderLink() {

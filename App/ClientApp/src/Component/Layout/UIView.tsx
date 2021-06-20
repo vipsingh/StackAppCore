@@ -29,7 +29,7 @@ export default class UIView extends React.Component<{
                     <Tabs style={{ marginBottom: 32 }}>
                     {
                         _.map(Pages, (s, ix) => {
-                            return (<TabPane tab="Default" key={`page_${ix}`}>
+                            return (<TabPane tab={s.Text || "Default"} key={`page_${ix}`}>
                                 {this.renderSheet(s, i)}
                             </TabPane>)
                         })
@@ -79,7 +79,7 @@ export const PageSheet: React.FC<any> = (props) => {
 
 export const PageGroup: React.FC<any> = (props) => {
     const { group, getControl, sheetId } = props;
-    const { Rows, Label } = group;
+    const { Rows, Text } = group;
     //let i = 0;
     const renderDesigner = (api: any) => {
         if (!api) return;
@@ -89,7 +89,7 @@ export const PageGroup: React.FC<any> = (props) => {
 
     return (
         <div className="form-ui-group paper-group">
-            {!Label || <h3>{Label}</h3>}
+            {!Text || <h3>{Text}</h3>}
             <DesignerContext.Consumer>
                 {(api) => renderDesigner(api)}
             </DesignerContext.Consumer>

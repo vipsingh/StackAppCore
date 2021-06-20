@@ -37,7 +37,13 @@ namespace StackErp.UI.View.Studio
             View.CurrentQuery = reqQuery.ToQueryString();
            
             var formContext = new DetailFormContext(_appContext, EntityCode.EntityMaster, new RequestQueryString(){ EntityId = EntityCode.EntityMaster, ItemId = entityItemId });
-            formContext.Build();            
+            formContext.Build();
+            formContext.CreateDataModel();
+
+            var entityMasterModel = formContext.EntityModel;
+
+            View.PageTitle = new DynamicObj();
+            View.PageTitle.Add("Title", entityMasterModel.GetValue<string>("text", ""));
 
             AddHeaderActions(reqQuery, entityItemId);
 
@@ -99,26 +105,26 @@ namespace StackErp.UI.View.Studio
             var qs = new RequestQueryString() { EntityId = EntityCode.EntitySchema, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId};
             View.Actions.Add("BTN_NEW", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs){ Title = "New Field", LinkTarget="POPUP" });
 
-            var qs1 = new RequestQueryString() { EntityId = EntityCode.EntityAction, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
-            View.Actions.Add("BTN_NEW_ACTION", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs1){ Title = "New Action", LinkTarget="POPUP" });
+            //var qs1 = new RequestQueryString() { EntityId = EntityCode.EntityAction, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
+            //View.Actions.Add("BTN_NEW_ACTION", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs1){ Title = "New Action", LinkTarget="POPUP" });
 
-            var refEntity = EntityMetaData.Get(entityItemId);
-            var layoutEntity = EntityMetaData.GetAs<Core.Entity.EntityLayoutEntity>(EntityCode.EntityLayout);
-            var fExp = new Model.Entity.FilterExpression(EntityCode.EntityLayout);
-            fExp.Add(new Model.Entity.FilterExpField("itemtype", FilterOperationType.Equal, refEntity.DefaultItemTypeId));
-            fExp.Add(new Model.Entity.FilterExpField("entityid", FilterOperationType.Equal, entityItemId));
-            fExp.Add(new Model.Entity.FilterExpField("viewtype", FilterOperationType.Equal, 0));
-            var lids = layoutEntity.ReadIds(_appContext, fExp);
+            //var refEntity = EntityMetaData.Get(entityItemId);
+            //var layoutEntity = EntityMetaData.GetAs<Core.Entity.EntityLayoutEntity>(EntityCode.EntityLayout);
+            //var fExp = new Model.Entity.FilterExpression(EntityCode.EntityLayout);
+            //fExp.Add(new Model.Entity.FilterExpField("itemtype", FilterOperationType.Equal, refEntity.DefaultItemTypeId));
+            //fExp.Add(new Model.Entity.FilterExpField("entityid", FilterOperationType.Equal, entityItemId));
+            //fExp.Add(new Model.Entity.FilterExpField("viewtype", FilterOperationType.Equal, 0));
+            //var lids = layoutEntity.ReadIds(_appContext, fExp);
 
-            if(lids.Count > 0)
-            {
-                var qs2 = new RequestQueryString() { EntityId = EntityCode.EntityLayout, ItemId = lids[0] };
-                View.Actions.Add("BTN_VIEW_Layout", new Model.Form.ActionInfo(AppLinkProvider.DETAIL_ENTITY_URL, qs2){ Title = "View Layout", LinkTarget="POPUP" });
-            }
-            else {
-                var qs2 = new RequestQueryString() { EntityId = EntityCode.EntityLayout, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
-                View.Actions.Add("BTN_NEW_Layout", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs2){ Title = "New Layout", LinkTarget="POPUP" });
-            }
+            //if(lids.Count > 0)
+            //{
+            //    var qs2 = new RequestQueryString() { EntityId = EntityCode.EntityLayout, ItemId = lids[0] };
+            //    View.Actions.Add("BTN_VIEW_Layout", new Model.Form.ActionInfo(AppLinkProvider.DETAIL_ENTITY_URL, qs2){ Title = "View Layout", LinkTarget="POPUP" });
+            //}
+            //else {
+            //    var qs2 = new RequestQueryString() { EntityId = EntityCode.EntityLayout, RelatedEntityId = EntityCode.EntityMaster, RelationField="entityid", RelatedObjectId = entityItemId };
+            //    View.Actions.Add("BTN_NEW_Layout", new Model.Form.ActionInfo(AppLinkProvider.NEW_ENTITY_URL, qs2){ Title = "New Layout", LinkTarget="POPUP" });
+            //}
 
         }
     }

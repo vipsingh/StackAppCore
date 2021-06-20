@@ -21,6 +21,7 @@ namespace StackErp.ViewModel.ViewContext
 
         public void CreateDataModel()
         {
+            if (EntityModel != null) return;
             //Add all data related info in this function
             
             if (IsNew)

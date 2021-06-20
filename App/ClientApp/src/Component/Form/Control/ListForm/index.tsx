@@ -5,7 +5,7 @@ import _ from "lodash";
 import { Button, Table, Space } from "antd";
 import update from "immutability-helper";
 //import { getFormDataToSubmit } from "../../../../Core/Form/Utils/FormUtils";
-import { getComponent } from "../../../WidgetFactory";
+import { getComponent } from "../../../../Core/ComponentFactory";
 import { EditFilled, SaveFilled, DeleteFilled } from '@ant-design/icons';
 
 export interface ListFormProps extends WidgetInfoProps {

@@ -2,7 +2,7 @@ import React from "react";
 import update from "immutability-helper";
 import _ from "lodash";
 import { notification } from 'antd';
-import { getComponent } from "../WidgetFactory";
+import { getComponent } from "../../Core/ComponentFactory";
 import FormField from "./FormField";
 import HiddenField from "./Control/HiddenField";
 import formFeatures from "../../Core/Form/Features";

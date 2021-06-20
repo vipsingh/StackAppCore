@@ -1,9 +1,12 @@
 import StatusCode from "../../Constant/StatusCodes";
 
-function handeleResponse(result: RequestResultInfo, navigator: any) {
+function handeleResponse(result: RequestResultInfo, navigator: any, handler: any = {}) {
     const { Status, RedirectUrl, Message } = result;
 
     if (Status === StatusCode.Success) {
+        if (handler.onSuccessOverride) {
+            return handler.onSuccess(result);
+        }
         window._App.Notify.success("Data Saved");
         if (navigator.opener) {
             navigator.close();

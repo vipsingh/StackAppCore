@@ -13,6 +13,7 @@ declare var _AppSetting: {
     BaseUrl: string,
     ApiUrl: string,
     AssetUrl: string,
+    AppRoot: string,
     BaseCurrency: number,
     BaseCurrencySymbol: string,
     DecimalPlaces: number
@@ -20,6 +21,7 @@ declare var _AppSetting: {
 declare var _PAGE_DATA_: any;
 declare var _Debug: { error: Function, log: Function };
 declare var __L: (key: string, def?: string) => string
+declare var _isEntityStudioApp: bool;
 
 interface IDictionary<T> {
     [index: string]: T;
@@ -113,7 +115,9 @@ interface ListingProps extends WidgetInfoProps {
     api?: FormApi,
     SelectionConfig?: any,
     FilterBox?: any,
-    IsLocalStore?: boolean
+    IsLocalStore?: boolean,
+    formatCell?: Function,
+    renderAction?: Function
 }
 
 interface ActionInfo {

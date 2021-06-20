@@ -10,13 +10,21 @@ namespace StackErp.DB
 {
     public static partial class EntityDBService
     {
-        public static List<DbObject> GetEntities()
+        public static List<DbObject> GetEntities(int id = 0)
         {
+            if (id > 0)
+            {
+                return DBService.Query("select * from t_entitymaster where id=@id", new { id }).ToList();
+            }
             var entities = DBService.Query("select * from t_entitymaster");
             return entities.ToList();
         }
-        public static IEnumerable<DbObject> GetEntitySchemas()
+        public static IEnumerable<DbObject> GetEntitySchemas(int entityid = 0)
         {
+            if (entityid > 0)
+            {
+                return DBService.Query("select * from t_entityschema where entityid=@id", new { id = entityid }).ToList();
+            }
             var entitiesSchemas = DBService.Query("select * from t_entityschema order by id");
             return entitiesSchemas;
         }

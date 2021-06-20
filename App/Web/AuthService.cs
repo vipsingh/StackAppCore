@@ -65,7 +65,7 @@ namespace StackErp.Web
         {
             var sessionHelper = new SessionHelper(context);
             var stackAppContext = new WebAppContext(sessionHelper);
-            stackAppContext.Init(appSettings); 
+            stackAppContext.Init(appSettings);
             var str = context.Session.GetString("USER_CONTEXT");
 
             if (!string.IsNullOrEmpty(str)){

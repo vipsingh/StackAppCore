@@ -235,6 +235,10 @@ create table t_entitystatus_master
 
 insert into autoid values(1, 10000);
 insert into autoid values(2, 1000000);
+insert into autoid values(3, 10000);
+insert into autoid values(4, 100000);
+insert into autoid values(5, 100000);
+insert into autoid values(6, 100000);
 
 insert into t_app_modules values(1, 'Other', 'Others');
 insert into t_app_modules values(2, 'Core', 'Core');

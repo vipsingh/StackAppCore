@@ -124,11 +124,16 @@ namespace StackErp.App
             app.UseEndpoints(endpoints =>
             {  
                 endpoints.MapControllers();
-                              
+
                 // endpoints.MapControllerRoute(
                 //     name: "web",
                 //     pattern: "web/{c?}/{a?}",
                 //     defaults: new { controller = "App", action = "Index" });
+
+                endpoints.MapControllerRoute(
+                    name: "studio",
+                    pattern: "entitystudio/{a}/{id?}",
+                    defaults: new { controller = "EntityStudio", action = "Index" });
 
                 endpoints.MapControllerRoute(
                     name: "default",

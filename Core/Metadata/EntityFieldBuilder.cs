@@ -32,7 +32,8 @@ namespace StackErp.Core
             field.ViewOrder = sch.Get("vieworder", 10000);
 
             field.IsRequired = sch.Get("isrequired", false);
-            
+            field.IsReadOnly = sch.Get("isreadonly", false);
+
             var computeexpression = sch.Get("computeexpression", "");
             if (!string.IsNullOrEmpty(computeexpression))
             {

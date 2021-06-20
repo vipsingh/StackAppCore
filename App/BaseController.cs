@@ -33,6 +33,8 @@ namespace StackErp.UI.Controllers
 
         public override void OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context)
         {
+            RequestQuery = GetQuery();
+
             if (HttpContext.Session.Keys.Count() == 0)
             {
                 if (HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated)
@@ -43,11 +45,12 @@ namespace StackErp.UI.Controllers
                         (new Web.AuthService()).PrepareUserSession(int.Parse(cl.First().Value), HttpContext);
 
                         if (HttpContext.Session.IsAvailable)
+                        {
                             WebAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
-
-                        RequestQuery = GetQuery(); 
+                            WebAppContext.AppRoot = Url.Content("~/");
+                            WebAppContext.RequestQuery = RequestQuery;
+                        }
                         
-                        WebAppContext.RequestQuery = RequestQuery;
                     }
                     else 
                     {
@@ -64,10 +67,12 @@ namespace StackErp.UI.Controllers
             else 
             {
                 if (HttpContext.Session.IsAvailable)
+                {
                     WebAppContext = (new Web.AuthService()).GetAppContext(_appSetting, HttpContext);
+                    WebAppContext.AppRoot = Url.Content("~/");
+                    WebAppContext.RequestQuery = RequestQuery;
+                }
 
-                RequestQuery = GetQuery(); 
-                    
                 WebAppContext.RequestQuery = RequestQuery;
             }
         }
@@ -118,6 +123,7 @@ namespace StackErp.UI.Controllers
             ViewBag.OrignalUrl = Request.Path.Value + (this.Request.QueryString != null ? this.Request.QueryString.ToString(): "");
             ViewBag.PageData = json;
             ViewBag.Host = Request.Scheme + "://" + Request.Host.ToUriComponent();
+            ViewBag.AppRoot = Url.Content("~/");
 
             return View("_App", m);
         }  

@@ -49,7 +49,8 @@ namespace StackErp.Model
         public const int EntityLayout = 4;
         public const int EntityList = 5;
         public const int EntityAction = 6;
-        
+        public const int Collection = 11;
+
         public const int User = 101;
         public const int UserRole = 102;  
 

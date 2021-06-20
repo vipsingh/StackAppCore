@@ -1,14 +1,15 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
+import PageFactory from "../Core/PageFactory";
 import PageDesigner, {PageX} from "../StudioApp/Pages/Studio/PageDesigner";
-import { RouteComponent } from "../Component/PageComponent";
+import PageContext, { createPageContext } from "../Core/PageContext";
+import { closeAll } from "../Component/UI/Dialog";
 
 function AppRoutes() {
   return (
     <Switch>
       <Route exact path="/PageDesigner" component={PageDesigner} />
-      <Route exact path="/PageX" component={PageX} />
-      <Route path="/:controller/:action/:param?" component={RouteComponent} />      
+      <Route exact path="/PageX" component={PageX} />  
       <Route component={NotFound} />
     </Switch>
   );

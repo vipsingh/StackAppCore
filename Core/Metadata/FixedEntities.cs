@@ -36,7 +36,8 @@ namespace StackErp.Core.Metadata
                     ""fieldtype"": 1,
                     ""fieldname"": ""tablename"",
                     ""isrequired"": true,
-                    ""dbname"": ""tablename""
+                    ""dbname"": ""tablename"",
+                    ""viewtype"": -1
                 }
             ");
             
@@ -48,7 +49,9 @@ namespace StackErp.Core.Metadata
                     ""fieldtype"": 1,
                     ""fieldname"": ""primaryfield"",
                     ""isrequired"": true,
-                    ""dbname"": ""primaryfield""
+                    ""dbname"": ""primaryfield"",
+                    ""isreadonly"": true,
+                    ""defaultvalue"": ""id""
                 }
             ");
             
@@ -70,7 +73,11 @@ namespace StackErp.Core.Metadata
 
             dbo = DbObject.FromJSON(@"{""fieldtype"": 2,""fieldname"": ""parententity"",""isrequired"": false,""dbname"": ""namefield""}");
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
-            fs.Add("PARENTENTITY", f); 
+            fs.Add("PARENTENTITY", f);
+
+            dbo = DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""features"",""isrequired"": false,""dbname"": ""features""}");
+            f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
+            fs.Add("FEATURES", f);
 
             dbo = DbObject.FromJSON(@"{""fieldtype"": 20,""fieldname"": ""fields"",""isrequired"": false,""linkentity"": 2,""linkentity_field"":""entityid""}");
             f = EntityMetaData.BuildField(entityName, entityName, dbo, null);
@@ -142,6 +149,7 @@ namespace StackErp.Core.Metadata
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 7,""fieldname"": ""ismultiselect"",""isrequired"": false,""dbname"": ""ismultiselect""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 7,""fieldname"": ""isrequired"",""isrequired"": false,""dbname"": ""isrequired""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""dbname"",""isrequired"": false,""dbname"": ""dbname""}"));
+            list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""tablename"",""isrequired"": false,""dbname"": ""tablename""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""computeexpression"",""isrequired"": false,""dbname"": ""computeexpression""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 24,""fieldname"": ""uisetting"",""isrequired"": false,""dbname"": ""uisetting""}"));
             list.Add(DbObject.FromJSON(@"{""fieldtype"": 1,""fieldname"": ""defaultvalue"",""isrequired"": false,""dbname"": ""defaultvalue""}"));

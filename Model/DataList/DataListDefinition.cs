@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using StackErp.Model.Entity;
+using StackErp.Model.Form;
 using StackErp.Model.Layout;
 
 namespace StackErp.Model.DataList
@@ -20,6 +21,7 @@ namespace StackErp.Model.DataList
         public List<string> AdditionalFields {set;get;}
         public FilterExpression FixedFilter {set;get;}
         public FilterExpression FilterPolicy {set;get;}
+        public LinkUrlDefn ItemViewLink { set; get; }
 
     }
 

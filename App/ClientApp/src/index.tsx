@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { RegisterAllComponents } from "./Component/WidgetFactory";
 import registerPages from "./App/Page";
 import MyApp from './App/MyApp';
+import StudioApp from './StudioApp';
 import Notify from "./Core/Utils/Notify";
 import Request from "./Core/Utils/Request";
 import DebugTrace from "./Core/Utils/DebugTrace";
@@ -32,18 +34,30 @@ if (!window._AppSetting) {
     Language: "en-us",
     DateFormat: "DD-MM-YYYY",
     BaseUrl: "/",
-    ApiUrl: "@ViewBag.Host",
-    AssetUrl: "@ViewBag.Host",
+      ApiUrl: "/",
+      AssetUrl: "/",
+      AppRoot: "/",
     BaseCurrency: 1,
     BaseCurrencySymbol: "$",
-    DecimalPlaces: 2
+    DecimalPlaces: 3
   };
 }
 //
 
+RegisterAllComponents();
 registerPages();
 
-ReactDOM.render(<MyApp />, document.getElementById('app'));
+const StartApp = () => {
+
+    if (window._isEntityStudioApp) {
+        return <StudioApp />;
+    } else {
+        return <MyApp />;
+    } 
+};
+
+ReactDOM.render(<StartApp />, document.getElementById('app'));
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

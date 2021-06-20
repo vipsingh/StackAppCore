@@ -9,7 +9,7 @@ import Backend from 'react-dnd-html5-backend'
 import _ from 'lodash';
 import { DesignerContext } from '../../../../Core/Studio';
 import { SettingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { getComponent } from '../../../../Component/WidgetFactory';
+import { getComponent } from '../../../../Core/ComponentFactory';
 import DesignerFieldProp from "./DesignerFieldProp";
 import { openDialog } from "../../../../Component/UI/Dialog";
 import ActionLink from '../../../../Component/ActionLink';

@@ -4,7 +4,8 @@ import PageView from "../../../Component/Form/PageView";
 
 
 export default class NewEdit extends React.Component <{
-    data: any
+    data: any,
+    overrideProps?: any
     }, {
         IsLoading: boolean,
         Schema: any,
@@ -41,6 +42,7 @@ export default class NewEdit extends React.Component <{
             <EntityForm
                 Schema={this.state.Schema}
                 FormData={this.state.FormData}
+                overrideProps={this.props.overrideProps}
                 render={
                     (prop: any) => {
                         return (

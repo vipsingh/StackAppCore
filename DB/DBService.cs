@@ -113,23 +113,54 @@ namespace StackErp.DB
             }
         }
 
-        public static int Execute(string query, object param, IDbTransaction trans = null)
+        public static int Execute(string query, object param, IDbConnection cons = null, IDbTransaction trans = null)
         {
-            using (IDbConnection dbConnection = Connection)
+            if (cons != null)
             {
-                var affectedRows = dbConnection.Execute(query, param);
+                return cons.Execute(query, param, trans);
+            }
+            else
+            {
+                using (IDbConnection dbConnection = Connection)
+                {
+                    var affectedRows = dbConnection.Execute(query, param);
 
-                return affectedRows;
+                    return affectedRows;
+                }
             }
         }
 
-        public static int ExecuteDMLQuery(string query, object param, IDbTransaction trans = null)
+        public static int ExecuteDMLQuery(string query, object param, IDbConnection cons = null, IDbTransaction trans = null)
         {
-            using (IDbConnection dbConnection = Connection)
+            if (cons != null)
             {
-                var affectedRows = dbConnection.Execute(query, param);
+                return cons.Execute(query, param, trans);
+            }
+            else
+            {
+                using (IDbConnection dbConnection = Connection)
+                {
+                    var affectedRows = dbConnection.Execute(query, param);
 
-                return affectedRows;
+                    return affectedRows;
+                }
+            }
+        }
+
+        public static int ExecuteDDLQuery(string query, object param, IDbConnection cons = null, IDbTransaction trans = null)
+        {
+            if (cons != null)
+            {
+                return cons.Execute(query, param, trans);
+            } 
+            else
+            {
+                using (IDbConnection dbConnection = Connection)
+                {
+                    var affectedRows = dbConnection.Execute(query, param);
+
+                    return affectedRows;
+                }
             }
         }
 

@@ -2,12 +2,13 @@ import React from "react";
 import { Table, Dropdown, Menu } from 'antd';
 import _, { Dictionary } from "lodash";
 import ListingWrapper from "./ListingWrapper";
-import { cellRenderer } from "./Helper";
 import { DashOutlined } from '@ant-design/icons';
 import ActionLink from "../ActionLink";
 
 class GridView extends React.Component<{
-    listData: any, 
+    listData: any,
+    formatCell: Function,
+    renderAction: Function,
     pager?: any,
     rowSelection?: any
 }, {
@@ -23,10 +24,6 @@ class GridView extends React.Component<{
         };
     }
 
-    formatCell(col: any, val: any, row: any) {        
-        return cellRenderer(col, val);
-    }
-
     prepareAntTableSchema(columns: Dictionary<any>) {
         const cols =  _.reduce(Object.keys(columns), (result: Array<any>, value: any) => {
             const c =  columns[value];
@@ -36,7 +33,7 @@ class GridView extends React.Component<{
                 title: c.Caption,
                 dataIndex: c.WidgetId, 
                 key: c.WidgetId,
-                render: this.formatCell.bind(this, c)
+                render: this.props.formatCell.bind(this, c)
             });
 
             return result;
@@ -52,8 +49,8 @@ class GridView extends React.Component<{
                 var menu = (
                     <Menu>
                         {_.map(col, (a) => {
-                            return (<Menu.Item>
-                                <ActionLink {...a} Target="POPUP" />
+                            return (<Menu.Item key={a.ActionId}>
+                                {this.props.renderAction(a)}
                             </Menu.Item>)
                         })}
                     </Menu>

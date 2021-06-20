@@ -65,20 +65,21 @@ namespace StackErp.Core.Entity
             {
                 if (model.IsNew)
                 {
-                    CreateTableColumn(model, transaction);
+                    CreateTableColumn(model, connection, transaction);
                 }
             }
             return sts;
         }
 
-        private void CreateTableColumn(EntityModelBase model, IDbTransaction transaction)
+        private void CreateTableColumn(EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
         {
 			var fieldName = model.GetValue("dbname", "");
-			var type = model.GetValue("fieldtype", 0);
+			//var type = model.GetValue("fieldtype", 0);
 			var baseType = model.GetTempInfo("basetypecode", 0);
 			var table = model.GetValue("tablename", "");
+			var length = model.GetValue("length", 0);
 
-			EntityBuilder.CreateEntityColumn(transaction, table, fieldName, (TypeCode)baseType, 0);
+			EntityBuilder.CreateEntityColumn(connection, transaction, table, fieldName, (TypeCode)baseType, length);
         }
 
 		protected override bool Validate(EntityModelBase model)
@@ -139,6 +140,8 @@ namespace StackErp.Core.Entity
 			});
 
 			view1.Pages.Add(new TPage() {
+				Id = "page_1",
+				Text = "General",
 				Groups = new List<TGroup>() {
 					new TGroup() {
 						Rows =  new List<TRow>() {
@@ -149,7 +152,7 @@ namespace StackErp.Core.Entity
 								Cols = new List<TCol>() { new TCol("defaultvalue"), new TCol("ismultiselect") }
 							},
 							new TRow() {
-								Cols = new List<TCol>() { new TCol("computeexpression"), new TCol("uisetting") }
+								Cols = new List<TCol>() { new TCol("computeexpression") }
 							}
 						}
 					},
@@ -171,14 +174,30 @@ namespace StackErp.Core.Entity
 				}
 			});
 
-            return view1;
+			view1.Pages.Add(new TPage()
+			{
+				Id = "page_2",
+				Text = "UI Setting",
+				Groups = new List<TGroup>() {
+					new TGroup() {
+						Rows =  new List<TRow>() {
+							new TRow() {
+								Cols = new List<TCol>() { new TCol("uisetting") { Span = 2 } }
+							},
+						}
+					}
+				}
+			});
+
+
+			return view1;
         }        
     
 		public override Model.DataList.EntityListDefinition CreateDefaultListDefn(StackAppContext appContext)
         {
             var defn = PrepareEntityListDefin();
             
-            var layoutF = new List<string>() { "fieldname", "entityid", "fieldtype", "linkentity", "collectionid" };
+            var layoutF = new List<string>() { "fieldname", "fieldtype", "label", "linkentity", "collectionid", "computeexpression" };
             var tlist = new TList();
             foreach (var f in layoutF)
             {

@@ -118,10 +118,12 @@
         function login() {
             var returnUrl = "@Html.Raw(ViewBag.ReturnUrl)";
             var loginId = document.getElementById("login_username").value;
+            var appRoot = "@ViewBag.AppRoot";
             var pwd = document.getElementById("login_password").value;
-            window._App.Request.getData({ type: "POST", body: {Username: loginId, Password: ""}, url: "/auth/Authenticate" }).then(function(res) {
+            window._App.Request.getData({ type: "POST", body: { Username: loginId, Password: "" }, url: appRoot + "auth/Authenticate" }).then(function (res) {
+                debugger;
                 if (res.token) {
-                    location.href = returnUrl ? returnUrl : "/entity/desk/customer";
+                    location.href = appRoot + (returnUrl ? returnUrl : "entity/desk/customer");
                 } else {
                     alert("invalid token");
                 }

@@ -38,6 +38,8 @@ namespace StackErp.Core
                         ((EntityRecordModel)model).ResolveComputedFields();
                     }
                     status = EntityDBService.SaveEntity(appContext, this, model, connection, transaction);
+                    if (status == AnyStatus.Success)
+                        status = OnSaveComplete(appContext, model);
                 }
                 else 
                 {
@@ -101,6 +103,10 @@ namespace StackErp.Core
             return sts;
         }
 
+        public virtual AnyStatus OnSaveComplete(StackAppContext appContext, EntityModelBase model)
+        {
+            return AnyStatus.Success;
+        }
         protected virtual bool Validate(EntityModelBase model)
         {
             //check concurrency based on LastModifiedOn

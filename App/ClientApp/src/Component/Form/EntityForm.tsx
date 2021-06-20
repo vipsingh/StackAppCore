@@ -9,6 +9,7 @@ import LinkProcesser from "../../Core/Utils/LinkProcesser";
 export interface EntityFormProps {
     Schema: any,
     FormData?: any,
+    overrideProps?: any,
     render: Function,
     entityModel?: ViewPageInfo
 }
@@ -70,8 +71,17 @@ export default class EntityForm extends React.Component<EntityFormProps, {
         });
     }
 
+    performAnyFormTask = () => {
+
+    }
+
     handeleSubmitResponse(result: RequestResultInfo) {
-        LinkProcesser.handeleResponse(result, this.context.navigator);
+        const { overrideProps } = this.props;
+        if (overrideProps && overrideProps.handeleSubmitResponse) {
+            overrideProps.handeleSubmitResponse(result, this.context.navigator, this.performAnyFormTask);
+        } else {
+            LinkProcesser.handeleResponse(result, this.context.navigator);
+        }
     }
 
     updateForm = (model: IDictionary<IFieldData>, updateBy: { updateBy: string, param?: string }, afterChange: () => void = () => {}) => {

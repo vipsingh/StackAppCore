@@ -62,3 +62,16 @@ export default class FormField extends React.Component<{widgetInfo: WidgetInfoPr
         );
     }    
 }
+
+export function FormFieldComponent({ formItemLayout, label, hasError, validResult, children }: any) {
+    
+  return (<FormItem
+  {...formItemLayout}        
+  label={label}        
+  >
+    <div className={cs("form-field-control", {"ant-form-item-has-error": hasError})}>
+      {children}
+      { !hasError || <div className="ant-form-item-explain"><div>{validResult.Message}</div></div>}
+    </div>
+</FormItem>);
+}

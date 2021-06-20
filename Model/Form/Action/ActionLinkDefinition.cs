@@ -21,4 +21,15 @@ namespace StackErp.Model.Form
         public List<EvalParam> DataParam { set; get; }
         public string ConfirmMessage { set; get; }
     }
+
+    public class LinkUrlDefn
+    {
+        public LinkUrlDefn(string url, List<EvalParam> queryParam = null)
+        {
+            this.Url = url;
+            this.QueryParam = queryParam;
+        }
+        public string Url { set; get; }
+        public List<EvalParam> QueryParam { set; get; }
+    }
 }

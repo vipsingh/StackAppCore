@@ -29,27 +29,44 @@ namespace StackErp.Core.Entity
 
         public override AnyStatus Save(StackAppContext appContext, EntityModelBase model)
         {
+
             return base.Save(appContext, model);
         }
 
         public override AnyStatus OnAfterDbSave(StackAppContext appContext, EntityModelBase model, IDbConnection connection, IDbTransaction transaction)
         {
             AnyStatus sts = base.OnAfterDbSave(appContext, model, connection, transaction);
+            int defaultItemType = 0;
             if (sts == AnyStatus.Success)
             {
                 if (model.IsNew)
                 {
-                    
+                    EntityBuilder.CreateEntityTable(model, connection, transaction, out defaultItemType);
                 }
+                
             }
             return sts;
+        }
+
+        public override AnyStatus OnSaveComplete(StackAppContext appContext, EntityModelBase model)
+        {
+            EntityMetaData.Build();
+
+            return base.OnSaveComplete(appContext, model);
+        }
+
+        protected override bool Validate(EntityModelBase model)
+        {
+            var isvalid = base.Validate(model);
+
+            return isvalid;
         }
 
         public override Model.DataList.EntityListDefinition CreateDefaultListDefn(StackAppContext appContext)
         {
             var defn = PrepareEntityListDefin();
             
-            var layoutF = new List<string>() { "name", "text", "tablename", "primaryfield", "namefield" };
+            var layoutF = new List<string>() { "name", "text", "tablename", "namefield" };
             var tlist = new TList();
             foreach (var f in layoutF)
             {

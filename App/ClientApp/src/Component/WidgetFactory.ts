@@ -1,5 +1,8 @@
 import React from "react";
+import { registerComponent, registerBasicComponent } from "../Core/ComponentFactory";
 import { getAsyncComponent } from "./Helper/asyncImport";
+
+import { FormFieldComponent } from "./Form/FormField";
 
 import * as CTRL from "./Form/Control/input";
 import * as HField from "./Form/Control/HiddenField";
@@ -16,84 +19,27 @@ import JsonEditor from "./Form/Control/ContentEditor/JsonEditor";
 import StackScriptEditor from "./Form/Control/ContentEditor/StackScriptEditor";
 
 
-export function getComponent(controlType: number, isViewMode?: boolean) {
-    let editComponent = null;
-    let viewComponent: any = LabelField;
-    switch(controlType) {
-        case FormControlType.TextBox:
-            editComponent = CTRL.TextBox;
-            break;
-        case FormControlType.DatePicker:
-            editComponent = CTRL.DateBox;
-            break;
-        case FormControlType.DecimalBox:
-            editComponent = CTRL.DecimalBox;
-            break;
-        case FormControlType.CheckBox:
-            editComponent = viewComponent = CTRL.CheckBox;
-            break;
-        case FormControlType.NumberBox:
-            editComponent = CTRL.NumberBox;
-            break;
-        case FormControlType.Dropdown:
-            editComponent = CTRL.SelectBox;
-            break;
-        case FormControlType.EntityPicker:
-            editComponent = CTRL.EntityPicker;
-            break;
-        case FormControlType.LongText:
-            editComponent = CTRL.TextArea;
-            break;
-        case FormControlType.Label:
-            editComponent = LabelField;
-            break;
-        case FormControlType.Image:
-            editComponent = viewComponent =  CTRL.ImageField;
-            break;
-        case FormControlType.HtmlText:
-            editComponent = viewComponent = HtmlTextBox;
-            break;
-        case FormControlType.XmlEditor:
-            editComponent = viewComponent = XmlEditor;
-            break;
-        case FormControlType.JsonEditor:
-            editComponent = viewComponent = JsonEditor;
-            break;
-        case FormControlType.StackScriptEditor:
-            editComponent = viewComponent = StackScriptEditor;
-            break;
-        default:
-            const w = widgets[controlType];
-            if (w) {
-                editComponent = w.edit;
-                viewComponent = w.view;
-            }
-            break;
-    }
-    if(isViewMode) {
-        return viewComponent;
-    }
-    return editComponent;
+const HiddenField = HField.default;
+const BlockElement = (props: any) => { return React.createElement("div", props) }
+
+export function RegisterAllComponents() {
+    registerBasicComponent(BlockElement, LabelField, HiddenField, FormFieldComponent);
+
+    registerComponent(FormControlType.TextBox, CTRL.TextBox);
+    registerComponent(FormControlType.DatePicker, CTRL.DateBox);
+    registerComponent(FormControlType.DecimalBox, CTRL.DecimalBox);
+    registerComponent(FormControlType.CheckBox, CTRL.CheckBox, CTRL.CheckBox);
+    registerComponent(FormControlType.NumberBox, CTRL.NumberBox);
+    registerComponent(FormControlType.Dropdown, CTRL.SelectBox);
+    registerComponent(FormControlType.EntityPicker, CTRL.EntityPicker);
+    registerComponent(FormControlType.LongText, CTRL.TextArea);
+    registerComponent(FormControlType.Image, CTRL.ImageField);
+    registerComponent(FormControlType.HtmlText, HtmlTextBox);
+    registerComponent(FormControlType.XmlEditor, XmlEditor);
+    registerComponent(FormControlType.JsonEditor, JsonEditor);
+    registerComponent(FormControlType.StackScriptEditor, StackScriptEditor);
+
+    registerComponent(99, ListForm);
+    registerComponent(100, ListView);
+    registerComponent(101, FilterBox);
 }
-
-export function getBasicValidation(controlInfo: any) {
-
-}
-
-export const HiddenField = HField.default;
-
-export const BlockElement = (props: any) => { return React.createElement("div", props) }
-
-const widgets: IDictionary<{edit: any, view: any}> = {};
-
-export function registerWidget(type: number, editComponent: any, viewComponent: any = null, config: any = null) {
-    widgets[type] = {
-        edit: editComponent,
-        view: viewComponent? viewComponent : editComponent
-    };
-}
-
-registerWidget(99, ListForm);
-
-registerWidget(100, ListView);
-registerWidget(101, FilterBox);
